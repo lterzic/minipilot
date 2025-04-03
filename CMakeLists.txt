@@ -53,3 +53,9 @@ target_link_libraries(minipilot PUBLIC
     emblib
     minipilot-proto
 )
+
+# Minipilot compile options
+target_compile_options(minipilot PUBLIC
+    -fno-rtti
+    -fno-exceptions
+)

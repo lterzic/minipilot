@@ -4,7 +4,7 @@
 #include "task_accelerometer.hpp"
 #include "task_gyroscope.hpp"
 #include "task_state_estimator.hpp"
-#include "emblib/driver/io/char_dev.hpp"
+#include "emblib/driver/char_dev.hpp"
 #include "emblib/rtos/task.hpp"
 #include "emblib/rtos/queue.hpp"
 #include "pb/telemetry.pb.h"

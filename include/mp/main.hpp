@@ -1,9 +1,9 @@
 #pragma once
 
 #include "vehicles/vehicle.hpp"
-#include "emblib/driver/io/char_dev.hpp"
-#include "emblib/driver/sensor/accelerometer.hpp"
-#include "emblib/driver/sensor/gyroscope.hpp"
+#include "emblib/driver/char_dev.hpp"
+#include "emblib/driver/accelerometer.hpp"
+#include "emblib/driver/gyroscope.hpp"
 
 namespace mp {
 

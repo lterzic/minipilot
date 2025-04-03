@@ -2,7 +2,7 @@
 
 #include "task_config.hpp"
 #include "task_three_axis_sensor.hpp"
-#include "emblib/driver/sensor/gyroscope.hpp"
+#include "emblib/driver/gyroscope.hpp"
 
 namespace mp {
 
