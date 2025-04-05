@@ -6,16 +6,21 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(minipilot VERSION 1.0)
 
-# EMBLIB configuration
+# emblib configuration
 add_library(emblib_config INTERFACE)
 target_include_directories(emblib_config INTERFACE
     "${PROJECT_SOURCE_DIR}/src"
 )
 
+# Set the protoc path for nanopb
+set(nanopb_PROTOC_PATH ${CMAKE_SOURCE_DIR}/lib/protoc)
+
+# Setup the python environment
+add_subdirectory("python")
+
 # Dependencies
-set(protobuf_BUILD_TESTS OFF)
 add_subdirectory("lib/emblib")
-add_subdirectory("lib/protobuf")
+add_subdirectory("lib/nanopb")
 
 # Generate protobuf cpp files from sources
 add_subdirectory("protobuf")

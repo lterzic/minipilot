@@ -1,40 +1,58 @@
 # Used to compile protobuf files on every build
 
-# Path to the build protobuf compiler
-set(PROTOC ${CMAKE_CURRENT_BINARY_DIR}/../lib/protobuf/protoc)
+# Path to protoc and nanopb generator
+set(PROTOC_DIR "${CMAKE_SOURCE_DIR}/lib")
+set(NANOPB_GEN "${CMAKE_SOURCE_DIR}/lib/nanopb/generator")
 
-set(PROTO_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(PROTO_CPP_OUT ${CMAKE_CURRENT_SOURCE_DIR}/out/cpp/pb)
-set(PROTO_PY_OUT ${CMAKE_CURRENT_SOURCE_DIR}/out/py)
+# Set paths
+set(PROTO_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(PROTO_GEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out/c/pb")
 
-make_directory(${PROTO_CPP_OUT})
-make_directory(${PROTO_PY_OUT})
+# Find all proto files recursively
+file(GLOB_RECURSE PROTO_FILES "${PROTO_SRC_DIR}/*.proto")
 
+# Create output directories
+file(MAKE_DIRECTORY ${PROTO_GEN_DIR})
 
-# Get all protobuf src files
-file(GLOB_RECURSE PROTO_SRCS ${PROTO_SRC_DIR}/*.proto)
-
-# List of all generated cpp files (1 for each proto source)
-set(PROTO_CC_SRCS "")
-foreach(_SRC_ABSPATH ${PROTO_SRCS})
-    # Replace the .proto extension in the filename with .pb.cc
-    file(RELATIVE_PATH _SRC_RELPATH ${PROTO_SRC_DIR} ${_SRC_ABSPATH})
-    string(REGEX REPLACE "[.]proto$" ".pb.cc" _CC_RELPATH ${_SRC_RELPATH})
-    set(_CC_ABSPATH ${PROTO_CPP_OUT}/${_CC_RELPATH})
-
-    # Generate output files from this proto source
+# Process each proto file
+foreach(PROTO_FILE ${PROTO_FILES})
+    # Get relative path to maintain directory structure
+    file(RELATIVE_PATH REL_PATH ${PROTO_SRC_DIR} ${PROTO_FILE})
+    get_filename_component(REL_DIR ${REL_PATH} DIRECTORY)
+    get_filename_component(FILE_NAME ${PROTO_FILE} NAME_WE)
+    
+    # Create output directory
+    set(OUTPUT_DIR "${PROTO_GEN_DIR}/${REL_DIR}")
+    file(MAKE_DIRECTORY ${OUTPUT_DIR})
+    
+    # Output files
+    set(C_OUTPUT "${OUTPUT_DIR}/${FILE_NAME}.pb.c")
+    set(H_OUTPUT "${OUTPUT_DIR}/${FILE_NAME}.pb.h")
+    
+    # Command to generate nanopb files
     add_custom_command(
-        OUTPUT ${_CC_ABSPATH}
-        DEPENDS ${_SRC}
-        COMMAND ${PROTOC} --cpp_out=lite:${PROTO_CPP_OUT} --python_out=${PROTO_PY_OUT} -I=${PROTO_SRC_DIR} ${_SRC_ABSPATH}
+        OUTPUT ${C_OUTPUT} ${H_OUTPUT}
+        COMMAND ${CMAKE_COMMAND} -E env 
+            "PATH=${PROTOC_DIR}:$PATH PYTHONPATH=${NANOPB_GEN}"
+            ${VENV_PYTHON} ${NANOPB_GEN}/nanopb_generator.py
+            -I ${PROTO_SRC_DIR}
+            -D ${PROTO_GEN_DIR}
+            -q
+            ${PROTO_FILE}
+        DEPENDS ${PROTO_FILE}
+        COMMENT "Generating nanopb files for ${REL_PATH}"
+        VERBATIM
     )
-    # Add this cpp files to the list to be used by the static library
-    list(APPEND PROTO_CC_SRCS ${_CC_ABSPATH})
+    
+    # Add to list of generated files (make accessible to parent scope)
+    set_property(GLOBAL APPEND PROPERTY GENERATED_FILES ${C_OUTPUT} ${H_OUTPUT})
 endforeach()
 
-# Static library with all the generated cpp files
-add_library(minipilot-proto STATIC ${PROTO_CC_SRCS})
-target_link_libraries(minipilot-proto PUBLIC libprotobuf-lite)
-target_include_directories(minipilot-proto PUBLIC ${PROTO_CPP_OUT}) # Needed since protobuf includes don't have relative paths
-target_include_directories(minipilot-proto PUBLIC ${PROTO_CPP_OUT}/..)
-add_dependencies(minipilot-proto protoc)
+# Get all generated files
+get_property(ALL_GENERATED_FILES GLOBAL PROPERTY GENERATED_FILES)
+
+# Create a library with all generated files
+add_library(minipilot-proto STATIC ${ALL_GENERATED_FILES})
+target_link_libraries(minipilot-proto PUBLIC protobuf-nanopb-static)
+target_include_directories(minipilot-proto PUBLIC ${PROTO_GEN_DIR})
+target_include_directories(minipilot-proto PUBLIC ${PROTO_GEN_DIR}/..)
