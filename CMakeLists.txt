@@ -13,7 +13,7 @@ target_include_directories(emblib_config INTERFACE
 )
 
 # Set the protoc path for nanopb
-set(nanopb_PROTOC_PATH ${CMAKE_SOURCE_DIR}/lib/protoc)
+set(nanopb_PROTOC_PATH ${PROJECT_SOURCE_DIR}/lib/protoc)
 
 # Setup the python environment
 add_subdirectory("python")

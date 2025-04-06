@@ -1,18 +1,15 @@
 # Used to compile protobuf files on every build
 
 # Path to protoc and nanopb generator
-set(PROTOC_DIR "${CMAKE_SOURCE_DIR}/lib")
-set(NANOPB_GEN "${CMAKE_SOURCE_DIR}/lib/nanopb/generator")
+set(PROTOC_DIR "${PROJECT_SOURCE_DIR}/lib")
+set(NANOPB_GEN "${PROJECT_SOURCE_DIR}/lib/nanopb/generator/nanopb_generator.py")
 
 # Set paths
 set(PROTO_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
-set(PROTO_GEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out/c/pb")
+set(PROTO_OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/out")
 
 # Find all proto files recursively
 file(GLOB_RECURSE PROTO_FILES "${PROTO_SRC_DIR}/*.proto")
-
-# Create output directories
-file(MAKE_DIRECTORY ${PROTO_GEN_DIR})
 
 # Process each proto file
 foreach(PROTO_FILE ${PROTO_FILES})
@@ -22,30 +19,37 @@ foreach(PROTO_FILE ${PROTO_FILES})
     get_filename_component(FILE_NAME ${PROTO_FILE} NAME_WE)
     
     # Create output directory
-    set(OUTPUT_DIR "${PROTO_GEN_DIR}/${REL_DIR}")
-    file(MAKE_DIRECTORY ${OUTPUT_DIR})
+    set(OUT_C_DIR ${PROTO_OUT_DIR}/c/pb/${REL_DIR})
+    set(OUT_PY_DIR ${PROTO_OUT_DIR}/py/${REL_DIR})
+    file(MAKE_DIRECTORY ${OUT_C_DIR})
+    file(MAKE_DIRECTORY ${OUT_PY_DIR})
     
     # Output files
-    set(C_OUTPUT "${OUTPUT_DIR}/${FILE_NAME}.pb.c")
-    set(H_OUTPUT "${OUTPUT_DIR}/${FILE_NAME}.pb.h")
+    set(C_OUTPUT "${OUT_C_DIR}/${FILE_NAME}.pb.c")
     
-    # Command to generate nanopb files
+    # Generate output files
     add_custom_command(
-        OUTPUT ${C_OUTPUT} ${H_OUTPUT}
+        OUTPUT ${C_OUTPUT}
+        # nanopb generation
         COMMAND ${CMAKE_COMMAND} -E env 
-            "PATH=${PROTOC_DIR}:$PATH PYTHONPATH=${NANOPB_GEN}"
-            ${VENV_PYTHON} ${NANOPB_GEN}/nanopb_generator.py
+            "PATH=${PROTOC_DIR}:$PATH"
+            ${VENV_PYTHON} ${NANOPB_GEN}
             -I ${PROTO_SRC_DIR}
-            -D ${PROTO_GEN_DIR}
+            -D ${PROTO_OUT_DIR}/c/pb
             -q
             ${PROTO_FILE}
+        # py generation
+        COMMAND ${PROTOC_DIR}/protoc
+            -I=${PROTO_SRC_DIR}
+            --python_out=${PROTO_OUT_DIR}/py
+            ${PROTO_FILE}
         DEPENDS ${PROTO_FILE}
-        COMMENT "Generating nanopb files for ${REL_PATH}"
+        # COMMENT "Generating nanopb files for ${REL_PATH}"
         VERBATIM
     )
     
     # Add to list of generated files (make accessible to parent scope)
-    set_property(GLOBAL APPEND PROPERTY GENERATED_FILES ${C_OUTPUT} ${H_OUTPUT})
+    set_property(GLOBAL APPEND PROPERTY GENERATED_FILES ${C_OUTPUT})
 endforeach()
 
 # Get all generated files
@@ -54,5 +58,5 @@ get_property(ALL_GENERATED_FILES GLOBAL PROPERTY GENERATED_FILES)
 # Create a library with all generated files
 add_library(minipilot-proto STATIC ${ALL_GENERATED_FILES})
 target_link_libraries(minipilot-proto PUBLIC protobuf-nanopb-static)
-target_include_directories(minipilot-proto PUBLIC ${PROTO_GEN_DIR})
-target_include_directories(minipilot-proto PUBLIC ${PROTO_GEN_DIR}/..)
+target_include_directories(minipilot-proto PUBLIC ${PROTO_OUT_DIR}/c/)
+target_include_directories(minipilot-proto PUBLIC ${PROTO_OUT_DIR}/c/pb)
