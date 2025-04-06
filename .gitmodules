@@ -3,4 +3,4 @@
 	url = https://github.com/protocolbuffers/protobuf
 [submodule "lib/emblib"]
 	path = lib/emblib
-	url = https://github.com/terzaterza/emblib
+	url = https://github.com/lterzic/emblib

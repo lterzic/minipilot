@@ -1,8 +1,8 @@
 # Minipilot
 
-Minipilot is a small flight controller that supports multiple vehicle models: quadcopters, hexacopter, fixed-wing v-tails, t-tails, etc. Code in this core repository is written with a custom driver library [emblib](https://github.com/terzaterza/emblib) which allows it to be platform independent. Minipilot is then compiled as a static libary that can be ported to a desired architecture by providing the entry point function with driver implementations for that specific platform.
+Minipilot is a small flight controller that supports multiple vehicle models: quadcopters, hexacopter, fixed-wing v-tails, t-tails, etc. Code in this core repository is written with a custom driver library [emblib](https://github.com/lterzic/emblib) which allows it to be platform independent. Minipilot is then compiled as a static libary that can be ported to a desired architecture by providing the entry point function with driver implementations for that specific platform.
 
-This provides a nice way to test the firmware within a simulator, by just providing drivers that talk to the simulator socket instead of the actual hardware. Unity based simulator with the Minipilot port which runs on POSIX systems can be found at [minipilot-sim](https://github.com/terzaterza/minipilot-sim).
+This provides a nice way to test the firmware within a simulator, by just providing drivers that talk to the simulator socket instead of the actual hardware. Unity based simulator with the Minipilot port which runs on POSIX systems can be found at [minipilot-sim](https://github.com/lterzic/minipilot-sim).
 
 ## Project structure
 Source files can be found in `src` and `include` folders, where files in the `src` folder are used only within the Minipilot itself (included as private in the CMake project), and the files in the `include` folder are meant to be used when porting this core library to a specific platform.
@@ -43,4 +43,4 @@ After adding the executable, you would link the minipilot library to that execut
 ```CMake
 target_link_libraries(<executable-name> PRIVATE/PUBLIC minipilot)
 ```
-For an example check [minipilot-sim](https://github.com/terzaterza/minipilot-sim).
+For an example check [minipilot-sim](https://github.com/lterzic/minipilot-sim).
