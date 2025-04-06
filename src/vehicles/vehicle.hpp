@@ -29,7 +29,7 @@ public:
     /**
      * @returns false if the command is not for this vehicle type
      */
-    virtual bool handle_command(const pb::Command& command) noexcept = 0;
+    virtual bool handle_command(const mp_pb_Command& command) noexcept = 0;
 
     /**
      * Get information about onboard sensors
