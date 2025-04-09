@@ -2,6 +2,7 @@
 
 #include "task_config.hpp"
 #include "pb/command.pb.h"
+#include "pb_decode.h"
 #include "emblib/driver/char_dev.hpp"
 #include "emblib/rtos/task.hpp"
 #include "emblib/rtos/queue.hpp"
@@ -16,19 +17,28 @@ public:
      * Returns true if a command was available and was successfully copied
      * into the provided buffer
      */
-    bool get_command(pb::Command* command_buffer) noexcept;
+    bool get_command(mp_pb_Command& command_buffer) noexcept;
 
 private:
+    /**
+     * Callback for receiving data as it is needed (we do not
+     * receive a full buffer of data ahead of starting the decoding)
+     * 
+     * This is called during the execution of nanopb's pb_decode function
+     */
+    static bool pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t count);
+
+    /**
+     * Implementation of the task
+     */
     void run() noexcept override;
 
 private:
     emblib::task_stack_t<TASK_RECEIVER_STACK_SIZE> m_task_stack;
+    emblib::queue<mp_pb_Command, TASK_RECEIVER_QUEUE_SIZE> m_command_queue;
     emblib::char_dev& m_receiver_device;
-    
-    emblib::queue<pb::Command*, TASK_RECEIVER_QUEUE_SIZE> m_command_queue;
-    char m_arena_buffer[TASK_RECEIVER_ARENA_SIZE];
-    char m_recv_buffer[COMMAND_MSG_MAX_SIZE];
-    google::protobuf::Arena m_arena;
+
+    pb_istream_t m_pb_istream;
 };
 
 }

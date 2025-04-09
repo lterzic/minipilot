@@ -39,7 +39,7 @@ public:
     /**
      * Handle copter commands
      */
-    bool handle_command(const pb::Command& command) noexcept override;
+    bool handle_command(const mp_pb_Command& command) noexcept override;
 
     /**
      * Returns the acceleration of the model in the global coordinate frame

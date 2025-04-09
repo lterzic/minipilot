@@ -8,9 +8,13 @@
 #include "emblib/rtos/task.hpp"
 #include "emblib/rtos/queue.hpp"
 #include "pb/telemetry.pb.h"
+#include "pb_encode.h"
 
 namespace mp {
 
+// Change to task_transmitter and add queue for output messages
+// Also pack each message into protobuf which describes the type
+// Example: LogMessage, TelemetryMessage, ...
 class task_telemetry : public emblib::task {
 
 public:
@@ -19,20 +23,12 @@ public:
         task_accelerometer& task_accelerometer,
         task_gyroscope& task_gyroscope,
         task_state_estimator& task_state_estimator
-    ) :
-        task("Task telemetry", TASK_TELEMETRY_PRIORITY, m_task_stack),
-        m_telemetry_device(telemetry_device),
-        m_task_accel(task_accelerometer),
-        m_task_gyro(task_gyroscope),
-        m_task_state(task_state_estimator),
-        m_arena(google::protobuf::ArenaOptions {
-            .max_block_size = TASK_TELEMETRY_ARENA_SIZE,
-            .initial_block = m_arena_buffer,
-            .initial_block_size = TASK_TELEMETRY_ARENA_SIZE
-        })
-    {}
+    );
 
 private:
+    /**
+     * Task implementation
+     */
     void run() noexcept override;
 
 private:
@@ -42,11 +38,6 @@ private:
     task_accelerometer& m_task_accel;
     task_gyroscope& m_task_gyro;
     task_state_estimator& m_task_state;
-
-    char m_arena_buffer[TASK_TELEMETRY_ARENA_SIZE];
-    char m_out_msg_buffer[TASK_TELEMETRY_ARENA_SIZE];
-    google::protobuf::Arena m_arena;
-
 };
 
 }

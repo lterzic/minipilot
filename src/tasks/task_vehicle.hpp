@@ -30,10 +30,6 @@ private:
 
     task_receiver& m_task_receiver;
     task_state_estimator& m_task_state_estimator;
-
-    // Command receive arena
-    google::protobuf::Arena m_arena;
-    char m_arena_buffer[COMMAND_MSG_MAX_SIZE];
 };
 
 }

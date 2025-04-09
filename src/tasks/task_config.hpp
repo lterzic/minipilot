@@ -16,14 +16,11 @@ enum task_priority_e : size_t {
 
 // Stack and buffer sizes are in bytes
 
-inline constexpr size_t             COMMAND_MSG_MAX_SIZE        = 64;
-
 inline constexpr size_t             TASK_LOGGER_QUEUE_SIZE      = 8;
 inline constexpr size_t             TASK_LOGGER_STACK_SIZE      = 1024;
 inline constexpr task_priority_e    TASK_LOGGER_PRIORITY        = TASK_PRIORITY_VERY_LOW;
 
 inline constexpr size_t             TASK_TELEMETRY_STACK_SIZE   = 1024;
-inline constexpr size_t             TASK_TELEMETRY_ARENA_SIZE   = 256;
 inline constexpr task_priority_e    TASK_TELEMETRY_PRIORITY     = TASK_PRIORITY_LOW;
 inline constexpr auto               TASK_TELEMETRY_PERIOD       = std::chrono::milliseconds(200); // 5Hz
 
@@ -39,7 +36,6 @@ inline constexpr auto               TASK_STATE_PERIOD           = std::chrono::m
 
 inline constexpr size_t             TASK_RECEIVER_STACK_SIZE    = 1024;
 inline constexpr size_t             TASK_RECEIVER_QUEUE_SIZE    = 4;
-inline constexpr size_t             TASK_RECEIVER_ARENA_SIZE    = TASK_RECEIVER_QUEUE_SIZE * COMMAND_MSG_MAX_SIZE;
 inline constexpr task_priority_e    TASK_RECEIVER_PRIORITY      = TASK_PRIORITY_HIGH;
 
 inline constexpr size_t             TASK_VEHICLE_STACK_SIZE     = 4096;

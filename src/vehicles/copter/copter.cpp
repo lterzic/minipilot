@@ -122,27 +122,27 @@ void copter::update(const state_s& state, float dt) noexcept
     actuate(m_controller.get_thrust(), m_controller.get_torque());
 }
 
-bool copter::handle_command(const pb::Command& command) noexcept
+bool copter::handle_command(const mp_pb_Command& command) noexcept
 {
-    if (!command.has_copter_command()) {
+    if (command.which_command_type != mp_pb_Command_copter_command_tag) {
         return false;
     }
 
     // Result of command execution
     bool command_status = false;
-    const pb::vehicles::CopterCommand& copter_command = command.copter_command();
+    const mp_pb_vehicles_CopterCommand& copter_command = command.command_type.copter_command;
     
-    switch (copter_command.command_type_case()) {
-    case pb::vehicles::CopterCommand::kSetAngularVelocity: {
-        const auto& w = copter_command.set_angular_velocity().angular_velocity();
-        const float thrust = copter_command.set_angular_velocity().thrust();
-        command_status = m_controller.set_target_w({w.x(), w.y(), w.z()}, thrust);
+    switch (copter_command.which_command_type) {
+    case mp_pb_vehicles_CopterCommand_set_angular_velocity_tag: {
+        const auto& w = copter_command.command_type.set_angular_velocity.angular_velocity;
+        const float thrust = copter_command.command_type.set_angular_velocity.thrust;
+        command_status = m_controller.set_target_w({w.x, w.y, w.z}, thrust);
         break;
     }
-    case pb::vehicles::CopterCommand::kSetLinearVelocity: {
-        const auto& v = copter_command.set_linear_velocity().velocity();
-        const float dir = copter_command.set_linear_velocity().direction();
-        command_status = m_controller.set_target_v({v.x(), v.y(), v.z()}, dir);
+    case mp_pb_vehicles_CopterCommand_set_linear_velocity_tag: {
+        const auto& v = copter_command.command_type.set_linear_velocity.velocity;
+        const float dir = copter_command.command_type.set_linear_velocity.direction;
+        command_status = m_controller.set_target_v({v.x, v.y, v.z}, dir);
         break;
     }
     default:

@@ -1,5 +1,6 @@
 #include "task_vehicle.hpp"
 #include "util/logger.hpp"
+#include "pb/command.pb.h"
 
 namespace mp {
 
@@ -14,12 +15,7 @@ task_vehicle::task_vehicle(
     task("Task vehicle", TASK_VEHICLE_PRIORITY, m_task_stack),
     m_vehicle(vehicle),
     m_task_receiver(task_receiver),
-    m_task_state_estimator(task_state_estimator),
-    m_arena(google::protobuf::ArenaOptions {
-        .max_block_size = COMMAND_MSG_MAX_SIZE,
-        .initial_block = m_arena_buffer,
-        .initial_block_size = COMMAND_MSG_MAX_SIZE
-    })
+    m_task_state_estimator(task_state_estimator)
 {}
 
 void task_vehicle::run() noexcept
@@ -32,23 +28,13 @@ void task_vehicle::run() noexcept
     }
 
     while (true) {
-        // Clear any leftover data
-        m_arena.Reset();
-
         // See if there are any commands available and execute them
         // before running the next iteration of the update loop
-        while (true) {
-            pb::Command* command = m_arena.Create<pb::Command>(&m_arena);
-            
-            // If no command was available, exit the loop
-            if (!m_task_receiver.get_command(command)) {
-                break;
-            }
-            
+        mp_pb_Command recv_command;
+        while (m_task_receiver.get_command(recv_command)) {            
             // TODO: If false is returned, this command was not for this
             // vehicle, try to handle it globally
-            m_vehicle.handle_command(*command);
-            m_arena.Destroy(command);
+            m_vehicle.handle_command(recv_command);
         }
         
         state_s state = m_task_state_estimator.get_state();

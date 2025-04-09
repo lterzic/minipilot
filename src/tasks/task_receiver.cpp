@@ -1,68 +1,114 @@
 #include "task_receiver.hpp"
 #include "util/logger.hpp"
+#include "pb_decode.h"
 
 namespace mp {
 
 task_receiver::task_receiver(emblib::char_dev& receiver_device) noexcept :
     task("Task Receiver", TASK_RECEIVER_PRIORITY, m_task_stack),
-    m_receiver_device(receiver_device),
-    m_arena(google::protobuf::ArenaOptions {
-        .max_block_size = TASK_RECEIVER_ARENA_SIZE,
-        .initial_block = m_arena_buffer,
-        .initial_block_size = TASK_RECEIVER_ARENA_SIZE
-    })
-{}
-
-bool task_receiver::get_command(pb::Command* command_buffer) noexcept
+    m_receiver_device(receiver_device)
 {
-    pb::Command* next_command = nullptr;
+    m_pb_istream.callback = &task_receiver::pb_istream_cb;
+    m_pb_istream.state = this;
+    m_pb_istream.bytes_left = SIZE_MAX;
+}
 
-    // If the queue is empty just return false
-    if (!m_command_queue.receive(next_command, emblib::ticks_t(0)))
+bool task_receiver::get_command(mp_pb_Command& command_buffer) noexcept
+{
+    // Try to read from queue with timeout 0
+    // If the queue is empty it will return false
+    return m_command_queue.receive(command_buffer, emblib::ticks_t(0));
+}
+
+bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t count)
+{
+    // If `buf` is NULL, then the next `count` bytes are not needed
+    // This is static since it doesn't have to be thread-safe as this
+    // data is never used, and the size is chosen to be not to small
+    // to increase overhead, and not too big to waste memory
+    static char discard_buffer[64];
+
+    // This callback is always called from the context of the task
+    task_receiver* this_task = (task_receiver*)stream->state;
+
+    // Callback used when task's receiver finishes
+    ssize_t recv_status = -1;
+    auto read_async_cb = [this_task, &recv_status](ssize_t status) {
+        recv_status = status;
+        this_task->notify_from_isr();
+    };
+
+    if (buf == NULL) {
+        while (count > 0) {
+            size_t to_recv = count > sizeof(discard_buffer) ? sizeof(discard_buffer) : count;
+            
+            // If failed starting the read op, exit
+            if (!this_task->m_receiver_device.read_async(discard_buffer, to_recv, read_async_cb))
+                return false;
+            // This is okay since we know we are in the context of this task
+            this_task->wait_notification();
+
+            if (recv_status <= 0)
+                return false;
+            else
+                count -= recv_status;
+        }
+        return true;
+    }
+
+    // Try to start an async read and wait for it to finish
+    if (!this_task->m_receiver_device.read_async((char*)buf, count, read_async_cb))
         return false;
 
-    // Copy the command to the provided buffer and free up space in this arena
-    *command_buffer = *next_command;
-    m_arena.Destroy(next_command);
-    return true;
+    this_task->wait_notification();
+    return recv_status == count;
 }
 
 void task_receiver::run() noexcept
 {
     assert(m_receiver_device.is_async_available());
 
-    ssize_t recv_status = 0;
     while (true) {
-        // Try to start an async read from the receiver device
-        // If the start was unsuccessful, go to sleep, else try to parse the data
-        if (m_receiver_device.read_async(m_recv_buffer, COMMAND_MSG_MAX_SIZE, [this, &recv_status](ssize_t status) {
-            recv_status = status;
-            notify_from_isr();
-        })) {
-            // If the read was started okay, we're waiting for the notify from the
-            // read callback to start the processing
-            wait_notification();
-            if (recv_status < 0)
-                continue;
+        mp_pb_Command recv_command = mp_pb_Command_init_zero;
 
-            pb::Command* command = m_arena.Create<pb::Command>(&m_arena);
-            if (command == nullptr) {
-                log_warning("Can't create the command in the arena!");
-                continue;
-            }
-
-            // Try to parse, if okay, put it into the queue
-            if (command->ParseFromArray(m_recv_buffer, recv_status)) {
-                log_debug("Command received and parsed!");
-                // Try to put the command into the queue if there is space
-                if (!m_command_queue.send(command, emblib::ticks_t(0)))
-                    log_warning("No space in command queue!");
-            }
+#if TASK_RECEIVER_STREAM_DATA
+        if (pb_decode(&m_pb_istream, mp_pb_Command_fields, &recv_command)) {
+            // Send to queue with infinite timeout
+            m_command_queue.send(recv_command);
         } else {
-            // Starting an async read was not successful, go to sleep for some time
+            log_error("Receiver decoding failed!");
+            // Decode process (probably reading) was not successful, go
+            // to sleep for some time
             sleep(std::chrono::milliseconds(100));
         }
+#else
+        char recv_buf[sizeof(mp_pb_Command)];
+
+        ssize_t recv_status = -1;
+        bool start_status = m_receiver_device.read_async(recv_buf, sizeof(recv_buf), [this, &recv_status](ssize_t status){
+            recv_status = status;
+            notify_from_isr();
+        });
+        
+        if (!start_status) {
+            log_warning("Receiver read start fail!");
+            // Sleep to give time to the receiver to unblock
+            sleep(std::chrono::milliseconds(100));
+            continue;
+        }
+
+        wait_notification();
+        if (recv_status <= 0) {
+            log_error("Receiver read error!");
+            continue;
+        }
+
+        pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, recv_status);
+        if (pb_decode(&buf_istream, mp_pb_Command_fields, &recv_command)) {
+            m_command_queue.send(recv_command);
+        }
     }
+#endif
 }
 
 }
