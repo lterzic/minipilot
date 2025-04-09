@@ -2,7 +2,7 @@
 
 #include "state_estimator.hpp"
 #include "vehicles/ekf_vehicle.hpp"
-#include "emblib/dsp/kalman.hpp"
+#include <emblib/dsp/kalman.hpp>
 
 namespace mp {
 

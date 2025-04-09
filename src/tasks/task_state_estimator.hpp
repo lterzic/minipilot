@@ -4,8 +4,8 @@
 #include "state/state_estimator.hpp"
 #include "tasks/task_accelerometer.hpp"
 #include "tasks/task_gyroscope.hpp"
-#include "emblib/rtos/mutex.hpp"
-#include "emblib/rtos/task.hpp"
+#include <emblib/rtos/mutex.hpp>
+#include <emblib/rtos/task.hpp>
 
 namespace mp {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mp/util/math.hpp"
+#include "util/math.hpp"
 
 namespace mp {
 

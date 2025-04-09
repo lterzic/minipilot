@@ -2,7 +2,7 @@
 
 #include "copter_controller.hpp"
 #include "vehicles/copter/copter.hpp"
-#include "emblib/dsp/pid.hpp"
+#include <emblib/dsp/pid.hpp>
 
 namespace mp {
 

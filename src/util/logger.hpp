@@ -1,6 +1,6 @@
 #pragma once
 
-#include "emblib/common/logger.hpp"
+#include <emblib/common/logger.hpp>
 
 #define MP_LOGGER_USE_PROTOBUF      0
 

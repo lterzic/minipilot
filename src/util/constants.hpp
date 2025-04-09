@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mp/util/math.hpp"
-#include "emblib/driver/accelerometer.hpp"
+#include "math.hpp"
+#include <emblib/driver/accelerometer.hpp>
 
 namespace mp {
 

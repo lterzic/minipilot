@@ -1,4 +1,4 @@
-#include "mp/main.hpp"
+#include "main.hpp"
 #include "tasks/task_logger.hpp"
 #include "tasks/task_telemetry.hpp"
 #include "tasks/task_accelerometer.hpp"

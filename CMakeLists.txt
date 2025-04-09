@@ -49,7 +49,7 @@ target_include_directories(minipilot PRIVATE
 )
 
 # Header files to be used by external porting projects
-target_include_directories(minipilot PUBLIC
+target_include_directories(minipilot INTERFACE
     "${PROJECT_SOURCE_DIR}/include"
 )
 

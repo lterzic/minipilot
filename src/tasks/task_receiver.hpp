@@ -2,10 +2,10 @@
 
 #include "task_config.hpp"
 #include "pb/command.pb.h"
-#include "pb_decode.h"
-#include "emblib/driver/char_dev.hpp"
-#include "emblib/rtos/task.hpp"
-#include "emblib/rtos/queue.hpp"
+#include <emblib/driver/char_dev.hpp>
+#include <emblib/rtos/task.hpp>
+#include <emblib/rtos/queue.hpp>
+#include <pb_decode.h>
 
 namespace mp {
 

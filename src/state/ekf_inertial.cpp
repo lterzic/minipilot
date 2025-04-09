@@ -1,5 +1,5 @@
 #include "ekf_inertial.hpp"
-#include "mp/util/constants.hpp"
+#include "util/constants.hpp"
 
 namespace mp {
 

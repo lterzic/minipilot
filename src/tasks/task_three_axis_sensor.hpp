@@ -1,11 +1,11 @@
 #pragma once
 
 #include "task_config.hpp"
-#include "mp/util/math.hpp"
 #include "util/logger.hpp"
-#include "emblib/driver/three_axis_sensor.hpp"
-#include "emblib/rtos/task.hpp"
-#include "emblib/rtos/mutex.hpp"
+#include "util/math.hpp"
+#include <emblib/driver/three_axis_sensor.hpp>
+#include <emblib/rtos/task.hpp>
+#include <emblib/rtos/mutex.hpp>
 
 namespace mp {
 

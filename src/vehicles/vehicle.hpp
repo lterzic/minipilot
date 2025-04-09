@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mp/util/math.hpp"
 #include "state/state_estimator.hpp"
+#include "util/math.hpp"
 #include "pb/command.pb.h"
 
 namespace mp {

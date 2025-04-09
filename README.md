@@ -9,11 +9,11 @@ Source files can be found in `src` and `include` folders, where files in the `sr
 
 Dependencies are located in the `lib` folder, usually as a git submodule, but they can be replaced with symlinks during local development.
 
-Protobuf source files are located in `protobuf` and are compiled during build (or manually) to `protobuf/out`. C++ protobuf output is then built as a static library which is linked to minipilot.
+Protobuf source files are located in `protobuf` and are compiled during build (or manually) to `protobuf/out`. C/C++ protobuf output is then built as a static library which is linked to minipilot.
 
 Documents describing the system as a whole, but also smaller parts in more detail can be found in `docs`. [Overview](docs/Overview.md) document should be used as a starting point for understanding the architecture of the software.
 
-Python notebooks which are used for formula derivations or signal analysis are found in the `python` folder. This folder has a [requirements.txt](python/requirements.txt) which can be used to install (`pip install -r requirements.txt`) all needed pip dependencies for running the scripts/notebooks.
+Python environment that should be used for all python scripts in this project is created in the `python/venv` folder during CMake configuration. This folder has a [packages.txt](python/packages.txt) which is used to install all needed pip dependencies for running the scripts/notebooks.
 
 ## Build
 This project is configured with a (currently) simple [CMake file](CMakeLists.txt).
@@ -33,7 +33,7 @@ cmake --build build
 If the build is successful, should have a `build/libminipilot.a` static library.
 
 ## Porting Minipilot
-Minipilot is compiled as a CMake static libary, meaning it does not run on its own. Entry point of the library is the function `mp::main` declared in [main.hpp](include/mp/main.hpp). It takes in a struct of device drivers for all devices that the library might use, as well as the vehicle model and the state estimator which are to be used.
+Minipilot is compiled as a CMake static libary, meaning it does not run on its own. Entry point of the library is the function `mp::main` declared in [main.hpp](src/main.hpp) and included through [mp.hpp](include/mp/mp.hpp). It takes in a struct of device drivers for all devices that the library might use, as well as the vehicle model and the state estimator which are to be used.
 
 To use Minipilot on a specific platform, you would create a standard CMake project with an executable and add this project as a subdirectory:
 ```CMake
