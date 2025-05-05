@@ -6,25 +6,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(minipilot VERSION 1.0)
 
-# emblib configuration
-add_library(emblib_config INTERFACE)
-target_include_directories(emblib_config INTERFACE
-    "${PROJECT_SOURCE_DIR}/src"
-)
-
-# Set the protoc path for nanopb
-set(nanopb_PROTOC_PATH ${PROJECT_SOURCE_DIR}/lib/protoc)
-
-# Setup the python environment
-add_subdirectory("python")
-
-# Dependencies
-add_subdirectory("lib/emblib")
-add_subdirectory("lib/nanopb")
-
-# Generate protobuf cpp files from sources
-add_subdirectory("protobuf")
-
 # Source files for minipilot
 add_library(minipilot STATIC
     src/vehicles/copter/copter.cpp
@@ -53,14 +34,51 @@ target_include_directories(minipilot INTERFACE
     "${PROJECT_SOURCE_DIR}/include"
 )
 
+# Minipilot compiler and linker options
+target_compile_options(minipilot PUBLIC
+    -fno-rtti
+    -fno-exceptions
+    -fdata-sections
+    -ffunction-sections
+    -fstack-usage
+    -flto
+    # -Wall
+    # -Wextra
+    # -Wpedantic
+)
+target_link_options(minipilot PUBLIC
+    -flto
+    -Wl,-Map=${CMAKE_PROJECT_NAME}.map
+    -Wl,--gc-sections
+    -Wl,--print-memory-usage
+)
+
+# Add path to emblib configuration
+add_library(emblib_config INTERFACE)
+target_include_directories(emblib_config INTERFACE
+    "${PROJECT_SOURCE_DIR}/src"
+)
+
+# FreeRTOS configuration
+add_library(freertos_config INTERFACE)
+target_include_directories(freertos_config SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src)
+target_compile_definitions(freertos_config INTERFACE projCOVERAGE_TEST=0)
+
+# Set the protoc path for nanopb
+set(nanopb_PROTOC_PATH ${PROJECT_SOURCE_DIR}/lib/protoc)
+
+# Setup the python environment
+add_subdirectory("python")
+
+# Dependencies
+add_subdirectory("lib/emblib")
+add_subdirectory("lib/nanopb")
+
+# Generate protobuf cpp files from sources
+add_subdirectory("protobuf")
+
 # Link dependency libraries to minipilot
 target_link_libraries(minipilot PUBLIC
     emblib
     minipilot-proto
-)
-
-# Minipilot compile options
-target_compile_options(minipilot PUBLIC
-    -fno-rtti
-    -fno-exceptions
 )
