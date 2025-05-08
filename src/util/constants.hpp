@@ -1,7 +1,6 @@
 #pragma once
 
 #include "math.hpp"
-#include <emblib/driver/accelerometer.hpp>
 
 namespace mp {
 
@@ -14,7 +13,7 @@ inline const vector3f RIGHT      = -LEFT;
 inline const vector3f DOWN       = -UP;
 
 // Gravity const G = 9.80665
-inline constexpr float G = emblib::accelerometer::G_TO_MPS2;
+inline constexpr float G = 9.80665f;
 // Gravity vector = G * DOWN
 inline const vector3f GV = DOWN * G;
 

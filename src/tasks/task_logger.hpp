@@ -2,7 +2,7 @@
 
 #include "task_config.hpp"
 #include "util/logger.hpp"
-#include <emblib/driver/char_dev.hpp>
+#include <emblib/driver/io/char_dev.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
 
@@ -11,8 +11,6 @@ namespace mp {
 class task_logger : public emblib::task, public emblib::char_dev {
 
 public:
-    using milliseconds_t = emblib::milliseconds;
-
     explicit task_logger(emblib::char_dev& log_device) :
         task("Task logger", TASK_LOGGER_PRIORITY, m_task_stack),
         m_log_device(log_device)
@@ -21,12 +19,12 @@ public:
     /**
      * Char dev write interface override
      */
-    ssize_t write(const char* data, size_t size, milliseconds_t timeout = milliseconds_t(0)) noexcept override;
+    ssize_t write(const char* data, size_t size, emblib::milliseconds_t timeout) noexcept override;
 
     /**
      * Reading not supported for the log task
      */
-    ssize_t read(char* buffer, size_t size, milliseconds_t timeout = milliseconds_t(0)) noexcept override
+    ssize_t read(char* buffer, size_t size, emblib::milliseconds_t timeout) noexcept override
     {
         UNUSED(buffer);
         UNUSED(size);

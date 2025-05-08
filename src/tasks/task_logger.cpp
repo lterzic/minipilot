@@ -3,13 +3,14 @@
 
 namespace mp {
 
+using emblib::milliseconds_t;
+
 ssize_t task_logger::write(const char* data, size_t size, milliseconds_t timeout) noexcept
 {
-    UNUSED(timeout);
     log_msg_s msg;
     msg.length = size;
     memcpy(msg.data, data, size);
-    return m_log_msg_queue.send(msg) ? size : -1;
+    return m_log_msg_queue.send(msg, timeout) ? size : -1;
 }
 
 void task_logger::run() noexcept
@@ -21,14 +22,15 @@ void task_logger::run() noexcept
     while (true) {
         // TODO: Bypass this copying by reading the queue's top element data
         // and removing the item from queue after write somehow
-        m_log_msg_queue.receive(recv_msg);
+        m_log_msg_queue.receive(recv_msg, emblib::MILLISECONDS_MAX);
 
         if (use_async) {
-            m_log_device.write_async(recv_msg.data, recv_msg.length, [this](ssize_t status) {
+            bool status = m_log_device.write_async(recv_msg.data, recv_msg.length, [this](ssize_t status) {
                 notify_from_isr();
             });
-            // TODO: FIX: Only wait for notification if write_async started correctly (returned true)
-            wait_notification();
+            
+            if (status)
+                wait_notification(emblib::MILLISECONDS_MAX);
         } else {
             m_log_device.write(recv_msg.data, recv_msg.length, milliseconds_t(0));
         }

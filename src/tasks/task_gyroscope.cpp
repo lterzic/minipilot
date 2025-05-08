@@ -2,21 +2,16 @@
 
 namespace mp {
 
-task_gyroscope::task_gyroscope(
-    emblib::gyroscope& gyroscope,
-    matrix_t transform
-) :
-    task_three_axis_sensor(
-        gyroscope,
-        "Task gyroscope",
-        TASK_GYRO_PRIORITY,
-        TASK_GYRO_PERIOD
-    ),
-    m_transform(transform)
-{}
+bool
+task_gyroscope::init(emblib::sensor<vector<rps_t, 3>>& sensor) noexcept
+{
+    // TODO: Get the average of multiple readings as drift
+    // to speed up kalman bias convergence
+    return true;
+}
 
-task_gyroscope::vector_t
-task_gyroscope::process(const vector_t& raw_data) const noexcept
+vector<rps_t, 3>
+task_gyroscope::process(const vector<rps_t, 3>& raw_data) const noexcept
 {
     // TODO: Add (conditional) band-pass / high-pass filtering
     return m_transform.matmul(raw_data);

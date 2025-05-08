@@ -1,27 +1,45 @@
 #pragma once
 
 #include "task_config.hpp"
-#include "task_three_axis_sensor.hpp"
-#include <emblib/driver/accelerometer.hpp>
+#include "task_sensor.hpp"
+#include "util/math.hpp"
+#include <emblib/driver/sensor/accelerometer.hpp>
 
 namespace mp {
 
-// TODO: Replace float data_type with m/s^2
-class task_accelerometer : public task_three_axis_sensor<float> {
+/**
+ * Data type for meters per second^2 with
+ * float as the underlying type
+ */
+using emblib::mpss_t;
+
+/**
+ * Sensor task which provides accelerometer readings
+ */
+class task_accelerometer : public task_sensor<vector<mpss_t, 3>> {
 
 public:
     explicit task_accelerometer(
-        emblib::accelerometer& accelerometer,
-        matrix_t transform,
-        vector_t bias
-    );
+        emblib::accelerometer<mpss_t>& accelerometer,
+        matrix<float, 3> transform
+    ) : task_sensor(
+        accelerometer,
+        "Task accelerometer",
+        TASK_ACCEL_PRIORITY,
+        TASK_ACCEL_PERIOD
+    ), m_transform(transform) {}
 
 private:
-    vector_t process(const vector_t& raw_data) const noexcept override;
+    bool init(emblib::sensor<vector<mpss_t, 3>>& sensor) noexcept override;
+
+    vector<mpss_t, 3> process(const vector<mpss_t, 3>& raw_data) const noexcept override;
 
 private:
-    vector_t m_bias;
-    matrix_t m_transform;
+    // Transform maps a potentially different coordinate space
+    // of the readings into the minipilot coordinate system and
+    // addresses any misalignments
+    matrix<float, 3> m_transform;
+    vector<mpss_t, 3> m_bias;
     // TODO: Add low-pass filter
 };
 

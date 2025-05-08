@@ -5,19 +5,18 @@
 
 namespace mp {
 
-// Conversion of the task period to floating point delta time
-inline constexpr float DT = std::chrono::duration<float>(TASK_STATE_PERIOD).count();
-
 void task_state_estimator::run() noexcept
 {
+    constexpr float dt = TASK_STATE_PERIOD.convert<emblib::second_t>().value();
+    
     // Assuming that sensor covariances won't change during runtime
     const matrix3f accel_cov = m_task_accel.get_noise_variance();
     const matrix3f gyro_cov = m_task_gyro.get_noise_variance();
     
     while (true) {
         // Get latest sensor measurements
-        vector3f a_read = m_task_accel.get_corrected();
-        vector3f w_read = m_task_gyro.get_corrected();
+        vector3f a_read = m_task_accel.get_corrected().cast<float>();
+        vector3f w_read = m_task_gyro.get_corrected().cast<float>();
         // TODO: Get rest of the sensors here
         
         sensor_data_s sensor_data {
@@ -26,7 +25,7 @@ void task_state_estimator::run() noexcept
             .gyroscope = &w_read,
             .gyroscope_cov = &gyro_cov
         };
-        m_state_estimator.update(sensor_data, DT);
+        m_state_estimator.update(sensor_data, dt);
 
         // Assign the estimator state to the readable state struct
         m_state_mutex.lock();

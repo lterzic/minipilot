@@ -28,7 +28,7 @@
 #define configTASK_NOTIFICATION_ARRAY_ENTRIES                       1
 #define configUSE_MUTEXES                                           1
 #define configUSE_RECURSIVE_MUTEXES                                 0
-#define configUSE_COUNTING_SEMAPHORES                               0
+#define configUSE_COUNTING_SEMAPHORES                               1 // TODO: Change to 0 as is not used
 #define configUSE_ALTERNATIVE_API                                   0 /* Deprecated! */
 #define configQUEUE_REGISTRY_SIZE                                   0
 #define configUSE_QUEUE_SETS                                        0

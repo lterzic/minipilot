@@ -2,7 +2,7 @@
 
 #include <assert.h>
 #include <cstddef>
-#include <chrono>
+#include <emblib/utils/chrono.hpp>
 
 namespace mp {
 
@@ -22,17 +22,17 @@ inline constexpr task_priority_e    TASK_LOGGER_PRIORITY        = TASK_PRIORITY_
 
 inline constexpr size_t             TASK_TELEMETRY_STACK_SIZE   = 1024;
 inline constexpr task_priority_e    TASK_TELEMETRY_PRIORITY     = TASK_PRIORITY_LOW;
-inline constexpr auto               TASK_TELEMETRY_PERIOD       = std::chrono::milliseconds(200); // 5Hz
+inline constexpr auto               TASK_TELEMETRY_PERIOD       = emblib::milliseconds_t(200); // 5Hz
 
 inline constexpr task_priority_e    TASK_ACCEL_PRIORITY         = TASK_PRIORITY_REALTIME;
-inline constexpr auto               TASK_ACCEL_PERIOD           = std::chrono::milliseconds(5); // 200Hz
+inline constexpr auto               TASK_ACCEL_PERIOD           = emblib::milliseconds_t(5); // 200Hz
 
 inline constexpr task_priority_e    TASK_GYRO_PRIORITY          = TASK_PRIORITY_REALTIME;
-inline constexpr auto               TASK_GYRO_PERIOD            = std::chrono::milliseconds(5); // 200Hz
+inline constexpr auto               TASK_GYRO_PERIOD            = emblib::milliseconds_t(5); // 200Hz
 
 inline constexpr size_t             TASK_STATE_STACK_SIZE       = 24576;
 inline constexpr task_priority_e    TASK_STATE_PRIORITY         = TASK_PRIORITY_REALTIME;
-inline constexpr auto               TASK_STATE_PERIOD           = std::chrono::milliseconds(20); // 50Hz
+inline constexpr auto               TASK_STATE_PERIOD           = emblib::milliseconds_t(20); // 50Hz
 
 inline constexpr size_t             TASK_RECEIVER_STACK_SIZE    = 1024;
 inline constexpr size_t             TASK_RECEIVER_QUEUE_SIZE    = 4;
@@ -40,6 +40,6 @@ inline constexpr task_priority_e    TASK_RECEIVER_PRIORITY      = TASK_PRIORITY_
 
 inline constexpr size_t             TASK_VEHICLE_STACK_SIZE     = 4096;
 inline constexpr task_priority_e    TASK_VEHICLE_PRIORITY       = TASK_PRIORITY_HIGH;
-inline constexpr auto               TASK_VEHICLE_PERIOD         = std::chrono::milliseconds(50); // 20Hz
+inline constexpr auto               TASK_VEHICLE_PERIOD         = emblib::milliseconds_t(50); // 20Hz
 
 }

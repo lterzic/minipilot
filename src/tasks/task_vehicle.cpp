@@ -4,9 +4,6 @@
 
 namespace mp {
 
-// Conversion of the task period to floating point delta time
-static constexpr float DT = std::chrono::duration<float>(TASK_VEHICLE_PERIOD).count();
-
 task_vehicle::task_vehicle(
     vehicle& vehicle,
     task_receiver& task_receiver,
@@ -20,6 +17,8 @@ task_vehicle::task_vehicle(
 
 void task_vehicle::run() noexcept
 {
+    constexpr float dt = TASK_VEHICLE_PERIOD.convert<emblib::second_t>().value();
+    
     // Vehicle's init must complete successfully for
     // the rest of the system to run as intended
     if (!m_vehicle.init()) {
@@ -38,7 +37,7 @@ void task_vehicle::run() noexcept
         }
         
         state_s state = m_task_state_estimator.get_state();
-        m_vehicle.update(state, DT);
+        m_vehicle.update(state, dt);
 
         sleep_periodic(TASK_VEHICLE_PERIOD);
     }

@@ -1,5 +1,7 @@
 #include "task_telemetry.hpp"
 #include "util/pb_util.hpp"
+#include "pb/telemetry.pb.h"
+#include <pb_encode.h>
 
 namespace mp {
 
@@ -20,7 +22,7 @@ void task_telemetry::run() noexcept
 {
     // This doesn't have to be an assert
     // Can just exit and turn off the telemetry task
-    assert(m_telemetry_device.probe(emblib::milliseconds(0)));
+    assert(m_telemetry_device.probe(emblib::milliseconds_t(0)));
 
     while (true) {
         mp_pb_TelemetryMessage msg = mp_pb_TelemetryMessage_init_zero;
@@ -40,10 +42,10 @@ void task_telemetry::run() noexcept
         msg.has_state = true;
         
         // Sensor data
-        pb_vector3f_set(msg.sensor_data.acc_raw, m_task_accel.get_raw());
-        pb_vector3f_set(msg.sensor_data.acc_corrected, m_task_accel.get_corrected());
-        pb_vector3f_set(msg.sensor_data.gyro_raw, m_task_gyro.get_raw());
-        pb_vector3f_set(msg.sensor_data.gyro_corrected, m_task_gyro.get_corrected());
+        pb_vector3f_set(msg.sensor_data.acc_raw, m_task_accel.get_raw().cast<float>());
+        pb_vector3f_set(msg.sensor_data.acc_corrected, m_task_accel.get_corrected().cast<float>());
+        pb_vector3f_set(msg.sensor_data.gyro_raw, m_task_gyro.get_raw().cast<float>());
+        pb_vector3f_set(msg.sensor_data.gyro_corrected, m_task_gyro.get_corrected().cast<float>());
         msg.sensor_data.has_acc_raw = true;
         msg.sensor_data.has_acc_corrected = true;
         msg.sensor_data.has_gyro_raw = true;
@@ -65,7 +67,7 @@ void task_telemetry::run() noexcept
                 });
 
                 if (start_status)
-                    wait_notification();
+                    wait_notification(emblib::MILLISECONDS_MAX);
             } else {
                 m_telemetry_device.write(out_buffer, pb_ostream.bytes_written, std::chrono::milliseconds(0));
             }

@@ -2,7 +2,7 @@
 
 #include "task_config.hpp"
 #include "pb/command.pb.h"
-#include <emblib/driver/char_dev.hpp>
+#include <emblib/driver/io/char_dev.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
 #include <pb_decode.h>
@@ -14,8 +14,12 @@ public:
     task_receiver(emblib::char_dev& receiver_device) noexcept;
 
     /**
-     * Returns true if a command was available and was successfully copied
-     * into the provided buffer
+     * This task has a command buffer which is filled up as the
+     * commands are received, which are then fetched by the vehicle
+     * through this method
+     * 
+     * Returns true if a command was available and was successfully
+     * copied into the provided buffer
      */
     bool get_command(mp_pb_Command& command_buffer) noexcept;
 

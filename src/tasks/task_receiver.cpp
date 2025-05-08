@@ -17,7 +17,7 @@ bool task_receiver::get_command(mp_pb_Command& command_buffer) noexcept
 {
     // Try to read from queue with timeout 0
     // If the queue is empty it will return false
-    return m_command_queue.receive(command_buffer, emblib::ticks_t(0));
+    return m_command_queue.receive(command_buffer, emblib::milliseconds_t(0));
 }
 
 bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t count)
@@ -46,7 +46,7 @@ bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t cou
             if (!this_task->m_receiver_device.read_async(discard_buffer, to_recv, read_async_cb))
                 return false;
             // This is okay since we know we are in the context of this task
-            this_task->wait_notification();
+            this_task->wait_notification(emblib::MILLISECONDS_MAX);
 
             if (recv_status <= 0)
                 return false;
@@ -60,7 +60,7 @@ bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t cou
     if (!this_task->m_receiver_device.read_async((char*)buf, count, read_async_cb))
         return false;
 
-    this_task->wait_notification();
+    this_task->wait_notification(emblib::MILLISECONDS_MAX);
     return recv_status == count;
 }
 
@@ -93,11 +93,11 @@ void task_receiver::run() noexcept
         if (!start_status) {
             log_warning("Receiver read start fail!");
             // Sleep to give time to the receiver to unblock
-            sleep(std::chrono::milliseconds(100));
+            sleep(emblib::milliseconds_t(100));
             continue;
         }
 
-        wait_notification();
+        wait_notification(emblib::MILLISECONDS_MAX);
         if (recv_status <= 0) {
             log_error("Receiver read error!");
             continue;
@@ -105,7 +105,7 @@ void task_receiver::run() noexcept
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, recv_status);
         if (pb_decode(&buf_istream, mp_pb_Command_fields, &recv_command)) {
-            m_command_queue.send(recv_command);
+            m_command_queue.send(recv_command, emblib::milliseconds_t(0));
         }
     }
 #endif
