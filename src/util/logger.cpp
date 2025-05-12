@@ -1,5 +1,5 @@
 #include "logger.hpp"
-#include "pb/log.pb.h"
+#include "pb/mp/log.pb.h"
 
 namespace mp {
 

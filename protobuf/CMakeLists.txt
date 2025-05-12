@@ -4,14 +4,14 @@
 set(PROTOC_DIR "${PROJECT_SOURCE_DIR}/lib")
 set(NANOPB_GEN "${PROJECT_SOURCE_DIR}/lib/nanopb/generator/nanopb_generator.py")
 
-# Set paths
 # Generated files are placed in the pb directory so that their
 # includes would have a prefix to differentiate from source files
-set(PROTO_SRC_DIR "${PROJECT_SOURCE_DIR}/lib/minipilot-proto/src/core")
+set(PROTO_SRC_DIR "${PROJECT_SOURCE_DIR}/lib/minipilot-proto/src")
 set(PROTO_GEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/gen/pb")
 
 # Find all proto files recursively
-file(GLOB_RECURSE PROTO_FILES "${PROTO_SRC_DIR}/*.proto")
+# Look only in the src/mp folder
+file(GLOB_RECURSE PROTO_FILES "${PROTO_SRC_DIR}/mp/*.proto")
 
 # List of generated files
 set(GENERATED_FILES "")
