@@ -1,4 +1,4 @@
 .vscode
 build
-protobuf/out
+protobuf/gen
 python/venv

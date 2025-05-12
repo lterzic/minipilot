@@ -78,7 +78,7 @@ add_subdirectory("lib/nanopb")
 add_subdirectory("protobuf")
 
 # Link dependency libraries to minipilot
-target_link_libraries(minipilot PUBLIC
+target_link_libraries(minipilot PRIVATE
     emblib
     minipilot-proto
 )
