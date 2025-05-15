@@ -75,10 +75,11 @@ add_subdirectory("lib/emblib")
 add_subdirectory("lib/nanopb")
 
 # Generate protobuf cpp files from sources
+add_subdirectory("lib/minipilot-proto")
 add_subdirectory("protobuf")
 
 # Link dependency libraries to minipilot
 target_link_libraries(minipilot PUBLIC
     emblib
-    minipilot-proto
+    minipilot-proto-nanopb
 )

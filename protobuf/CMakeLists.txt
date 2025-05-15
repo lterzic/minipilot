@@ -49,7 +49,7 @@ foreach(PROTO_FILE ${PROTO_FILES})
 endforeach()
 
 # Create a library with all generated files
-add_library(minipilot-proto STATIC ${GENERATED_FILES})
-target_link_libraries(minipilot-proto PUBLIC protobuf-nanopb-static)
-target_include_directories(minipilot-proto PUBLIC ${PROTO_GEN_DIR})
-target_include_directories(minipilot-proto INTERFACE ${PROTO_GEN_DIR}/..)
+add_library(minipilot-proto-nanopb STATIC ${GENERATED_FILES})
+target_link_libraries(minipilot-proto-nanopb PUBLIC protobuf-nanopb-static)
+target_include_directories(minipilot-proto-nanopb PUBLIC ${PROTO_GEN_DIR})
+target_include_directories(minipilot-proto-nanopb INTERFACE ${PROTO_GEN_DIR}/..)
