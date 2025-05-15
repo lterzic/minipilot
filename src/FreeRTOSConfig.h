@@ -47,6 +47,7 @@
 #define configTOTAL_HEAP_SIZE                                       0
 #define configAPPLICATION_ALLOCATED_HEAP                            0
 #define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP                   0
+#define configKERNEL_PROVIDED_STATIC_MEMORY                         1
 
 /* Hook function related definitions. */
 #define configUSE_IDLE_HOOK                                 0
