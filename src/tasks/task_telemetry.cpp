@@ -25,7 +25,7 @@ void task_telemetry::run() noexcept
     assert(m_telemetry_device.probe(emblib::milliseconds_t(0)));
 
     while (true) {
-        mp_pb_TelemetryMessage msg = mp_pb_TelemetryMessage_init_zero;
+        pb_mp_TelemetryMessage msg = pb_mp_TelemetryMessage_init_zero;
 
         // State data
         state_s state = m_task_state.get_state();
@@ -57,10 +57,10 @@ void task_telemetry::run() noexcept
         // Messages are encoded into a buffer before being sent
         // to avoid message fragmentation since the output device
         // can be used by other tasks such as the logger
-        char out_buffer[sizeof(mp_pb_TelemetryMessage)];
+        char out_buffer[sizeof(pb_mp_TelemetryMessage)];
         pb_ostream_t pb_ostream = pb_ostream_from_buffer((pb_byte_t*)out_buffer, sizeof(out_buffer));
         
-        if (pb_encode(&pb_ostream, mp_pb_TelemetryMessage_fields, &msg)) {
+        if (pb_encode(&pb_ostream, pb_mp_TelemetryMessage_fields, &msg)) {
             if (m_telemetry_device.is_async_available()) {
                 bool start_status = m_telemetry_device.write_async(out_buffer, pb_ostream.bytes_written, [this](ssize_t status) {
                     notify_from_isr();

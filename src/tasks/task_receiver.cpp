@@ -13,7 +13,7 @@ task_receiver::task_receiver(emblib::char_dev& receiver_device) noexcept :
     m_pb_istream.bytes_left = SIZE_MAX;
 }
 
-bool task_receiver::get_command(mp_pb_Command& command_buffer) noexcept
+bool task_receiver::get_command(pb_mp_Command& command_buffer) noexcept
 {
     // Try to read from queue with timeout 0
     // If the queue is empty it will return false
@@ -69,10 +69,10 @@ void task_receiver::run() noexcept
     assert(m_receiver_device.is_async_available());
 
     while (true) {
-        mp_pb_Command recv_command = mp_pb_Command_init_zero;
+        pb_mp_Command recv_command = pb_mp_Command_init_zero;
 
 #if TASK_RECEIVER_STREAM_DATA
-        if (pb_decode(&m_pb_istream, mp_pb_Command_fields, &recv_command)) {
+        if (pb_decode(&m_pb_istream, pb_mp_Command_fields, &recv_command)) {
             // Send to queue with infinite timeout
             m_command_queue.send(recv_command);
         } else {
@@ -82,7 +82,7 @@ void task_receiver::run() noexcept
             sleep(std::chrono::milliseconds(100));
         }
 #else
-        char recv_buf[sizeof(mp_pb_Command)];
+        char recv_buf[sizeof(pb_mp_Command)];
 
         ssize_t recv_status = -1;
         bool start_status = m_receiver_device.read_async(recv_buf, sizeof(recv_buf), [this, &recv_status](ssize_t status){
@@ -104,7 +104,7 @@ void task_receiver::run() noexcept
         }
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, recv_status);
-        if (pb_decode(&buf_istream, mp_pb_Command_fields, &recv_command)) {
+        if (pb_decode(&buf_istream, pb_mp_Command_fields, &recv_command)) {
             m_command_queue.send(recv_command, emblib::milliseconds_t(0));
         }
     }
