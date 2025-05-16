@@ -65,7 +65,8 @@ target_include_directories(freertos_config SYSTEM INTERFACE ${PROJECT_SOURCE_DIR
 target_compile_definitions(freertos_config INTERFACE projCOVERAGE_TEST=0)
 
 # Set the protoc path for nanopb
-set(nanopb_PROTOC_PATH ${PROJECT_SOURCE_DIR}/lib/protoc)
+set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/lib/minipilot-proto/lib)
+set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
 
 # Setup the python environment
 add_subdirectory("python")

@@ -1,7 +1,6 @@
 # Used to compile protobuf files on every build
 
-# Path to protoc and nanopb generator
-set(PROTOC_DIR "${PROJECT_SOURCE_DIR}/lib")
+# Path to nanopb generator
 set(NANOPB_GEN "${PROJECT_SOURCE_DIR}/lib/nanopb/generator/nanopb_generator.py")
 
 # Generated files are placed in the pb directory so that their
