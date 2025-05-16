@@ -1,6 +1,6 @@
 #include "task_telemetry.hpp"
 #include "util/pb_util.hpp"
-#include "pb/mp/telemetry.pb.h"
+#include "pb/mp/telemetry.nanopb.h"
 #include <pb_encode.h>
 
 namespace mp {

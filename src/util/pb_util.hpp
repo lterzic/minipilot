@@ -1,7 +1,7 @@
 #pragma once
 
 #include "util/math.hpp"
-#include "pb/mp/types.pb.h"
+#include "pb/mp/types.nanopb.h"
 
 namespace mp {
 

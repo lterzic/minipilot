@@ -24,7 +24,7 @@ foreach(PROTO_FILE ${PROTO_FILES})
     
     # Define the output file and directory
     set(GEN_DIR ${PROTO_GEN_DIR}/${REL_DIR})
-    set(GEN_FILE "${GEN_DIR}/${FILE_NAME}.pb.c")
+    set(GEN_FILE "${GEN_DIR}/${FILE_NAME}.nanopb.c")
     file(MAKE_DIRECTORY ${GEN_DIR})
     
     # Generate output files
@@ -37,6 +37,7 @@ foreach(PROTO_FILE ${PROTO_FILES})
             ${VENV_PYTHON} ${NANOPB_GEN}
             -I ${PROTO_SRC_DIR}
             -D ${PROTO_GEN_DIR}
+            -e ".nanopb"
             -q
             ${PROTO_FILE}
         # COMMENT "Generating nanopb files for ${REL_PATH}"

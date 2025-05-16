@@ -1,6 +1,6 @@
 #include "task_vehicle.hpp"
 #include "util/logger.hpp"
-#include "pb/mp/command.pb.h"
+#include "pb/mp/command.nanopb.h"
 
 namespace mp {
 

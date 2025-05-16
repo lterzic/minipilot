@@ -2,7 +2,7 @@
 
 #include "state/state_estimator.hpp"
 #include "util/math.hpp"
-#include "pb/mp/command.pb.h"
+#include "pb/mp/command.nanopb.h"
 
 namespace mp {
 

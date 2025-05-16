@@ -1,7 +1,7 @@
 #pragma once
 
 #include "task_config.hpp"
-#include "pb/mp/command.pb.h"
+#include "pb/mp/command.nanopb.h"
 #include <emblib/driver/io/char_dev.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
