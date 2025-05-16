@@ -1,6 +1,6 @@
 #include "task_vehicle.hpp"
 #include "util/logger.hpp"
-#include "pb/command.pb.h"
+#include "pb/mp/command.nanopb.h"
 
 namespace mp {
 
@@ -29,7 +29,7 @@ void task_vehicle::run() noexcept
     while (true) {
         // See if there are any commands available and execute them
         // before running the next iteration of the update loop
-        mp_pb_Command recv_command;
+        pb_mp_Command recv_command;
         while (m_task_receiver.get_command(recv_command)) {            
             // TODO: If false is returned, this command was not for this
             // vehicle, try to handle it globally

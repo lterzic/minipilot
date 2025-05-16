@@ -2,7 +2,7 @@
 
 #include "state/state_estimator.hpp"
 #include "util/math.hpp"
-#include "pb/command.pb.h"
+#include "pb/mp/command.nanopb.h"
 
 namespace mp {
 
@@ -29,7 +29,7 @@ public:
     /**
      * @returns false if the command is not for this vehicle type
      */
-    virtual bool handle_command(const mp_pb_Command& command) noexcept = 0;
+    virtual bool handle_command(const pb_mp_Command& command) noexcept = 0;
 
     /**
      * Get information about onboard sensors

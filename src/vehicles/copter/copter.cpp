@@ -122,24 +122,24 @@ void copter::update(const state_s& state, float dt) noexcept
     actuate(m_controller.get_thrust(), m_controller.get_torque());
 }
 
-bool copter::handle_command(const mp_pb_Command& command) noexcept
+bool copter::handle_command(const pb_mp_Command& command) noexcept
 {
-    if (command.which_command_type != mp_pb_Command_copter_command_tag) {
+    if (command.which_command_type != pb_mp_Command_copter_command_tag) {
         return false;
     }
 
     // Result of command execution
     bool command_status = false;
-    const mp_pb_vehicles_CopterCommand& copter_command = command.command_type.copter_command;
+    const pb_mp_CopterCommand& copter_command = command.command_type.copter_command;
     
     switch (copter_command.which_command_type) {
-    case mp_pb_vehicles_CopterCommand_set_angular_velocity_tag: {
+    case pb_mp_CopterCommand_set_angular_velocity_tag: {
         const auto& w = copter_command.command_type.set_angular_velocity.angular_velocity;
         const float thrust = copter_command.command_type.set_angular_velocity.thrust;
         command_status = m_controller.set_target_w({w.x, w.y, w.z}, thrust);
         break;
     }
-    case mp_pb_vehicles_CopterCommand_set_linear_velocity_tag: {
+    case pb_mp_CopterCommand_set_linear_velocity_tag: {
         const auto& v = copter_command.command_type.set_linear_velocity.velocity;
         const float dir = copter_command.command_type.set_linear_velocity.direction;
         command_status = m_controller.set_target_v({v.x, v.y, v.z}, dir);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "task_config.hpp"
-#include "pb/command.pb.h"
+#include "pb/mp/command.nanopb.h"
 #include <emblib/driver/io/char_dev.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
@@ -21,7 +21,7 @@ public:
      * Returns true if a command was available and was successfully
      * copied into the provided buffer
      */
-    bool get_command(mp_pb_Command& command_buffer) noexcept;
+    bool get_command(pb_mp_Command& command_buffer) noexcept;
 
 private:
     /**
@@ -39,7 +39,7 @@ private:
 
 private:
     emblib::task_stack_t<TASK_RECEIVER_STACK_SIZE> m_task_stack;
-    emblib::queue<mp_pb_Command, TASK_RECEIVER_QUEUE_SIZE> m_command_queue;
+    emblib::queue<pb_mp_Command, TASK_RECEIVER_QUEUE_SIZE> m_command_queue;
     emblib::char_dev& m_receiver_device;
 
     pb_istream_t m_pb_istream;

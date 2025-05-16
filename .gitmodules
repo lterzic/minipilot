@@ -4,3 +4,6 @@
 [submodule "lib/nanopb"]
 	path = lib/nanopb
 	url = https://github.com/nanopb/nanopb
+[submodule "lib/minipilot-proto"]
+	path = lib/minipilot-proto
+	url = https://github.com/lterzic/minipilot-proto
