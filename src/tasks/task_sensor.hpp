@@ -34,7 +34,7 @@ public:
     /**
      * Get last read raw value
      */
-    raw_data_type get_raw() noexcept
+    raw_data_type get_raw() const noexcept
     {
         emblib::scoped_lock lock{m_read_mutex};
         return m_last_raw;
@@ -43,7 +43,7 @@ public:
     /**
      * Get last corrected value
      */
-    out_data_type get_corrected() noexcept
+    out_data_type get_corrected() const noexcept
     {
         emblib::scoped_lock lock{m_read_mutex};
         return m_last_corrected;
@@ -96,7 +96,7 @@ private:
     emblib::milliseconds_t m_task_period;
     sensor_t& m_sensor;
     
-    emblib::mutex m_read_mutex;
+    mutable emblib::mutex m_read_mutex;
     raw_data_type m_last_raw;
     out_data_type m_last_corrected;
 };

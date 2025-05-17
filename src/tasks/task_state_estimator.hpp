@@ -31,7 +31,7 @@ public:
      * Get the current state
      * @todo Maybe return as reference
      */
-    state_s get_state() noexcept
+    state_s get_state() const noexcept
     {
         emblib::scoped_lock lock(m_state_mutex);
         return m_state;
@@ -48,7 +48,7 @@ private:
 
     state_s m_state;
     state_estimator& m_state_estimator;
-    emblib::mutex m_state_mutex;
+    mutable emblib::mutex m_state_mutex;
     
     task_accelerometer& m_task_accel;
     task_gyroscope& m_task_gyro;
