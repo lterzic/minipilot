@@ -35,6 +35,8 @@ private:
     task_accelerometer& m_task_accel;
     task_gyroscope& m_task_gyro;
     task_state_estimator& m_task_state;
+
+    size_t m_msg_id;
 };
 
 }
