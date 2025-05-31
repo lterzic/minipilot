@@ -7,7 +7,7 @@
 namespace mp {
 
 task_telemetry::task_telemetry(
-    emblib::char_dev& telemetry_device,
+    emblib::io_dev& telemetry_device,
     task_accelerometer& task_accelerometer,
     task_gyroscope& task_gyroscope,
     task_state_estimator& task_state_estimator

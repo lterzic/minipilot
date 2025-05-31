@@ -4,7 +4,7 @@
 
 namespace mp {
 
-task_receiver::task_receiver(emblib::char_dev& receiver_device) noexcept :
+task_receiver::task_receiver(emblib::io_dev& receiver_device) noexcept :
     task("Task Receiver", TASK_RECEIVER_PRIORITY, m_task_stack),
     m_receiver_device(receiver_device)
 {

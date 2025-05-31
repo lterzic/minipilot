@@ -73,6 +73,8 @@ add_subdirectory("python")
 
 # Dependencies
 add_subdirectory("lib/emblib")
+add_subdirectory("lib/emblib/impl/rtos/freertos")
+add_subdirectory("lib/emblib/impl/math/eigen")
 add_subdirectory("lib/nanopb")
 add_subdirectory("lib/minipilot-proto")
 

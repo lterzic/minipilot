@@ -45,7 +45,7 @@ void logger::flush(log_level_e level) noexcept
 
 #else
 
-void logger::flush(log_level_e level, const buffer_t& buffer, emblib::char_dev& log_device) noexcept
+void logger::flush(log_level_e level, const buffer_t& buffer, emblib::io_dev& log_device) noexcept
 {
     // Don't wait if cannot write currently
     static constexpr auto WRITE_TIMEOUT = std::chrono::milliseconds(0);

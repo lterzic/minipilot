@@ -121,4 +121,4 @@ task_telemetry --> telemetry_packet_dev --> out_dev
 task_logger --> log_packet_dev --> out_dev
 ```
 
-where `telemetry_packet_dev` and `log_packet_dev` are instances of a `message_pack` : public `char_dev` class which takes a byte array and creates a protobuf message containing that array and an enum which carries information about the message type (source).
+where `telemetry_packet_dev` and `log_packet_dev` are instances of a `message_pack` : public `io_dev` class which takes a byte array and creates a protobuf message containing that array and an enum which carries information about the message type (source).

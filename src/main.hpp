@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vehicles/vehicle.hpp"
-#include <emblib/driver/io/char_dev.hpp>
+#include <emblib/driver/io/io_dev.hpp>
 #include <emblib/driver/sensor/accelerometer.hpp>
 #include <emblib/driver/sensor/gyroscope.hpp>
 
@@ -24,9 +24,9 @@ struct devices_s {
         // Map the sensor reading to the mp coordinate frame
         const matrix3f& transform;
     } gyroscope;
-    emblib::char_dev* log_device;
-    emblib::char_dev* telemetry_device;
-    emblib::char_dev& receiver_device;
+    emblib::io_dev* log_device;
+    emblib::io_dev* telemetry_device;
+    emblib::io_dev& receiver_device;
 };
 
 /**
