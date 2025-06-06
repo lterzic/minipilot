@@ -124,13 +124,13 @@ void copter::update(const state_s& state, float dt) noexcept
 
 bool copter::handle_command(const pb_mp_Command& command) noexcept
 {
-    if (command.which_command_type != pb_mp_Command_copter_command_tag) {
+    if (command.which_vehicle != pb_mp_Command_copter_tag) {
         return false;
     }
 
     // Result of command execution
     bool command_status = false;
-    const pb_mp_CopterCommand& copter_command = command.command_type.copter_command;
+    const pb_mp_CopterCommand& copter_command = command.vehicle.copter;
     
     switch (copter_command.which_command_type) {
     case pb_mp_CopterCommand_set_angular_velocity_tag: {

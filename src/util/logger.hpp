@@ -27,11 +27,24 @@ class logger : public emblib::logger<LOGGER_MAX_INPUT_SIZE> {
 public:
     static logger& get_instance() noexcept;
 
+    void set_encode_protobuf(bool value)
+    {
+        m_encode_protobuf = value;
+    }
+
 private:
     // Singleton
-    logger() : emblib::logger<LOGGER_MAX_INPUT_SIZE>(nullptr) {}
+    logger() :
+        emblib::logger<LOGGER_MAX_INPUT_SIZE>(nullptr),
+        m_encode_protobuf(false),
+        m_message_id(0)
+    {}
 
     void flush(log_level_e level, const buffer_t& buffer, emblib::io_dev& log_device) noexcept override;
+
+private:
+    bool m_encode_protobuf;
+    size_t m_message_id;
 };
 
 static void log_set_level(log_level_e level) noexcept

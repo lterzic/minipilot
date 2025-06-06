@@ -33,7 +33,7 @@ void task_telemetry::run() noexcept
         // When the first telemetry messages is received this is used
         // to set the session start time and all other messages
         // are timestamped relative to that time
-        msg.time_since_start = get_time_since_start().value();
+        msg.timestamp_ms = get_time_since_start().value();
 
         // Assign the counter for the current session and increment
         msg.message_id = m_msg_id;
