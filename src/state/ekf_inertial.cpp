@@ -29,7 +29,7 @@ ekf_inertial::update(const sensor_data_s& input, float dt) noexcept
     constexpr float a_noise = 5e-1;
     constexpr float q_noise = 1e-1;
     constexpr float w_noise = 5e-1;
-    constexpr float wd_noise = 1e-1;
+    constexpr float wd_noise = 1e-2;
     const auto Q = vectorf<KALMAN_DIM>({
         v_noise, v_noise, v_noise,
         a_noise, a_noise, a_noise,

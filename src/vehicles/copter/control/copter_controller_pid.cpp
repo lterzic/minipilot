@@ -7,7 +7,7 @@ namespace mp {
 copter_controller_pid::copter_controller_pid(const copter_params_s& copter_params) noexcept :
     m_copter_params(copter_params),
     m_angular_velocity_pid(1, 0.2, 0),
-    m_linear_acceleration_pid(1, 2, 0),
+    m_linear_acceleration_pid(1.4, 0.1, 0.1),
     m_control_mode(control_mode_e::ANGULAR)
 {}
 
@@ -47,7 +47,7 @@ void copter_controller_pid::update(const state_s& state, float dt) noexcept
 
         // Since the cross product is between to normalized vectors, its max magnitude is
         // 1 when the angle is PI/2, so this constant is the maximum magnitude of target w
-        m_target_w = target_w_dir * 5.f;
+        m_target_w = target_w_dir * 2.f;
 
         // TODO: Add yaw rotation based on m_target_dir
 
