@@ -4,7 +4,7 @@
 #include "task_accelerometer.hpp"
 #include "task_gyroscope.hpp"
 #include "task_state_estimator.hpp"
-#include <emblib/driver/io/io_dev.hpp>
+#include <emblib/io/ostream.hpp>
 #include <emblib/rtos/task.hpp>
 
 namespace mp {
@@ -16,7 +16,7 @@ class task_telemetry : public emblib::task {
 
 public:
     explicit task_telemetry(
-        emblib::io_dev& telemetry_device,
+        emblib::io::ostream<char>& telemetry_device,
         task_accelerometer& task_accelerometer,
         task_gyroscope& task_gyroscope,
         task_state_estimator& task_state_estimator
@@ -30,7 +30,7 @@ private:
 
 private:
     emblib::task_stack_t<TASK_TELEMETRY_STACK_SIZE> m_task_stack;
-    emblib::io_dev& m_telemetry_device;
+    emblib::io::ostream<char>& m_telemetry_device;
 
     task_accelerometer& m_task_accel;
     task_gyroscope& m_task_gyro;

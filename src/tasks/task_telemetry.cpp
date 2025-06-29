@@ -7,7 +7,7 @@
 namespace mp {
 
 task_telemetry::task_telemetry(
-    emblib::io_dev& telemetry_device,
+    emblib::io::ostream<char>& telemetry_device,
     task_accelerometer& task_accelerometer,
     task_gyroscope& task_gyroscope,
     task_state_estimator& task_state_estimator
@@ -22,9 +22,7 @@ task_telemetry::task_telemetry(
 
 void task_telemetry::run() noexcept
 {
-    // This doesn't have to be an assert
-    // Can just exit and turn off the telemetry task
-    assert(m_telemetry_device.probe(milliseconds_t(0)));
+    // TODO: Add a health check call for the output device
 
     while (true) {
         pb_mp_Telemetry msg = pb_mp_Telemetry_init_zero;

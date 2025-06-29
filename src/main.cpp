@@ -10,16 +10,13 @@
 
 namespace mp {
 
-// Timeout for checking if the device is properly working
-inline constexpr auto DEVICE_PROBE_TIMEOUT = std::chrono::milliseconds(10);
-
 int main(const devices_s& devices, state_estimator& state_estimator, vehicle& vehicle)
 {
     // If the logging task is not created, this stays uninitialized
     task_logger* task_logger_ptr = nullptr;
 
     // Initialize the logging system (task) if there is an available logging device
-    if (devices.log_device && devices.log_device->probe(DEVICE_PROBE_TIMEOUT)) {
+    if (devices.log_device) {
         // Create the logging task
         static task_logger task_logger(*devices.log_device);
         task_logger_ptr = &task_logger;
@@ -51,11 +48,6 @@ int main(const devices_s& devices, state_estimator& state_estimator, vehicle& ve
         devices.gyroscope.transform
     );
 
-    // Receiver is required
-    if (!devices.receiver_device.probe(DEVICE_PROBE_TIMEOUT)) {
-        log_error("Receiver not available!");
-        return 1;
-    }
     // Create the receiver task
     static task_receiver task_receiver(devices.receiver_device);
 
@@ -75,7 +67,7 @@ int main(const devices_s& devices, state_estimator& state_estimator, vehicle& ve
 
     // If there is a telemetry device available, create the telemetry task
     // Telemetry could also be required (not optional)
-    if (devices.telemetry_device && devices.telemetry_device->probe(DEVICE_PROBE_TIMEOUT)) {
+    if (devices.telemetry_device) {
         static task_telemetry task_telemetry(
             *devices.telemetry_device,
             task_accelerometer,
@@ -97,7 +89,7 @@ int main(const devices_s& devices, state_estimator& state_estimator, vehicle& ve
     }
 
     // Start the scheduler
-    emblib::task::start_tasks();
+    emblib::task::start_scheduler();
     
     // Should never reach this
     return 1;
