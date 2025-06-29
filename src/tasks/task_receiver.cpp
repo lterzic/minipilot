@@ -4,7 +4,7 @@
 
 namespace mp {
 
-task_receiver::task_receiver(emblib::io_dev& receiver_device) noexcept :
+task_receiver::task_receiver(emblib::io::istream<char>& receiver_device) noexcept :
     task("Task Receiver", TASK_RECEIVER_PRIORITY, m_task_stack),
     m_receiver_device(receiver_device)
 {
@@ -17,7 +17,7 @@ bool task_receiver::get_command(pb_mp_Command& command_buffer) noexcept
 {
     // Try to read from queue with timeout 0
     // If the queue is empty it will return false
-    return m_command_queue.receive(command_buffer, emblib::milliseconds_t(0));
+    return m_command_queue.receive(command_buffer, milliseconds_t(0));
 }
 
 bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t count)
@@ -46,7 +46,7 @@ bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t cou
             if (!this_task->m_receiver_device.read_async(discard_buffer, to_recv, read_async_cb))
                 return false;
             // This is okay since we know we are in the context of this task
-            this_task->wait_notification(emblib::MILLISECONDS_MAX);
+            this_task->wait_notification(milliseconds_t(-1));
 
             if (recv_status <= 0)
                 return false;
@@ -60,14 +60,12 @@ bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t cou
     if (!this_task->m_receiver_device.read_async((char*)buf, count, read_async_cb))
         return false;
 
-    this_task->wait_notification(emblib::MILLISECONDS_MAX);
+    this_task->wait_notification(milliseconds_t(-1));
     return recv_status == count;
 }
 
 void task_receiver::run() noexcept
 {
-    assert(m_receiver_device.is_async_available());
-
     while (true) {
         pb_mp_Command recv_command = pb_mp_Command_init_zero;
 
@@ -93,11 +91,11 @@ void task_receiver::run() noexcept
         if (!start_status) {
             log_warning("Receiver read start fail!");
             // Sleep to give time to the receiver to unblock
-            sleep(emblib::milliseconds_t(100));
+            sleep(milliseconds_t(100));
             continue;
         }
 
-        wait_notification(emblib::MILLISECONDS_MAX);
+        wait_notification(milliseconds_t(-1));
         if (recv_status <= 0) {
             log_error("Receiver read error!");
             continue;
@@ -105,7 +103,7 @@ void task_receiver::run() noexcept
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, recv_status);
         if (pb_decode(&buf_istream, pb_mp_Command_fields, &recv_command)) {
-            m_command_queue.send(recv_command, emblib::milliseconds_t(0));
+            m_command_queue.send(recv_command, milliseconds_t(0));
         }
     }
 #endif

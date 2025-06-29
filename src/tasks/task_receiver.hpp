@@ -2,7 +2,7 @@
 
 #include "task_config.hpp"
 #include "pb/mp/command.nanopb.h"
-#include <emblib/driver/io/io_dev.hpp>
+#include <emblib/io/istream.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
 #include <pb_decode.h>
@@ -11,7 +11,7 @@ namespace mp {
 
 class task_receiver : public emblib::task {
 public:
-    task_receiver(emblib::io_dev& receiver_device) noexcept;
+    task_receiver(emblib::io::istream<char>& receiver_device) noexcept;
 
     /**
      * This task has a command buffer which is filled up as the
@@ -40,7 +40,7 @@ private:
 private:
     emblib::task_stack_t<TASK_RECEIVER_STACK_SIZE> m_task_stack;
     emblib::queue<pb_mp_Command, TASK_RECEIVER_QUEUE_SIZE> m_command_queue;
-    emblib::io_dev& m_receiver_device;
+    emblib::io::istream<char>& m_receiver_device;
 
     pb_istream_t m_pb_istream;
 };

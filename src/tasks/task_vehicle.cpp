@@ -17,7 +17,7 @@ task_vehicle::task_vehicle(
 
 void task_vehicle::run() noexcept
 {
-    constexpr float dt = TASK_VEHICLE_PERIOD.convert<emblib::second_t>().value();
+    constexpr float dt = emblib::units::seconds<float>(TASK_VEHICLE_PERIOD).value();
     
     // Vehicle's init must complete successfully for
     // the rest of the system to run as intended

@@ -7,7 +7,7 @@
 namespace mp {
 
 task_telemetry::task_telemetry(
-    emblib::io_dev& telemetry_device,
+    emblib::io::ostream<char>& telemetry_device,
     task_accelerometer& task_accelerometer,
     task_gyroscope& task_gyroscope,
     task_state_estimator& task_state_estimator
@@ -22,9 +22,7 @@ task_telemetry::task_telemetry(
 
 void task_telemetry::run() noexcept
 {
-    // This doesn't have to be an assert
-    // Can just exit and turn off the telemetry task
-    assert(m_telemetry_device.probe(emblib::milliseconds_t(0)));
+    // TODO: Add a health check call for the output device
 
     while (true) {
         pb_mp_Telemetry msg = pb_mp_Telemetry_init_zero;
@@ -66,16 +64,12 @@ void task_telemetry::run() noexcept
         pb_ostream_t pb_ostream = pb_ostream_from_buffer((pb_byte_t*)out_buffer, sizeof(out_buffer));
         
         if (pb_encode(&pb_ostream, pb_mp_Telemetry_fields, &msg)) {
-            if (m_telemetry_device.is_async_available()) {
-                bool start_status = m_telemetry_device.write_async(out_buffer, pb_ostream.bytes_written, [this](ssize_t status) {
-                    notify_from_isr();
-                });
+            bool start_status = m_telemetry_device.write_async(out_buffer, pb_ostream.bytes_written, [this](ssize_t status) {
+                notify_from_isr();
+            });
 
-                if (start_status)
-                    wait_notification(emblib::MILLISECONDS_MAX);
-            } else {
-                m_telemetry_device.write(out_buffer, pb_ostream.bytes_written, emblib::milliseconds_t(0));
-            }
+            if (start_status)
+                wait_notification(milliseconds_t(-1));
         } else {
             log_error("Failed to encode telemetry!");
         }

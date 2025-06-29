@@ -1,6 +1,6 @@
 #pragma once
 
-#include <emblib/utils/logger.hpp>
+#include "embliblogger.hpp"
 
 #define MP_LOGGER_USE_PROTOBUF      0
 
@@ -40,7 +40,7 @@ private:
         m_message_id(0)
     {}
 
-    void flush(log_level_e level, const buffer_t& buffer, emblib::io_dev& log_device) noexcept override;
+    void flush(log_level_e level, const buffer_t& buffer, emblib::io::ostream<char>& log_device) noexcept override;
 
 private:
     bool m_encode_protobuf;

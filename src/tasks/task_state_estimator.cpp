@@ -7,7 +7,7 @@ namespace mp {
 
 void task_state_estimator::run() noexcept
 {
-    constexpr float dt = TASK_STATE_PERIOD.convert<emblib::second_t>().value();
+    constexpr float dt = emblib::units::seconds<float>(TASK_STATE_PERIOD).value();
     
     // Assuming that sensor covariances won't change during runtime
     const matrix3f accel_cov = m_task_accel.get_noise_variance();

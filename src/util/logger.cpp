@@ -18,10 +18,10 @@ static bool encode_string(pb_ostream_t* stream, const pb_field_t* field, void* c
            pb_encode_string(stream, (const uint8_t *)buffer->c_str(), buffer->length());
 }
 
-void logger::flush(log_level_e level, const buffer_t& buffer, emblib::io_dev& log_device) noexcept
+void logger::flush(log_level_e level, const buffer_t& buffer, emblib::io::ostream<char>& log_device) noexcept
 {
     // Don't wait if cannot write currently
-    static constexpr auto WRITE_TIMEOUT = std::chrono::milliseconds(0);
+    static constexpr auto WRITE_TIMEOUT = milliseconds_t(0);
 
     if (m_encode_protobuf) {
         pb_mp_Log pb_msg = pb_mp_Log_init_zero;
