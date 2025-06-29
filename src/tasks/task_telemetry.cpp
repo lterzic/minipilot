@@ -24,7 +24,7 @@ void task_telemetry::run() noexcept
 {
     // This doesn't have to be an assert
     // Can just exit and turn off the telemetry task
-    assert(m_telemetry_device.probe(emblib::milliseconds_t(0)));
+    assert(m_telemetry_device.probe(milliseconds_t(0)));
 
     while (true) {
         pb_mp_Telemetry msg = pb_mp_Telemetry_init_zero;
@@ -74,7 +74,7 @@ void task_telemetry::run() noexcept
                 if (start_status)
                     wait_notification(emblib::MILLISECONDS_MAX);
             } else {
-                m_telemetry_device.write(out_buffer, pb_ostream.bytes_written, emblib::milliseconds_t(0));
+                m_telemetry_device.write(out_buffer, pb_ostream.bytes_written, milliseconds_t(0));
             }
         } else {
             log_error("Failed to encode telemetry!");

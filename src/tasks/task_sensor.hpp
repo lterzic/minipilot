@@ -23,7 +23,7 @@ public:
         sensor_t& sensor,
         const char* task_name,
         task_priority_e task_priority,
-        emblib::milliseconds_t task_period
+        milliseconds_t task_period
     ) :
         task(task_name, task_priority, m_task_stack),
         m_sensor(sensor),
@@ -93,7 +93,7 @@ private:
 
 private:
     emblib::task_stack_t<512> m_task_stack;
-    emblib::milliseconds_t m_task_period;
+    milliseconds_t m_task_period;
     sensor_t& m_sensor;
     
     mutable emblib::mutex m_read_mutex;

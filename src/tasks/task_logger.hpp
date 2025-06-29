@@ -19,12 +19,12 @@ public:
     /**
      * Char dev write interface override
      */
-    ssize_t write(const char* data, size_t size, emblib::milliseconds_t timeout) noexcept override;
+    ssize_t write(const char* data, size_t size, milliseconds_t timeout) noexcept override;
 
     /**
      * Reading not supported for the log task
      */
-    ssize_t read(char* buffer, size_t size, emblib::milliseconds_t timeout) noexcept override
+    ssize_t read(char* buffer, size_t size, milliseconds_t timeout) noexcept override
     {
         UNUSED(buffer);
         UNUSED(size);

@@ -3,7 +3,7 @@
 
 namespace mp {
 
-using emblib::milliseconds_t;
+using milliseconds_t;
 
 ssize_t task_logger::write(const char* data, size_t size, milliseconds_t timeout) noexcept
 {

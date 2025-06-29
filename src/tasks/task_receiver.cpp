@@ -17,7 +17,7 @@ bool task_receiver::get_command(pb_mp_Command& command_buffer) noexcept
 {
     // Try to read from queue with timeout 0
     // If the queue is empty it will return false
-    return m_command_queue.receive(command_buffer, emblib::milliseconds_t(0));
+    return m_command_queue.receive(command_buffer, milliseconds_t(0));
 }
 
 bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t count)
@@ -93,7 +93,7 @@ void task_receiver::run() noexcept
         if (!start_status) {
             log_warning("Receiver read start fail!");
             // Sleep to give time to the receiver to unblock
-            sleep(emblib::milliseconds_t(100));
+            sleep(milliseconds_t(100));
             continue;
         }
 
@@ -105,7 +105,7 @@ void task_receiver::run() noexcept
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, recv_status);
         if (pb_decode(&buf_istream, pb_mp_Command_fields, &recv_command)) {
-            m_command_queue.send(recv_command, emblib::milliseconds_t(0));
+            m_command_queue.send(recv_command, milliseconds_t(0));
         }
     }
 #endif
