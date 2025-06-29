@@ -19,11 +19,12 @@ void task_logger::run() noexcept
         // and removing the item from queue after write somehow
         m_log_msg_queue.receive(recv_msg, milliseconds_t(-1));
 
-        bool status = m_log_device.write_async(recv_msg.data, recv_msg.length, [this](ssize_t status) {
+        auto write_cb = [this](ssize_t status) {
             notify_from_isr();
-        });
-        
-        if (status)
+        };
+
+        // TODO: Add aborting in case of notification timeout
+        if (m_log_device.write_async(recv_msg.data, recv_msg.length, write_cb))
             wait_notification(milliseconds_t(-1));
     }
 }

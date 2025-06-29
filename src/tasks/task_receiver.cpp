@@ -82,13 +82,15 @@ void task_receiver::run() noexcept
 #else
         char recv_buf[sizeof(pb_mp_Command)];
 
-        ssize_t recv_status = -1;
-        bool start_status = m_receiver_device.read_async(recv_buf, sizeof(recv_buf), [this, &recv_status](ssize_t status){
-            recv_status = status;
+        // Read status is negative in case the read operation failed, else
+        // it is the size of the received message in bytes
+        ssize_t read_status = -1;
+        auto read_cb = [this, &read_status](ssize_t status) {
+            read_status = status;
             notify_from_isr();
-        });
+        };
         
-        if (!start_status) {
+        if (!m_receiver_device.read_async(recv_buf, sizeof(recv_buf), read_cb)) {
             log_warning("Receiver read start fail!");
             // Sleep to give time to the receiver to unblock
             sleep(milliseconds_t(100));
@@ -96,12 +98,12 @@ void task_receiver::run() noexcept
         }
 
         wait_notification(milliseconds_t(-1));
-        if (recv_status <= 0) {
+        if (read_status <= 0) {
             log_error("Receiver read error!");
             continue;
         }
 
-        pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, recv_status);
+        pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, read_status);
         if (pb_decode(&buf_istream, pb_mp_Command_fields, &recv_command)) {
             m_command_queue.send(recv_command, milliseconds_t(0));
         }
