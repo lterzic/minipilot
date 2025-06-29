@@ -64,16 +64,12 @@ void task_telemetry::run() noexcept
         pb_ostream_t pb_ostream = pb_ostream_from_buffer((pb_byte_t*)out_buffer, sizeof(out_buffer));
         
         if (pb_encode(&pb_ostream, pb_mp_Telemetry_fields, &msg)) {
-            if (m_telemetry_device.is_async_available()) {
-                bool start_status = m_telemetry_device.write_async(out_buffer, pb_ostream.bytes_written, [this](ssize_t status) {
-                    notify_from_isr();
-                });
+            bool start_status = m_telemetry_device.write_async(out_buffer, pb_ostream.bytes_written, [this](ssize_t status) {
+                notify_from_isr();
+            });
 
-                if (start_status)
-                    wait_notification(emblib::MILLISECONDS_MAX);
-            } else {
-                m_telemetry_device.write(out_buffer, pb_ostream.bytes_written, milliseconds_t(0));
-            }
+            if (start_status)
+                wait_notification(milliseconds_t(-1));
         } else {
             log_error("Failed to encode telemetry!");
         }

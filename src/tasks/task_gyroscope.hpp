@@ -21,7 +21,7 @@ class task_gyroscope : public task_sensor<vector<rps_t, 3>> {
 
 public:
     explicit task_gyroscope(
-        emblib::gyroscope<rps_t>& gyroscope,
+        emblib::gyroscope& gyroscope,
         matrix<float, 3> transform
     ) : task_sensor(
         gyroscope,

@@ -20,7 +20,7 @@ class task_accelerometer : public task_sensor<vector<mpss_t, 3>> {
 
 public:
     explicit task_accelerometer(
-        emblib::accelerometer<mpss_t>& accelerometer,
+        emblib::accelerometer& accelerometer,
         matrix<float, 3> transform
     ) : task_sensor(
         accelerometer,

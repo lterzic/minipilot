@@ -46,7 +46,7 @@ bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t cou
             if (!this_task->m_receiver_device.read_async(discard_buffer, to_recv, read_async_cb))
                 return false;
             // This is okay since we know we are in the context of this task
-            this_task->wait_notification(emblib::MILLISECONDS_MAX);
+            this_task->wait_notification(milliseconds_t(-1));
 
             if (recv_status <= 0)
                 return false;
@@ -60,14 +60,12 @@ bool task_receiver::pb_istream_cb(pb_istream_t *stream, uint8_t *buf, size_t cou
     if (!this_task->m_receiver_device.read_async((char*)buf, count, read_async_cb))
         return false;
 
-    this_task->wait_notification(emblib::MILLISECONDS_MAX);
+    this_task->wait_notification(milliseconds_t(-1));
     return recv_status == count;
 }
 
 void task_receiver::run() noexcept
 {
-    assert(m_receiver_device.is_async_available());
-
     while (true) {
         pb_mp_Command recv_command = pb_mp_Command_init_zero;
 
@@ -97,7 +95,7 @@ void task_receiver::run() noexcept
             continue;
         }
 
-        wait_notification(emblib::MILLISECONDS_MAX);
+        wait_notification(milliseconds_t(-1));
         if (recv_status <= 0) {
             log_error("Receiver read error!");
             continue;

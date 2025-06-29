@@ -16,12 +16,12 @@ namespace mp {
  */
 struct devices_s {
     struct {
-        emblib::accelerometer<emblib::mpss_t>& sensor;
+        emblib::accelerometer& sensor;
         // Map the sensor reading to the mp coordinate frame
         const matrix3f& transform;
     } accelerometer;
     struct {
-        emblib::gyroscope<emblib::rps_t>& sensor;
+        emblib::gyroscope& sensor;
         // Map the sensor reading to the mp coordinate frame
         const matrix3f& transform;
     } gyroscope;
