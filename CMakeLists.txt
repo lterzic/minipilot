@@ -21,6 +21,7 @@ add_library(minipilot STATIC
     src/state/ekf_ahrs.cpp
     src/state/ekf_inertial.cpp
     src/util/logger.cpp
+    src/logging/logger.cpp
     src/main.cpp
 )
 
