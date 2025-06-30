@@ -1,5 +1,5 @@
 #include "task_receiver.hpp"
-#include "util/logger.hpp"
+#include "logging/log.hpp"
 #include <pb_decode.h>
 
 namespace mp {

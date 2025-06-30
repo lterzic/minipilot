@@ -1,6 +1,7 @@
 #pragma once
 
 #include "log_handler.hpp"
+#include "task_config.hpp"
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
 #include <etl/list.h>
@@ -8,7 +9,7 @@
 
 namespace mp {
 
-class logger : public emblib::task {
+class logger : private emblib::task {
 
 public:
     /**
@@ -22,7 +23,7 @@ public:
     template <typename... item_types>
     void log(log_level_e level, item_types&&... items) noexcept
     {
-        if (m_handlers.empty()) {
+        if (m_handlers == nullptr || m_handlers->empty()) {
             return;
         }
 
@@ -38,9 +39,9 @@ public:
     /**
      * Subscribe a new handler to the log event
      */
-    void add_log_handler(log_handler& handler) noexcept
+    void set_handlers(etl::ilist<log_handler*>& handlers) noexcept
     {
-        m_handlers.push_back(&handler);
+        m_handlers = &handlers;
     }
 
 private:
@@ -64,15 +65,13 @@ private:
     etl::format_spec m_format;
     
     // List of all subscribed handlers
-    // TODO: Can be replaced by etl::ilist<>* and instead of having
-    // `add_log_handler`, use `set_log_handlers(etl::ilist<>*)`
-    etl::list<log_handler*, 4> m_handlers;
+    etl::ilist<log_handler*>* m_handlers;
 
     // Log queue
-    emblib::queue<log_s, 4> m_queue;
+    emblib::queue<log_s, TASK_LOGGER_QUEUE_SIZE> m_queue;
 
     // Task stack
-    emblib::task_stack_t<1024> m_stack;
+    emblib::task_stack_t<TASK_LOGGER_STACK_SIZE> m_stack;
 };
 
 }

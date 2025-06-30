@@ -10,7 +10,7 @@ logger& logger::get_instance() noexcept
 }
 
 logger::logger() noexcept :
-    task("Task logger", 1, m_stack),
+    task("Task logger", TASK_LOGGER_PRIORITY, m_stack),
     m_message_count(0)
 {
     m_format.precision(3);
@@ -30,7 +30,7 @@ void logger::flush_log(log_s& log, log_level_e level) noexcept
     } else {
         log.message_id = m_message_count++;
         
-        for (log_handler* handler : m_handlers) {
+        for (log_handler* handler : *m_handlers) {
             handler->handle_log(log);
         }
     }
@@ -44,7 +44,7 @@ void logger::run() noexcept
         m_queue.receive(log, milliseconds_t(-1));
         log.message_id = m_message_count++;
 
-        for (log_handler* handler : m_handlers) {
+        for (log_handler* handler : *m_handlers) {
             handler->handle_log(log);
         }
     }

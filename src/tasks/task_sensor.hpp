@@ -1,7 +1,7 @@
 #pragma once
 
 #include "task_config.hpp"
-#include "util/logger.hpp"
+#include "logging/log.hpp"
 #include <emblib/driver/sensor/sensor.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/mutex.hpp>
