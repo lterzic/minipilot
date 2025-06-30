@@ -1,28 +1,19 @@
 #include "main.hpp"
-#include "tasks/task_logger.hpp"
+#include "logging/log.hpp"
 #include "tasks/task_telemetry.hpp"
 #include "tasks/task_accelerometer.hpp"
 #include "tasks/task_gyroscope.hpp"
 #include "tasks/task_state_estimator.hpp"
 #include "tasks/task_receiver.hpp"
 #include "tasks/task_vehicle.hpp"
-#include "util/logger.hpp"
 
 namespace mp {
 
 int main(const devices_s& devices, state_estimator& state_estimator, vehicle& vehicle)
 {
-    // If the logging task is not created, this stays uninitialized
-    task_logger* task_logger_ptr = nullptr;
-
-    // Initialize the logging system (task) if there is an available logging device
-    if (devices.log_device) {
-        // Create the logging task
-        static task_logger task_logger(*devices.log_device);
-        task_logger_ptr = &task_logger;
-
-        // Logging device is used directly until the scheduler starts
-        logger::get_instance().set_output_device(*devices.log_device);
+    // Initialize the logging system if there is an available logging device
+    if (!devices.log_handlers.empty()) {
+        logger::get_instance().set_handlers(devices.log_handlers);
         log_info("Logging available!");
     }
 
@@ -81,12 +72,6 @@ int main(const devices_s& devices, state_estimator& state_estimator, vehicle& ve
 
 
     log_info("Starting the scheduler...");
-    
-    // If a logging device exists, it means the task was already
-    // created, so now switch the logging to go through the logging task
-    if (task_logger_ptr) {
-        logger::get_instance().set_output_device(*task_logger_ptr);
-    }
 
     // Start the scheduler
     emblib::task::start_scheduler();

@@ -1,6 +1,6 @@
 #include "task_state_estimator.hpp"
+#include "logging/log.hpp"
 #include "util/constants.hpp"
-#include "util/logger.hpp"
 #include <cmath>
 
 namespace mp {

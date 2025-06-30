@@ -1,10 +1,12 @@
 #pragma once
 
 #include "vehicles/vehicle.hpp"
+#include "logging/log_handler.hpp"
 #include <emblib/io/istream.hpp>
 #include <emblib/io/ostream.hpp>
 #include <emblib/driver/sensor/accelerometer.hpp>
 #include <emblib/driver/sensor/gyroscope.hpp>
+#include <etl/list.h>
 
 namespace mp {
 
@@ -25,9 +27,9 @@ struct devices_s {
         // Map the sensor reading to the mp coordinate frame
         const matrix3f& transform;
     } gyroscope;
-    emblib::io::ostream<char>* log_device;
     emblib::io::ostream<char>* telemetry_device;
     emblib::io::istream<char>& receiver_device;
+    etl::ilist<log_handler*>& log_handlers;
 };
 
 /**
