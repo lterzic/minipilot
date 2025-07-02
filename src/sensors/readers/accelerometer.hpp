@@ -38,7 +38,7 @@ public:
 private:
     bool init(sensor_t& sensor) noexcept override;
 
-    vector<mpss_t, 3> process(const accelerometer::data_t& raw_data) const noexcept override;
+    vector<mpss_t, 3> process(const accelerometer::data_t& raw_data) noexcept override;
 
 private:
     // Transform maps a potentially different coordinate space

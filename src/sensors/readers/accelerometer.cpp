@@ -21,13 +21,14 @@ accelerometer_reader::init(sensor_t& sensor) noexcept
 }
 
 vector<mpss_t, 3>
-accelerometer_reader::process(const accelerometer::data_t& raw_data) const noexcept
+accelerometer_reader::process(const accelerometer::data_t& raw_data) noexcept
 {
-    // TODO: Add (optional) low-pass filtering
-    
     // TODO: Update emblib so that casts don'd do lazy eval
     vector<mpss_t, 3> raw_vec {raw_data[0], raw_data[1], raw_data[2]};
-    return m_transform.matmul(raw_vec - m_bias);
+    vector<mpss_t, 3> ned_vec = m_transform.matmul(raw_vec);
+    
+    // TODO: Add (optional) low-pass filtering
+    return ned_vec - m_bias;
 }
 
 }

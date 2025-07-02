@@ -47,6 +47,14 @@ public:
         return m_last_processed;
     }
 
+    /**
+     * Get the underlying sensor
+     */
+    const sensor_t& get_sensor() const noexcept
+    {
+        return m_sensor;
+    }
+
 private:
     /**
      * Initialize the sensor like setting the data rate,
@@ -62,7 +70,7 @@ private:
      * Apply processing to the raw input value
      * This can be a filter, bias subtraction, ...
      */
-    virtual out_data_type process(const raw_data_type& raw_data) const noexcept = 0;
+    virtual out_data_type process(const raw_data_type& raw_data) noexcept = 0;
 
     /**
      * Task thread
