@@ -20,11 +20,13 @@ public:
 public:
     explicit sensor_reader(
         sensor_t& sensor,
+        emblib::mutex* sensor_mutex,
         task_priority_e task_priority,
         milliseconds_t task_period
     ) :
         task(create_task_name(sensor).c_str(), task_priority, m_task_stack),
         m_sensor(sensor),
+        m_sensor_mutex(sensor_mutex),
         m_task_period(task_period)
     {}
     virtual ~sensor_reader() = default;
@@ -94,6 +96,12 @@ private:
 private:
     emblib::task_stack_t<512> m_task_stack;
     milliseconds_t m_task_period;
+    
+    // The sensor might be shared with other tasks
+    // for example if one IMU provides both accelerometer
+    // and gyroscope data. This is needed to make sure
+    // both tasks don't read at the same time
+    emblib::mutex* m_sensor_mutex;
     sensor_t& m_sensor;
     
     mutable emblib::mutex m_read_mutex;
@@ -128,7 +136,17 @@ inline void sensor_reader<raw_data_type, out_data_type>::run() noexcept
             log_warning("Sensor data not ready!");
         }
 
+        // If a mutex exists, acquire it before trying to read
+        if (m_sensor_mutex) {
+            m_sensor_mutex->lock();
+        }
+
         if (m_sensor.read(read_data)) {
+            // Reading done, so allow other tasks to use the sensor
+            if (m_sensor_mutex) {
+                m_sensor_mutex->unlock();
+            }
+
             // Data is processed pre mutex lock to avoid unnecessary blocking
             // on this mutex while the shared data is not being updated
             auto processed_data = process(read_data);
@@ -139,6 +157,10 @@ inline void sensor_reader<raw_data_type, out_data_type>::run() noexcept
 
             // TODO: Once pub/sub system implemented, publish values from here
         } else {
+            if (m_sensor_mutex) {
+                m_sensor_mutex->unlock();
+            }
+            
             // TODO: Add information about sensor type to the log
             log_warning("Sensor reading failed");
         }
