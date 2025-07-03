@@ -1,9 +1,8 @@
 #pragma once
 
 #include "task_config.hpp"
-#include "task_accelerometer.hpp"
-#include "task_gyroscope.hpp"
 #include "task_state_estimator.hpp"
+#include "sensors/sensor_manager.hpp"
 #include <emblib/io/ostream.hpp>
 #include <emblib/rtos/task.hpp>
 
@@ -17,8 +16,7 @@ class task_telemetry : public emblib::task {
 public:
     explicit task_telemetry(
         emblib::io::ostream<char>& telemetry_device,
-        task_accelerometer& task_accelerometer,
-        task_gyroscope& task_gyroscope,
+        const sensor_manager& sensor_manager,
         task_state_estimator& task_state_estimator
     );
 
@@ -32,8 +30,7 @@ private:
     emblib::task_stack_t<TASK_TELEMETRY_STACK_SIZE> m_task_stack;
     emblib::io::ostream<char>& m_telemetry_device;
 
-    task_accelerometer& m_task_accel;
-    task_gyroscope& m_task_gyro;
+    const sensor_manager& m_sensor_manager;
     task_state_estimator& m_task_state;
 
     size_t m_msg_id;

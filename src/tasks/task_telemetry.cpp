@@ -8,14 +8,12 @@ namespace mp {
 
 task_telemetry::task_telemetry(
     emblib::io::ostream<char>& telemetry_device,
-    task_accelerometer& task_accelerometer,
-    task_gyroscope& task_gyroscope,
+    const sensor_manager& sensor_manager,
     task_state_estimator& task_state_estimator
 ) :
     task("Task telemetry", TASK_TELEMETRY_PRIORITY, m_task_stack),
     m_telemetry_device(telemetry_device),
-    m_task_accel(task_accelerometer),
-    m_task_gyro(task_gyroscope),
+    m_sensor_manager(sensor_manager),
     m_task_state(task_state_estimator),
     m_msg_id(0)
 {}
@@ -47,10 +45,10 @@ void task_telemetry::run() noexcept
         msg.has_state = true;
         
         // Sensor data
-        PB_SET(msg.sensors.accelerometer, raw, m_task_accel.get_raw().cast<float>());
-        PB_SET(msg.sensors.accelerometer, corrected, m_task_accel.get_corrected().cast<float>());
-        PB_SET(msg.sensors.gyroscope, raw, m_task_gyro.get_raw().cast<float>());
-        PB_SET(msg.sensors.gyroscope, corrected, m_task_gyro.get_corrected().cast<float>());
+        auto accelerometer = m_sensor_manager.get_sensor_reader<accelerometer_reader>();
+        auto gyroscope = m_sensor_manager.get_sensor_reader<gyroscope_reader>();
+        PB_SET(msg.sensors.accelerometer, corrected, accelerometer->get_processed().cast<float>());
+        PB_SET(msg.sensors.gyroscope, corrected, gyroscope->get_processed().cast<float>());
         msg.sensors.has_accelerometer = true;
         msg.sensors.has_gyroscope = true;
         msg.has_sensors = true;

@@ -5,6 +5,7 @@ namespace mp {
 accelerometer_reader::accelerometer_reader(const accelerometer_config_s& config) :
     sensor_reader(
         config.device,
+        config.mutex,
         TASK_ACCEL_PRIORITY,
         TASK_ACCEL_PERIOD
     ),

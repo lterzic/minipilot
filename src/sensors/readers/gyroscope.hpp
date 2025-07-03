@@ -23,6 +23,8 @@ using emblib::gyroscope;
 struct gyroscope_config_s {
     // Device reference
     gyroscope& device;
+    // Mutex in case the device is part of an IMU with other sensors
+    emblib::mutex* mutex;
     // Mapping from the device space into the NED coordinate system
     matrix3f transform;
 };
