@@ -25,7 +25,7 @@ struct devices_s {
  * Minipilot entry point
  */
 int main(
-    const sensor_readers_s& sensors,
+    const sensors_s& sensors,
     const devices_s& devices,
     state_estimator& state_estimator,
     vehicle& vehicle

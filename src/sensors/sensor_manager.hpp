@@ -1,7 +1,7 @@
 #pragma once
 
-#include "readers/accelerometer.hpp"
-#include "readers/gyroscope.hpp"
+#include "accelerometer.hpp"
+#include "gyroscope.hpp"
 
 namespace mp {
 
@@ -12,7 +12,7 @@ namespace mp {
  * to allow conditional compilation and replace with reference
  * instead of pointer
  */
-struct sensor_readers_s {
+struct sensors_s {
     accelerometer_reader* accelerometer;
     gyroscope_reader* gyroscope;
 };
@@ -22,8 +22,8 @@ struct sensor_readers_s {
  */
 class sensor_manager {
 public:
-    explicit sensor_manager(sensor_readers_s readers) :
-        m_readers(readers)
+    explicit sensor_manager(sensors_s sensors) :
+        m_sensors(sensors)
     {}
 
     /**
@@ -36,19 +36,19 @@ public:
     inline const reader_type* get_sensor_reader() const noexcept;
 
 private:
-    sensor_readers_s m_readers;
+    sensors_s m_sensors;
 };
 
 template <>
 inline const accelerometer_reader* sensor_manager::get_sensor_reader() const noexcept
 {
-    return m_readers.accelerometer;
+    return m_sensors.accelerometer;
 }
 
 template <>
 inline const gyroscope_reader* sensor_manager::get_sensor_reader() const noexcept
 {
-    return m_readers.gyroscope;
+    return m_sensors.gyroscope;
 }
 
 }

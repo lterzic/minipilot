@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../sensor_reader.hpp"
+#include "sensor_reader.hpp"
 #include "util/math.hpp"
 #include <emblib/driver/sensor/gyroscope.hpp>
 

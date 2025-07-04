@@ -18,8 +18,8 @@ add_library(minipilot STATIC
     src/state/ekf_inertial.cpp
     src/logging/logger.cpp
     src/logging/handlers/log_handler_string.cpp
-    src/sensors/readers/accelerometer.cpp
-    src/sensors/readers/gyroscope.cpp
+    src/sensors/accelerometer.cpp
+    src/sensors/gyroscope.cpp
     src/main.cpp
 )
 
