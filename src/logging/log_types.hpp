@@ -1,7 +1,6 @@
 #pragma once
 
 #include <emblib/units/time.hpp>
-#include <etl/string.h>
 
 namespace mp {
 
@@ -20,7 +19,7 @@ struct log_s {
     // Log time
     emblib::units::milliseconds<uint32_t> time_since_start;
     // Log data
-    etl::string<100> data;
+    char data[100];
 
     // TODO: Add task which called log
 };
