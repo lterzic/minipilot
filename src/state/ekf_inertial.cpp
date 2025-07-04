@@ -9,11 +9,13 @@ ekf_inertial::ekf_inertial(const ekf_vehicle& vehicle) noexcept :
 {}
 
 void
-ekf_inertial::update(const sensor_data_s& input, float dt) noexcept
+ekf_inertial::update(const sensor_manager& sensor_manager, float dt) noexcept
 {
-    // TODO: Validate accel and gyro input not nullptr
-    const vector3f a_in = *input.accelerometer;
-    const vector3f w_in = *input.gyroscope;
+    auto accelerometer = sensor_manager.get_sensor_reader<accelerometer_reader>();
+    auto gyroscope = sensor_manager.get_sensor_reader<gyroscope_reader>();
+
+    const vector3f a_in = accelerometer->get_processed().cast<float>();
+    const vector3f w_in = gyroscope->get_processed().cast<float>();
     const vectorf<OBS_DIM> observation {
         a_in(0), a_in(1), a_in(2),
         w_in(0), w_in(1), w_in(2)
@@ -21,8 +23,10 @@ ekf_inertial::update(const sensor_data_s& input, float dt) noexcept
 
     // Measurement (observation) variance
     matrixf<OBS_DIM> R(0);
-    R.set_submatrix(0, 0, *input.accelerometer_cov);
-    R.set_submatrix(3, 3, *input.gyroscope_cov);
+    float acc_nd = accelerometer->get_sensor().get_noise_density();
+    float gyro_nd = gyroscope->get_sensor().get_noise_density();
+    R.set_submatrix(0, 0, matrix3f::diagonal(acc_nd * acc_nd / dt));
+    R.set_submatrix(3, 3, matrix3f::diagonal(gyro_nd * gyro_nd / dt));
 
     // TODO: Get Q from the vehicle
     constexpr float v_noise = 1;

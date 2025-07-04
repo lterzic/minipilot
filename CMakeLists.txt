@@ -11,16 +11,15 @@ add_library(minipilot STATIC
     src/vehicles/copter/copter.cpp
     src/vehicles/copter/quadcopter.cpp
     src/vehicles/copter/control/copter_controller_pid.cpp
-    src/tasks/task_accelerometer.cpp
-    src/tasks/task_gyroscope.cpp
     src/tasks/task_telemetry.cpp
     src/tasks/task_state_estimator.cpp
     src/tasks/task_receiver.cpp
     src/tasks/task_vehicle.cpp
-    src/state/ekf_ahrs.cpp
     src/state/ekf_inertial.cpp
     src/logging/logger.cpp
     src/logging/handlers/log_handler_string.cpp
+    src/sensors/readers/accelerometer.cpp
+    src/sensors/readers/gyroscope.cpp
     src/main.cpp
 )
 

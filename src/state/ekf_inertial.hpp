@@ -47,7 +47,7 @@ public:
     /**
      * Algorithm iteration
      */
-    void update(const sensor_data_s& input, float dt) noexcept override;
+    void update(const sensor_manager& sensor_manager, float dt) noexcept override;
 
     /**
      * Get the current state

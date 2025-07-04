@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sensors/sensor_manager.hpp"
 #include "util/math.hpp"
 
 namespace mp {
@@ -36,34 +37,14 @@ struct state_s {
 };
 
 /**
- * Input for a state estimator
- * @note Assign `nullptr` if the appropriate value
- * is not available
- */
-struct sensor_data_s {
-    const vector3f* accelerometer = nullptr;
-    const matrix3f* accelerometer_cov = nullptr;
-
-    const vector3f* gyroscope = nullptr;
-    const matrix3f* gyroscope_cov = nullptr;
-
-    const vector3f* magnetometer = nullptr;
-    const matrix3f* magnetometer_cov = nullptr;
-    
-    const vector3f* gnss = nullptr;
-    const matrix3f* gnss_cov = nullptr;
-};
-
-/**
  * State estimation algorithm interface
  */
 class state_estimator {
-
 public:
     /**
      * Algorithm iteration
      */
-    virtual void update(const sensor_data_s& input, float dt) noexcept = 0;
+    virtual void update(const sensor_manager& sensor_manager, float dt) noexcept = 0;
 
     /**
      * Get the current state
