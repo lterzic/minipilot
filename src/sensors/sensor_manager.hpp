@@ -33,20 +33,20 @@ public:
      * type, add index as the parameter and set 0 as default
      */
     template <typename reader_type>
-    const reader_type* get_sensor_reader() const noexcept;
+    inline const reader_type* get_sensor_reader() const noexcept;
 
 private:
     sensor_readers_s m_readers;
 };
 
 template <>
-const accelerometer_reader* sensor_manager::get_sensor_reader() const noexcept
+inline const accelerometer_reader* sensor_manager::get_sensor_reader() const noexcept
 {
     return m_readers.accelerometer;
 }
 
 template <>
-const gyroscope_reader* sensor_manager::get_sensor_reader() const noexcept
+inline const gyroscope_reader* sensor_manager::get_sensor_reader() const noexcept
 {
     return m_readers.gyroscope;
 }
