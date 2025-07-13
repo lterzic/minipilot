@@ -38,8 +38,4 @@ inline constexpr size_t             TASK_RECEIVER_STACK_SIZE    = 1024;
 inline constexpr size_t             TASK_RECEIVER_QUEUE_SIZE    = 4;
 inline constexpr task_priority_e    TASK_RECEIVER_PRIORITY      = TASK_PRIORITY_HIGH;
 
-inline constexpr size_t             TASK_VEHICLE_STACK_SIZE     = 4096;
-inline constexpr task_priority_e    TASK_VEHICLE_PRIORITY       = TASK_PRIORITY_HIGH;
-inline constexpr auto               TASK_VEHICLE_PERIOD         = milliseconds_t(50); // 20Hz
-
 }

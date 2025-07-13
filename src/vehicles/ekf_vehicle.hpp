@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vehicle.hpp"
+#include "util/math.hpp"
 
 namespace mp {
 
@@ -8,7 +8,7 @@ namespace mp {
  * Adds required functionalities to a vehicle so it can be used
  * by the kalman filter
  */
-class ekf_vehicle : public vehicle {
+class ekf_vehicle {
 
 public:
     /**
