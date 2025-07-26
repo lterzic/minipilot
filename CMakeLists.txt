@@ -10,7 +10,7 @@ project(minipilot VERSION 1.0)
 add_library(minipilot STATIC
     src/tasks/task_telemetry.cpp
     src/tasks/task_receiver.cpp
-    src/state/ekf_inertial.cpp
+    src/state/ekf.cpp
     src/logging/logger.cpp
     src/logging/handlers/log_handler_string.cpp
     src/sensors/accelerometer.cpp
