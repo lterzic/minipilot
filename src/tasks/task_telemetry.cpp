@@ -9,12 +9,12 @@ namespace mp {
 task_telemetry::task_telemetry(
     emblib::io::ostream<char>& telemetry_device,
     const sensor_manager& sensor_manager,
-    task_state_estimator& task_state_estimator
+    const state_estimator& state_estimator
 ) :
     task("Task telemetry", TASK_TELEMETRY_PRIORITY, m_task_stack),
     m_telemetry_device(telemetry_device),
     m_sensor_manager(sensor_manager),
-    m_task_state(task_state_estimator),
+    m_state_estimator(state_estimator),
     m_msg_id(0)
 {}
 
@@ -36,7 +36,7 @@ void task_telemetry::run() noexcept
         m_msg_id++;
 
         // State data
-        state_s state = m_task_state.get_state();
+        state_s state = m_state_estimator.get_state();
         PB_SET(msg.state, position, state.position);
         PB_SET(msg.state, velocity, state.velocity);
         PB_SET(msg.state, acceleration, state.acceleration);

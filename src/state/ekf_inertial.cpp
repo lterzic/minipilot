@@ -3,65 +3,49 @@
 
 namespace mp {
 
-ekf_inertial::ekf_inertial(const ekf_vehicle& vehicle) noexcept :
-    m_vehicle(vehicle),
+// Extract the velocity vector from the kalman state vector
+static vector3f get_linear_velocity(const ekf::state_vec_t& state) noexcept
+{
+    return {state(0), state(1), state(2)};
+}
+
+// Extract the acceleration vector from the kalman state vector
+static vector3f get_linear_acceleration(const ekf::state_vec_t& state) noexcept
+{
+    return {state(3), state(4), state(5)};
+}
+
+// Extract the rotation quaternion from the kalman state vector
+static quaternionf get_rotation_q(const ekf::state_vec_t& state) noexcept
+{
+    return {state(6), state(7), state(8), state(9)};
+}
+
+// Extract the angular velocity vector from the kalman state vector
+static vector3f get_angular_velocity(const ekf::state_vec_t& state) noexcept
+{
+    return {state(10), state(11), state(12)};
+}
+
+// Extract the gyro drift vector from the kalman state vector
+static vector3f get_gyro_drift(const ekf::state_vec_t& state) noexcept
+{
+    return {state(13), state(14), state(15)};
+}
+
+ekf::ekf(
+    const sensor_manager& sensor_manager,
+    const model& model
+) noexcept :
+    state_estimator_periodic(KALMAN_FILTER_PERIOD),
+    m_sensor_manager(sensor_manager),
+    m_model(model),
     m_kalman({0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0})
 {}
 
-void
-ekf_inertial::update(const sensor_manager& sensor_manager, float dt) noexcept
-{
-    auto accelerometer = sensor_manager.get_sensor_reader<accelerometer_reader>();
-    auto gyroscope = sensor_manager.get_sensor_reader<gyroscope_reader>();
-
-    const vector3f a_in = accelerometer->get_processed().cast<float>();
-    const vector3f w_in = gyroscope->get_processed().cast<float>();
-    const vectorf<OBS_DIM> observation {
-        a_in(0), a_in(1), a_in(2),
-        w_in(0), w_in(1), w_in(2)
-    };
-
-    // Measurement (observation) variance
-    matrixf<OBS_DIM> R(0);
-    float acc_nd = accelerometer->get_sensor().get_noise_density();
-    float gyro_nd = gyroscope->get_sensor().get_noise_density();
-    R.set_submatrix(0, 0, matrix3f::diagonal(acc_nd * acc_nd / dt));
-    R.set_submatrix(3, 3, matrix3f::diagonal(gyro_nd * gyro_nd / dt));
-
-    // TODO: Get Q from the vehicle
-    constexpr float v_noise = 1;
-    constexpr float a_noise = 5e-1;
-    constexpr float q_noise = 1e-1;
-    constexpr float w_noise = 5e-1;
-    constexpr float wd_noise = 1e-2;
-    const auto Q = vectorf<KALMAN_DIM>({
-        v_noise, v_noise, v_noise,
-        a_noise, a_noise, a_noise,
-        q_noise, q_noise, q_noise, q_noise,
-        w_noise, w_noise, w_noise,
-        wd_noise, wd_noise, wd_noise
-    }).as_diagonal();
-
-    // Run the kalman filter iteration
-    m_kalman.update<OBS_DIM>(
-        [this, &dt](const state_vec_t& state) {return state_transition(state, dt);},
-        [this, &dt](const state_vec_t& state) {return state_transition_jacob(state, dt);},
-        [this, &dt](const state_vec_t& state) {return state_to_obs(state, dt);},
-        [this, &dt](const state_vec_t& state) {return state_to_obs_jacob(state, dt);},
-        Q,
-        R,
-        observation
-    );
-
-    // Position is integration of velocity and acceleration
-    const auto v = get_linear_velocity(m_kalman.get_state());
-    const auto a = get_linear_acceleration(m_kalman.get_state());
-    m_position += v * dt + a * (dt * dt / 2.f);
-}
-
 // For implementation details view docs for this task
-ekf_inertial::state_vec_t
-ekf_inertial::state_transition(const state_vec_t& state, float dt) const noexcept
+ekf::state_vec_t
+ekf::state_transition(const state_vec_t& state, float dt) const noexcept
 {
     const auto v = get_linear_velocity(state);
     const auto a = get_linear_acceleration(state);
@@ -71,7 +55,7 @@ ekf_inertial::state_transition(const state_vec_t& state, float dt) const noexcep
     // Acceleration is computed by the vehicle based on current actuator settings and the
     // dynamical model of the vehicle, and the velocity is the integration of acceleration
     vector3f v_next = v + dt * a;
-    vector3f a_next = m_vehicle.get_linear_acceleration(v, q);
+    vector3f a_next = m_model.get_linear_acceleration(v, q);
 
     // Quaternion is updated according to the approximation of the first derivative of
     // the quaternion (w.r.t. time) as a function of angular velocity in the local frame
@@ -92,7 +76,7 @@ ekf_inertial::state_transition(const state_vec_t& state, float dt) const noexcep
     
     // Angular acceleration is the first derivative of angular velocity and
     // is calculated according to the Euler's equations for a rotating reference frame
-    vector3f dw = m_vehicle.get_angular_acceleration(v, w, q);
+    vector3f dw = m_model.get_angular_acceleration(v, w, q);
     vector3f w_next = w + dt * dw;
 
     // We're not expecting the drift to change from iteration to iteration
@@ -107,8 +91,8 @@ ekf_inertial::state_transition(const state_vec_t& state, float dt) const noexcep
     };
 }
 
-matrixf<ekf_inertial::KALMAN_DIM>
-ekf_inertial::state_transition_jacob(const state_vec_t& state, float dt) const noexcept
+matrixf<ekf::KALMAN_DIM>
+ekf::state_transition_jacob(const state_vec_t& state, float dt) const noexcept
 {
     matrixf<KALMAN_DIM> result {0};
 
@@ -120,7 +104,7 @@ ekf_inertial::state_transition_jacob(const state_vec_t& state, float dt) const n
 
     // Not const because some matrices are multiplied by dt before
     // being inserted into the result matrix
-    auto jacobian = m_vehicle.get_jacobian(v, w, qv);
+    auto jacobian = m_model.get_jacobian(v, w, qv);
 
     // v_next = v + dt * a
     result(0, 0) = result(1, 1) = result(2, 2) = 1; // dv_dv
@@ -170,10 +154,7 @@ ekf_inertial::state_transition_jacob(const state_vec_t& state, float dt) const n
     return result;
 }
 
-// This implementation assumes only 2 readings:
-// acceleration and angular velocity
-vectorf<ekf_inertial::OBS_DIM>
-ekf_inertial::state_to_obs(const state_vec_t& state, float dt) const noexcept
+vectorf<6> ekf::update_acc_gyro(const state_vec_t& state) noexcept
 {
     const auto a = get_linear_acceleration(state);
     const auto q = get_rotation_q(state);
@@ -193,12 +174,9 @@ ekf_inertial::state_to_obs(const state_vec_t& state, float dt) const noexcept
     };
 }
 
-// This implementation assumes only 2 readings:
-// acceleration and angular velocity
-matrixf<ekf_inertial::OBS_DIM, ekf_inertial::KALMAN_DIM>
-ekf_inertial::state_to_obs_jacob(const state_vec_t& state, float dt) const noexcept
+matrixf<6, ekf::KALMAN_DIM> ekf::update_acc_gyro_jacob(const state_vec_t& state) noexcept
 {
-    matrixf<OBS_DIM, KALMAN_DIM> result {0};
+    matrixf<6, KALMAN_DIM> result {0};
 
     const auto a = get_linear_acceleration(state);
     const auto q = get_rotation_q(state);
@@ -232,5 +210,74 @@ ekf_inertial::state_to_obs_jacob(const state_vec_t& state, float dt) const noexc
 
     return result;
 }
-    
+
+void ekf::iteration(float dt) noexcept
+{
+    // TODO: Get Q from the vehicle
+    constexpr float v_noise = 1;
+    constexpr float a_noise = 5e-1;
+    constexpr float q_noise = 1e-1;
+    constexpr float w_noise = 5e-1;
+    constexpr float wd_noise = 1e-2;
+    const auto Q = vectorf<KALMAN_DIM>({
+        v_noise, v_noise, v_noise,
+        a_noise, a_noise, a_noise,
+        q_noise, q_noise, q_noise, q_noise,
+        w_noise, w_noise, w_noise,
+        wd_noise, wd_noise, wd_noise
+    }).as_diagonal();
+
+    while (true) {
+        // Run the prediction step based on the current state
+        m_kalman.predict(
+            [this, dt](const auto& state) { return state_transition(state, dt); },
+            [this, dt](const auto& state) { return state_transition_jacob(state, dt); },
+            Q
+        );
+
+        // Update based on IMU data
+        auto accelerometer = m_sensor_manager.get_sensor_reader<accelerometer_reader>();
+        auto gyroscope = m_sensor_manager.get_sensor_reader<gyroscope_reader>();
+
+        // TODO: Add checking if data is ready
+        if (accelerometer && gyroscope) {
+            const vector3f a_in = accelerometer->get_processed().cast<float>();
+            const vector3f w_in = gyroscope->get_processed().cast<float>();
+            const vectorf<6> observation {
+                a_in(0), a_in(1), a_in(2),
+                w_in(0), w_in(1), w_in(2)
+            };
+
+            matrixf<6> R(0);
+            float acc_nd = accelerometer->get_sensor().get_noise_density();
+            float gyro_nd = gyroscope->get_sensor().get_noise_density();
+            R.set_submatrix(0, 0, matrix3f::diagonal(acc_nd * acc_nd / dt));
+            R.set_submatrix(3, 3, matrix3f::diagonal(gyro_nd * gyro_nd / dt));
+
+            m_kalman.update<6>(
+                [](const auto& state) { return update_acc_gyro(state); },
+                [](const auto& state) { return update_acc_gyro_jacob(state); },
+                R,
+                observation
+            );
+        }
+
+        // Position is integration of velocity and acceleration
+        const auto v = get_linear_velocity(m_kalman.get_state());
+        const auto a = get_linear_acceleration(m_kalman.get_state());
+        m_position += v * dt + a * (dt * dt / 2.f);
+    }
+}
+
+state_s ekf::create_state() const noexcept
+{
+    return {
+        .position = m_position,
+        .velocity = get_linear_velocity(m_kalman.get_state()),
+        .acceleration = get_linear_acceleration(m_kalman.get_state()),
+        .angular_velocity = get_angular_velocity(m_kalman.get_state()),
+        .rotationq = get_rotation_q(m_kalman.get_state())
+    };
+}
+
 }

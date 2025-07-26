@@ -9,7 +9,6 @@ project(minipilot VERSION 1.0)
 # Source files for minipilot
 add_library(minipilot STATIC
     src/tasks/task_telemetry.cpp
-    src/tasks/task_state_estimator.cpp
     src/tasks/task_receiver.cpp
     src/state/ekf_inertial.cpp
     src/logging/logger.cpp

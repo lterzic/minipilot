@@ -1,20 +1,21 @@
 #pragma once
 
-#include "state_estimator.hpp"
-#include "vehicles/ekf_vehicle.hpp"
+#include "model.hpp"
+#include "state_estimator_periodic.hpp"
+#include "sensors/sensor_manager.hpp"
 #include <emblib/dsp/kalman.hpp>
 
 namespace mp {
 
-/**
- * Extended kalman filter used for inertial navigation
- * 
- * Uses only accelerometer, gyroscope and (optionally)
- * magnetometer data to compute the state, position is
- * just the integration of velocity
- */
-class ekf_inertial : public state_estimator {
+inline constexpr size_t KALMAN_FILTER_STACK_SIZE = 25000;
+inline constexpr milliseconds_t KALMAN_FILTER_PERIOD = milliseconds_t(20);
 
+/**
+ * Extended kalman filter based state estimator
+ */
+class ekf : public state_estimator_periodic<KALMAN_FILTER_STACK_SIZE> {
+
+public:
     /**
      * Dimension of the state vector used by the kalman filter
      * 3 - velocity
@@ -25,45 +26,25 @@ class ekf_inertial : public state_estimator {
      */
     static constexpr size_t KALMAN_DIM = 16;
 
-    /**
-     * Dimension of the measurement vector
-     * 3 - accelerometer
-     * 3 - gyroscope
-     * 
-     * @note This dimension does not need to be fixed since we
-     * can have a GPS (or some other sensor) measurement every n-th iteration
-     */
-    static constexpr size_t OBS_DIM = 6;
-
-
     // Convenience typedef
     using state_vec_t = vectorf<KALMAN_DIM>;
 
-public:
-    // Note: Maybe should not pass vehicle directly since it can
-    // be read without mutex while being updated by the task_vehicle
-    explicit ekf_inertial(const ekf_vehicle& vehicle) noexcept;
-
-    /**
-     * Algorithm iteration
-     */
-    void update(const sensor_manager& sensor_manager, float dt) noexcept override;
-
-    /**
-     * Get the current state
-     */
-    state_s get_state() const noexcept override
-    {
-        return {
-            .position = m_position,
-            .velocity = get_linear_velocity(m_kalman.get_state()),
-            .acceleration = get_linear_acceleration(m_kalman.get_state()),
-            .angular_velocity = get_angular_velocity(m_kalman.get_state()),
-            .rotationq = get_rotation_q(m_kalman.get_state())
-        };
-    }
+    explicit ekf(
+        const sensor_manager& sensor_manager,
+        const model& model
+    ) noexcept;
 
 private:
+    /**
+     * Run an iteration of the algorithm
+     */
+    void iteration(float dt) noexcept override;
+    
+    /**
+     * Create state from an internal representation
+     */
+    state_s create_state() const noexcept override;
+    
     /**
      * Kalman filter state transition - `f`
      * @note View docs for this task for reasoning
@@ -78,54 +59,28 @@ private:
     matrixf<KALMAN_DIM> state_transition_jacob(const state_vec_t& state, float dt) const noexcept;
 
     /**
-     * Kalman filter state to observation mapping - `h`
+     * Calculate the expected readings of an accelerometer and gyroscope
      */
-    vectorf<OBS_DIM> state_to_obs(const state_vec_t& state, float dt) const noexcept;
+    static vectorf<6> update_acc_gyro(const state_vec_t& state) noexcept;
 
     /**
-     * Kalman filter state to observation mapping jacobian - `H`
+     * Accelerometer and gyroscope reading jacobian
      */
-    matrixf<OBS_DIM, KALMAN_DIM> state_to_obs_jacob(const state_vec_t& state, float dt) const noexcept;
-
+    static matrixf<6, KALMAN_DIM> update_acc_gyro_jacob(const state_vec_t& state) noexcept;
     
-    // Extract the velocity vector from the kalman state vector
-    static vector3f get_linear_velocity(const state_vec_t& state) noexcept
-    {
-        return {state(0), state(1), state(2)};
-    }
     
-    // Extract the acceleration vector from the kalman state vector
-    static vector3f get_linear_acceleration(const state_vec_t& state) noexcept
-    {
-        return {state(3), state(4), state(5)};
-    }
-
-    // Extract the rotation quaternion from the kalman state vector
-    static quaternionf get_rotation_q(const state_vec_t& state) noexcept
-    {
-        return {state(6), state(7), state(8), state(9)};
-    }
-
-    // Extract the angular velocity vector from the kalman state vector
-    static vector3f get_angular_velocity(const state_vec_t& state) noexcept
-    {
-        return {state(10), state(11), state(12)};
-    }
-
-    // Extract the gyro drift vector from the kalman state vector
-    static vector3f get_gyro_drift(const state_vec_t& state) noexcept
-    {
-        return {state(13), state(14), state(15)};
-    }
 
 private:
-    const ekf_vehicle& m_vehicle;
-    emblib::kalman<KALMAN_DIM> m_kalman;
+    // Sensor manager
+    const sensor_manager& m_sensor_manager;
+    // Model used for prediction
+    const model& m_model;
 
+    // Kalman filter
+    emblib::kalman<KALMAN_DIM> m_kalman;
     // Kept separately as it's not computed as part
     // of the kalman filter vector
     vector3f m_position;
-
 };
 
 }

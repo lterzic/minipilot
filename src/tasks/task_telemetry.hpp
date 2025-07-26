@@ -1,7 +1,7 @@
 #pragma once
 
 #include "task_config.hpp"
-#include "task_state_estimator.hpp"
+#include "state/state_estimator.hpp"
 #include "sensors/sensor_manager.hpp"
 #include <emblib/io/ostream.hpp>
 #include <emblib/rtos/task.hpp>
@@ -17,7 +17,7 @@ public:
     explicit task_telemetry(
         emblib::io::ostream<char>& telemetry_device,
         const sensor_manager& sensor_manager,
-        task_state_estimator& task_state_estimator
+        const state_estimator& state_estimator
     );
 
 private:
@@ -31,7 +31,7 @@ private:
     emblib::io::ostream<char>& m_telemetry_device;
 
     const sensor_manager& m_sensor_manager;
-    task_state_estimator& m_task_state;
+    const state_estimator& m_state_estimator;
 
     size_t m_msg_id;
 };

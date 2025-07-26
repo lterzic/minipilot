@@ -30,10 +30,6 @@ inline constexpr auto               TASK_ACCEL_PERIOD           = milliseconds_t
 inline constexpr task_priority_e    TASK_GYRO_PRIORITY          = TASK_PRIORITY_REALTIME;
 inline constexpr auto               TASK_GYRO_PERIOD            = milliseconds_t(5); // 200Hz
 
-inline constexpr size_t             TASK_STATE_STACK_SIZE       = 24576;
-inline constexpr task_priority_e    TASK_STATE_PRIORITY         = TASK_PRIORITY_REALTIME;
-inline constexpr auto               TASK_STATE_PERIOD           = milliseconds_t(20); // 50Hz
-
 inline constexpr size_t             TASK_RECEIVER_STACK_SIZE    = 1024;
 inline constexpr size_t             TASK_RECEIVER_QUEUE_SIZE    = 4;
 inline constexpr task_priority_e    TASK_RECEIVER_PRIORITY      = TASK_PRIORITY_HIGH;
