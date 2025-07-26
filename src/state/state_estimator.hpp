@@ -1,6 +1,5 @@
 #pragma once
 
-#include "sensors/sensor_manager.hpp"
 #include "util/math.hpp"
 
 namespace mp {
@@ -40,12 +39,8 @@ struct state_s {
  * State estimation algorithm interface
  */
 class state_estimator {
-public:
-    /**
-     * Algorithm iteration
-     */
-    virtual void update(const sensor_manager& sensor_manager, float dt) noexcept = 0;
 
+public:
     /**
      * Get the current state
      */
