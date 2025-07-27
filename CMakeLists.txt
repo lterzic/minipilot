@@ -8,8 +8,7 @@ project(minipilot VERSION 1.0)
 
 # Source files for minipilot
 add_library(minipilot STATIC
-    src/tasks/task_telemetry.cpp
-    src/tasks/task_receiver.cpp
+    src/comm/pb/pb_rx.cpp
     src/state/ekf.cpp
     src/logging/logger.cpp
     src/logging/handlers/log_handler_string.cpp
