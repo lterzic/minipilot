@@ -2,7 +2,6 @@
 
 #include "pb/mp/link.nanopb.h"
 #include <emblib/io/istream.hpp>
-#include <emblib/rtos/queue.hpp>
 #include <emblib/rtos/task.hpp>
 #include <etl/delegate.h>
 #include <etl/map.h>
