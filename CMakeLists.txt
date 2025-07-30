@@ -10,6 +10,7 @@ project(minipilot VERSION 1.0)
 add_library(minipilot STATIC
     src/comm/pb/pb_rx.cpp
     src/comm/pb/pb_tx.cpp
+    src/comm/pb/telemetry.cpp
     src/state/ekf.cpp
     src/logging/logger.cpp
     src/logging/handlers/log_handler_string.cpp
