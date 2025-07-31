@@ -11,6 +11,7 @@ add_library(minipilot STATIC
     src/comm/pb/pb_rx.cpp
     src/comm/pb/pb_tx.cpp
     src/comm/pb/telemetry.cpp
+    src/comm/pb/log_sink_pb.cpp
     src/state/ekf.cpp
     src/logging/logger.cpp
     src/logging/log_sink_text.cpp
