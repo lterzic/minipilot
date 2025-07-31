@@ -1,6 +1,6 @@
 #include "pb_rx.hpp"
 #include "mp_config.hpp"
-#include "logging/log.hpp"
+#include "logging/logging.hpp"
 #include <pb_decode.h>
 
 namespace mp {

@@ -21,17 +21,17 @@ void logger::flush_log(log_s& log, log_level_e level) noexcept
     log.level = level;
     log.time_since_start = get_time_since_start();
     
-    // Message count is incremented here if running in bare-metal
-    // mode since there are no other threads for a race condition,
-    // else it is incremented in the task to avoid using a mutex here
-    
     if (task::is_scheduler_running()) {
         m_queue.send(log, milliseconds_t(-1));
     } else {
+        // Message count is incremented here if running in bare-metal
+        // mode since there are no other threads for a race condition,
+        // else it is incremented in the task to avoid using a mutex here
         log.message_id = m_message_count++;
         
-        for (log_handler* handler : *m_handlers) {
-            handler->handle_log(log);
+        for (log_sink* sink : *m_sinks) {
+            if (sink->get_level() <= log.level)
+                sink->write(log);
         }
     }
 }
@@ -44,8 +44,9 @@ void logger::run() noexcept
         m_queue.receive(log, milliseconds_t(-1));
         log.message_id = m_message_count++;
 
-        for (log_handler* handler : *m_handlers) {
-            handler->handle_log(log);
+        for (log_sink* sink : *m_sinks) {
+            if (sink->get_level() <= log.level)
+                sink->write(log);
         }
     }
 }

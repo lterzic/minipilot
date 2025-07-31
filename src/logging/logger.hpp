@@ -1,6 +1,6 @@
 #pragma once
 
-#include "log_handler.hpp"
+#include "log_sink.hpp"
 #include "mp_config.hpp"
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
@@ -23,7 +23,7 @@ public:
     template <typename... item_types>
     void log(log_level_e level, item_types&&... items) noexcept
     {
-        if (m_handlers == nullptr || m_handlers->empty()) {
+        if (m_sinks == nullptr || m_sinks->empty()) {
             return;
         }
 
@@ -39,11 +39,11 @@ public:
     }
 
     /**
-     * Subscribe a new handler to the log event
+     * Subscribe a new sink to the log event
      */
-    void set_handlers(etl::ilist<log_handler*>& handlers) noexcept
+    void set_sinks(etl::ilist<log_sink*>& sinks) noexcept
     {
-        m_handlers = &handlers;
+        m_sinks = &sinks;
     }
 
 private:
@@ -67,7 +67,7 @@ private:
     etl::format_spec m_format;
     
     // List of all subscribed handlers
-    etl::ilist<log_handler*>* m_handlers;
+    etl::ilist<log_sink*>* m_sinks;
 
     // Log queue
     emblib::queue<log_s, LOGGER_QUEUE_SIZE> m_queue;

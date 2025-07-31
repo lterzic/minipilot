@@ -13,7 +13,7 @@ add_library(minipilot STATIC
     src/comm/pb/telemetry.cpp
     src/state/ekf.cpp
     src/logging/logger.cpp
-    src/logging/handlers/log_handler_string.cpp
+    src/logging/log_sink_text.cpp
     src/sensors/accelerometer.cpp
     src/sensors/gyroscope.cpp
 )

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "logging/log.hpp"
+#include "logging/logging.hpp"
 #include <emblib/driver/sensor/sensor.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/mutex.hpp>

@@ -1,8 +1,28 @@
 #pragma once
 
-#include "logger.hpp"
+#include "mp_config.hpp"
+#include "util/chrono.hpp"
 
-#define log_debug(...) mp::logger::get_instance().log(mp::log_level_e::DEBUG, __VA_ARGS__)
-#define log_info(...) mp::logger::get_instance().log(mp::log_level_e::INFO, __VA_ARGS__);
-#define log_warning(...) mp::logger::get_instance().log(mp::log_level_e::WARNING, __VA_ARGS__);
-#define log_error(...) mp::logger::get_instance().log(mp::log_level_e::ERROR, __VA_ARGS__);
+namespace mp {
+
+enum class log_level_e {
+    DEBUG,
+    INFO,
+    WARNING,
+    ERROR
+};
+
+struct log_s {
+    // Unique ID within this session
+    size_t message_id;
+    // Log level
+    log_level_e level;
+    // Log time
+    milliseconds_t time_since_start;
+    // Log data
+    char data[LOG_MAX_MESSAGE_LENGTH];
+
+    // TODO: Add task which called log
+};
+
+}
