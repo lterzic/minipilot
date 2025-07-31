@@ -1,4 +1,5 @@
 #include "gyroscope.hpp"
+#include "mp_config.hpp"
 
 namespace mp {
 
@@ -6,8 +7,8 @@ gyroscope_reader::gyroscope_reader(const gyroscope_config_s& config) :
     sensor_reader(
         config.device,
         config.mutex,
-        TASK_GYRO_PRIORITY,
-        TASK_GYRO_PERIOD
+        GYROSCOPE_READER_PRIORITY,
+        GYROSCOPE_READER_PERIOD
     ),
     m_transform(config.transform)
 {}

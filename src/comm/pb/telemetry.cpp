@@ -1,5 +1,5 @@
 #include "telemetry.hpp"
-#include "task_config.hpp"
+#include "mp_config.hpp"
 #include "util/pb_util.hpp"
 
 namespace mp {
@@ -9,7 +9,7 @@ telemetry::telemetry(
     const sensor_manager& sensor_manager,
     const state_estimator& state_estimator
 ) :
-    task("Telemetry", TASK_TELEMETRY_PRIORITY, m_stack),
+    task("Telemetry", TELEMETRY_TASK_PRIORITY, m_stack),
     m_tx(tx),
     m_sensor_manager(sensor_manager),
     m_state_estimator(state_estimator)
@@ -41,7 +41,7 @@ void telemetry::run() noexcept
             msg.has_sensors = true;
         });
 
-        sleep_periodic(TASK_TELEMETRY_PERIOD);
+        sleep_periodic(TELEMETRY_PERIOD);
     }
 }
 

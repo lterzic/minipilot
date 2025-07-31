@@ -1,7 +1,7 @@
 #pragma once
 
 #include "log_handler.hpp"
-#include "task_config.hpp"
+#include "mp_config.hpp"
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
 #include <etl/list.h>
@@ -70,10 +70,10 @@ private:
     etl::ilist<log_handler*>* m_handlers;
 
     // Log queue
-    emblib::queue<log_s, TASK_LOGGER_QUEUE_SIZE> m_queue;
+    emblib::queue<log_s, LOGGER_QUEUE_SIZE> m_queue;
 
     // Task stack
-    emblib::task_stack_t<TASK_LOGGER_STACK_SIZE> m_stack;
+    emblib::task_stack_t<1024> m_stack;
 };
 
 }

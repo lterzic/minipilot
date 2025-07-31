@@ -1,6 +1,6 @@
 #pragma once
 
-#include "task_config.hpp"
+#include "mp_config.hpp"
 #include "state/state_estimator.hpp"
 #include <emblib/rtos/mutex.hpp>
 #include <emblib/rtos/task.hpp>
@@ -17,7 +17,7 @@ class state_estimator_periodic : public state_estimator, public emblib::task {
 public:
     explicit state_estimator_periodic(
         milliseconds_t period,
-        task_priority_e task_priority = task_priority_e::TASK_PRIORITY_REALTIME
+        task_priority_e task_priority = TASK_PRIORITY_VERY_HIGH
     ) noexcept :
         task("Periodic state estimator", task_priority, m_stack),
         m_period(period)

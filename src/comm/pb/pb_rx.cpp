@@ -1,12 +1,12 @@
 #include "pb_rx.hpp"
-#include "task_config.hpp"
+#include "mp_config.hpp"
 #include "logging/log.hpp"
 #include <pb_decode.h>
 
 namespace mp {
 
 pb_rx::pb_rx(emblib::io::istream<char>& rx_dev) :
-    task("PB rx task", TASK_RECEIVER_PRIORITY, m_stack),
+    task("PB rx task", RX_TASK_PRIORITY, m_stack),
     m_rx_dev(rx_dev)
 {}
 
