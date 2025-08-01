@@ -3,6 +3,7 @@
 #include "pb/mp/link.nanopb.h"
 #include <emblib/io/ostream.hpp>
 #include <emblib/rtos/mutex.hpp>
+#include <emblib/rtos/semaphore.hpp>
 #include <etl/delegate.h>
 
 namespace mp {
@@ -46,8 +47,10 @@ private:
 
     // Serial data transmit device
     emblib::io::ostream<char>& m_tx_dev;
-    // Data transmit mutex
+    // Mutex for ensuring a single user
     emblib::mutex m_mutex;
+    // Semaphore to signal the end of the async write
+    emblib::semaphore m_write_smphr;
 };
 
 }
