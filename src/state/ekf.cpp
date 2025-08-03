@@ -37,7 +37,7 @@ ekf::ekf(
     const sensor_manager& sensor_manager,
     const model& model
 ) noexcept :
-    state_estimator_periodic(KALMAN_FILTER_PERIOD),
+    state_estimator_periodic(KALMAN_FILTER_PERIOD, m_stack),
     m_sensor_manager(sensor_manager),
     m_model(model),
     m_kalman({0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0})

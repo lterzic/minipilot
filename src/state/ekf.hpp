@@ -13,7 +13,7 @@ inline constexpr milliseconds_t KALMAN_FILTER_PERIOD = milliseconds_t(20);
 /**
  * Extended kalman filter based state estimator
  */
-class ekf : public state_estimator_periodic<KALMAN_FILTER_STACK_SIZE> {
+class ekf : public state_estimator_periodic {
 
 public:
     /**
@@ -81,6 +81,8 @@ private:
     // Kept separately as it's not computed as part
     // of the kalman filter vector
     vector3f m_position;
+
+    emblib::task_stack_t<KALMAN_FILTER_STACK_SIZE> m_stack;
 };
 
 }

@@ -11,15 +11,16 @@ namespace mp {
  * Periodically runs the state estimation algorithm and
  * safely exposes the calculated state using a mutex
  */
-template <size_t STACK_SIZE>
-class state_estimator_periodic : public state_estimator, public emblib::task_static<STACK_SIZE> {
+class state_estimator_periodic : public state_estimator, public emblib::task {
 
 public:
+    template <size_t STACK_SIZE>
     explicit state_estimator_periodic(
         milliseconds_t period,
+        emblib::task_stack_t<STACK_SIZE>& stack,
         task_priority_e task_priority = TASK_PRIORITY_VERY_HIGH
     ) noexcept :
-        emblib::task_static<STACK_SIZE>("Periodic state estimator", task_priority),
+        task("Periodic state estimator", task_priority, stack),
         m_period(period)
     {}
 
@@ -46,20 +47,7 @@ private:
     /**
      * Task thread
      */
-    void run() noexcept override
-    {
-        float dt = emblib::seconds<float>(m_period).value();
-    
-        while (true) {
-            iteration(dt);
-
-            m_state_mutex.lock();
-            m_state = create_state();
-            m_state_mutex.unlock();
-
-            this->sleep_periodic(m_period);
-        }
-    }
+    void run() noexcept override;
 
 private:
     // State is copied here after the algorithm iteration

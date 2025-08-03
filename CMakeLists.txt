@@ -13,6 +13,7 @@ add_library(minipilot STATIC
     src/comm/pb/telemetry.cpp
     src/comm/pb/log_sink_pb.cpp
     src/state/ekf.cpp
+    src/state/state_estimator_periodic.cpp
     src/logging/logger.cpp
     src/logging/log_sink_text.cpp
     src/sensors/accelerometer.cpp
