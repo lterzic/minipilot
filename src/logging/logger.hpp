@@ -9,7 +9,7 @@
 
 namespace mp {
 
-class logger : private emblib::task {
+class logger : private emblib::task_static<1024> {
 
 public:
     /**
@@ -71,9 +71,6 @@ private:
 
     // Log queue
     emblib::queue<log_s, LOGGER_QUEUE_SIZE> m_queue;
-
-    // Task stack
-    emblib::task_stack_t<1024> m_stack;
 };
 
 }

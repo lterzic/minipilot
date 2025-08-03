@@ -8,7 +8,7 @@
 
 namespace mp {
 
-class pb_rx : public emblib::task {
+class pb_rx : public emblib::task_static<1024> {
 public:
     using handler_t = etl::delegate<void( const pb_mp_UplinkMessage&)>;
 
@@ -31,8 +31,6 @@ private:
     etl::map<size_t, handler_t, 4> m_handlers;
     // Serial data receive device
     emblib::io::istream<char>& m_rx_dev;
-    // Task stack
-    emblib::task_stack_t<1024> m_stack;
 };
 
 }

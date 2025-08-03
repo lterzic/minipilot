@@ -12,7 +12,7 @@ namespace mp {
  * Allows for raw data processing through the `process` method
  */
 template <typename raw_data_type, typename out_data_type = raw_data_type>
-class sensor_reader : public emblib::task {
+class sensor_reader : public emblib::task_static<512> {
 
 public:
     using sensor_t = emblib::sensor<raw_data_type>;
@@ -24,7 +24,7 @@ public:
         task_priority_e task_priority,
         milliseconds_t task_period
     ) :
-        task(create_task_name(sensor).c_str(), task_priority, m_task_stack),
+        task_static(create_task_name(sensor).c_str(), task_priority),
         m_sensor(sensor),
         m_sensor_mutex(sensor_mutex),
         m_task_period(task_period)
@@ -94,7 +94,6 @@ private:
     }
 
 private:
-    emblib::task_stack_t<512> m_task_stack;
     milliseconds_t m_task_period;
     
     // The sensor might be shared with other tasks

@@ -27,7 +27,7 @@ telemetry::telemetry(
     const sensor_manager& sensor_manager,
     const state_estimator& state_estimator
 ) :
-    task("Telemetry", TELEMETRY_TASK_PRIORITY, m_stack),
+    task_static("Telemetry", TELEMETRY_TASK_PRIORITY),
     m_tx(tx),
     m_sensor_manager(sensor_manager),
     m_state_estimator(state_estimator)

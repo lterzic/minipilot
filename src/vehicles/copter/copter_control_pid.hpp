@@ -9,7 +9,7 @@
 
 namespace mp {
 
-class copter_control_pid : public copter_control, public emblib::task {
+class copter_control_pid : public copter_control, public emblib::task_static<1024> {
 public:
     explicit copter_control_pid(
         const copter_params_s& copter_params,
@@ -53,7 +53,6 @@ private:
     emblib::pid<vector3f, float> m_linear_acceleration_pid;
 
     mutable emblib::mutex m_mutex;
-    emblib::task_stack_t<512> m_stack;
 };
 
 }

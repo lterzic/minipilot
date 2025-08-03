@@ -12,14 +12,14 @@ namespace mp {
  * safely exposes the calculated state using a mutex
  */
 template <size_t STACK_SIZE>
-class state_estimator_periodic : public state_estimator, public emblib::task {
+class state_estimator_periodic : public state_estimator, public emblib::task_static<STACK_SIZE> {
 
 public:
     explicit state_estimator_periodic(
         milliseconds_t period,
         task_priority_e task_priority = TASK_PRIORITY_VERY_HIGH
     ) noexcept :
-        task("Periodic state estimator", task_priority, m_stack),
+        emblib::task_static<STACK_SIZE>("Periodic state estimator", task_priority),
         m_period(period)
     {}
 
@@ -57,7 +57,7 @@ private:
             m_state = create_state();
             m_state_mutex.unlock();
 
-            sleep_periodic(m_period);
+            this->sleep_periodic(m_period);
         }
     }
 
@@ -68,8 +68,6 @@ private:
     state_s m_state;
     // Mutex for reading and writing to the state copy
     mutable emblib::mutex m_state_mutex;
-    // Task stack
-    emblib::task_stack_t<STACK_SIZE> m_stack;
     // Execution period
     milliseconds_t m_period;
 };

@@ -8,7 +8,7 @@ copter_control_pid::copter_control_pid(
     const copter_params_s& copter_params,
     const state_estimator& state_estimator
 ) noexcept :
-    task("CC PID", COPTER_CONTROL_PID_PRIORITY, m_stack),
+    task_static("CC PID", COPTER_CONTROL_PID_PRIORITY),
     m_copter_params(copter_params),
     m_state_estimator(state_estimator),
     m_angular_velocity_pid(1, 0.2, 0),

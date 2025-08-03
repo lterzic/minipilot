@@ -10,7 +10,7 @@ logger& logger::get_instance() noexcept
 }
 
 logger::logger() noexcept :
-    task("Task logger", LOGGER_TASK_PRIORITY, m_stack),
+    task_static("Task logger", LOGGER_TASK_PRIORITY),
     m_message_count(0)
 {
     m_format.precision(3);

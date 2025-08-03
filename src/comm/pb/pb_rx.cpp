@@ -6,7 +6,7 @@
 namespace mp {
 
 pb_rx::pb_rx(emblib::io::istream<char>& rx_dev) :
-    task("PB rx task", RX_TASK_PRIORITY, m_stack),
+    task_static("PB rx task", RX_TASK_PRIORITY),
     m_rx_dev(rx_dev)
 {}
 

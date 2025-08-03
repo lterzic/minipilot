@@ -7,7 +7,7 @@
 
 namespace mp {
 
-class telemetry : public emblib::task {
+class telemetry : public emblib::task_static<1024> {
 
 public:
     explicit telemetry(
@@ -24,8 +24,6 @@ private:
 
     const sensor_manager& m_sensor_manager;
     const state_estimator& m_state_estimator;
-    
-    emblib::task_stack_t<1024> m_stack;
 };
 
 }
