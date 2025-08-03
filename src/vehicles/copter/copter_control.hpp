@@ -9,14 +9,6 @@ namespace mp {
  */
 class copter_control {
 public:
-    struct actuation_s {
-        // Thrust in Newtons in the "UP" direction
-        float thrust;
-        // Torque in the forward-right-down system in Newton-meters
-        vector3f torque;
-    };
-
-public:
     /**
      * Set the desired angular velocity vector and thrust
      * @param velocity Angular velocity vector in forward-right-down system in radians per second
@@ -32,11 +24,6 @@ public:
      * @returns `false` if the given velocity can't be achieved
      */
     virtual bool set_linear_velocity(vector3f velocity, float dir) noexcept = 0;
-
-    /**
-     * Get the required actuation to achieve the last set command
-     */
-    virtual actuation_s get_actuation() const noexcept = 0;
 
 };
 

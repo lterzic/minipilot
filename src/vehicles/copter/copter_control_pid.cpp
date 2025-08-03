@@ -5,10 +5,12 @@
 namespace mp {
 
 copter_control_pid::copter_control_pid(
+    copter& copter,
     const copter_params_s& copter_params,
     const state_estimator& state_estimator
 ) noexcept :
     task_static("CC PID", COPTER_CONTROL_PID_PRIORITY),
+    m_copter(copter),
     m_copter_params(copter_params),
     m_state_estimator(state_estimator),
     m_angular_velocity_pid(1, 0.2, 0),
@@ -19,6 +21,7 @@ copter_control_pid::copter_control_pid(
 bool copter_control_pid::set_angular_velocity(vector3f velocity, float thrust) noexcept
 {
     // TODO: Add bounds checking and return false if out of bounds
+    emblib::scoped_lock lock(m_mutex);
     m_control_mode = control_mode_e::ANGULAR;
     m_target_w = velocity;
     m_output_thrust = thrust;
@@ -29,6 +32,7 @@ bool copter_control_pid::set_linear_velocity(vector3f velocity, float dir) noexc
 {
     // TODO: Add bounds checking
     // TODO: Reset linear pid to avoid previous integral accumulation glitches
+    emblib::scoped_lock lock(m_mutex);
     m_control_mode = control_mode_e::LINEAR;
     m_target_v = velocity;
     m_target_dir = dir;
@@ -42,7 +46,6 @@ void copter_control_pid::run() noexcept
     while (true) {
         state_s state = m_state_estimator.get_state();
 
-        // TODO: Move mutex lock after the computation before assigning
         m_mutex.lock();
         if (m_control_mode == control_mode_e::LINEAR) {
             const vector3f& v = state.velocity;
@@ -76,7 +79,9 @@ void copter_control_pid::run() noexcept
 
         const matrix3f& I = m_copter_params.moment_of_inertia;
         m_output_torque = I.matmul(target_dw) + w.cross(static_cast<vector3f>(I.matmul(w)));
+        
         m_mutex.unlock();
+        m_copter.actuate(m_output_thrust, m_output_torque);
 
         sleep_periodic(COPTER_CONTROL_PID_PERIOD);
     }
