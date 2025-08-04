@@ -19,6 +19,8 @@ add_library(minipilot STATIC
     src/sensors/accelerometer.cpp
     src/sensors/gyroscope.cpp
     src/vehicles/copter/copter.cpp
+    src/vehicles/copter/copter_control.cpp
+    src/vehicles/copter/copter_control_pid.cpp
 )
 
 # Header files to be used by minipilot

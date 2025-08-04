@@ -1,14 +1,32 @@
 #pragma once
 
+#include "copter.hpp"
+#include "mp_config.hpp"
+#include "state/state_estimator.hpp"
+#include "util/chrono.hpp"
 #include "util/math.hpp"
+#include <emblib/rtos/task.hpp>
 
 namespace mp {
 
 /**
  * Interface for controlling a `copter`
  */
-class copter_control {
+class copter_control : public emblib::task {
 public:
+    template <size_t STACK_SIZE>
+    explicit copter_control(
+        copter& copter,
+        const state_estimator& state_estimator,
+        milliseconds_t period,
+        emblib::task_stack_t<STACK_SIZE>& stack
+    ) :
+        task("Copter control", COPTER_CONTROL_PRIORITY, stack),
+        m_copter(copter),
+        m_state_estimator(state_estimator),
+        m_period(period)
+    {}
+
     /**
      * Set the desired angular velocity vector and thrust
      * @param velocity Angular velocity vector in forward-right-down system in radians per second
@@ -25,6 +43,31 @@ public:
      */
     virtual bool set_linear_velocity(vector3f velocity, float dir) noexcept = 0;
 
+protected:
+    struct actuation_s {
+        // Thrust in Newtons in the "UP" direction
+        float thrust;
+        // Torque in the forward-right-down system in Newton-meters
+        vector3f torque;
+    };
+
+private:
+    /**
+     * Get the required actuation to achieve the last set command
+     */
+    virtual actuation_s iterate(const state_s& state, float dt) noexcept = 0;
+
+    /**
+     * Run an iteration of the control algorithm and assign
+     * actuation values to the copter vehicle
+     */
+    void run() noexcept override;
+
+private:
+    copter& m_copter;
+    const state_estimator& m_state_estimator;
+    
+    milliseconds_t m_period;
 };
 
 }
