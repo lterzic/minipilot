@@ -21,6 +21,7 @@ add_library(minipilot STATIC
     src/vehicles/copter/copter.cpp
     src/vehicles/copter/copter_control.cpp
     src/vehicles/copter/copter_control_pid.cpp
+    src/vehicles/copter/quadcopter.cpp
 )
 
 # Header files to be used by minipilot
