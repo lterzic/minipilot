@@ -40,8 +40,11 @@ void pb_rx::run()
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, read_status);
         if (pb_decode(&buf_istream, pb_mp_UplinkMessage_fields, &recv_msg)) {
-            // TODO (Optional): Add buffering for parsed messages
-            m_handlers[recv_msg.which_payload](recv_msg);
+            // TODO (Optional): Add buffering (queue) for parsed messages
+            // to decouple handling time from parsing time and call handler elsewhere
+            auto handler = m_handlers.find(recv_msg.which_payload);
+            if (handler != m_handlers.end())
+                handler->second->handle(recv_msg);
         }
     }
 }
