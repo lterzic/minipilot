@@ -12,7 +12,7 @@ namespace mp {
  * Allows for raw data processing through the `process` method
  */
 template <typename raw_data_type, typename out_data_type = raw_data_type>
-class sensor_reader : public emblib::task_static<512> {
+class sensor_reader : private emblib::task_static<512> {
 
 public:
     using sensor_t = emblib::sensor<raw_data_type>;

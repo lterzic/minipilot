@@ -12,7 +12,7 @@ namespace mp {
 /**
  * Interface for controlling a `copter`
  */
-class copter_control : public emblib::task {
+class copter_control : private emblib::task {
 public:
     template <size_t STACK_SIZE>
     explicit copter_control(

@@ -7,7 +7,7 @@
 
 namespace mp {
 
-class telemetry : public emblib::task_static<1024> {
+class telemetry : private emblib::task_static<1024> {
 
 public:
     explicit telemetry(

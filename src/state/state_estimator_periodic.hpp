@@ -11,7 +11,7 @@ namespace mp {
  * Periodically runs the state estimation algorithm and
  * safely exposes the calculated state using a mutex
  */
-class state_estimator_periodic : public state_estimator, public emblib::task {
+class state_estimator_periodic : public state_estimator, private emblib::task {
 
 public:
     template <size_t STACK_SIZE>

@@ -15,7 +15,7 @@ struct rx_handler {
     virtual void handle(const pb_mp_UplinkMessage& message) noexcept = 0;
 };
 
-class pb_rx : public emblib::task_static<1024> {
+class pb_rx : private emblib::task_static<1024> {
 public:
     explicit pb_rx(emblib::io::istream<char>& rx_dev) noexcept;
 
