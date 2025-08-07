@@ -68,7 +68,7 @@ private:
     motor_values_s get_motor_directions() const noexcept;
 
 private:
-    const quadcopter_params_s& m_params;
+    quadcopter_params_s& m_params;
     quadcopter_actuators_s m_actuators;
 };
     

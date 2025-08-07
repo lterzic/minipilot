@@ -1,2 +1,2 @@
-#include "logging/logging.hpp"
-#include "logging/handlers/log_handler_string.hpp"
+#include "logging/log_sink_text.hpp"
+#include "comm/pb/log_sink_pb.hpp"
