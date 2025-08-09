@@ -29,7 +29,7 @@ void logger::flush_log(log_s& log, log_level_e level) noexcept
         // else it is incremented in the task to avoid using a mutex here
         log.message_id = m_message_count++;
         
-        for (log_sink* sink : *m_sinks) {
+        for (log_sink* sink : m_sinks) {
             if (sink->get_level() <= log.level)
                 sink->write(log);
         }
@@ -44,7 +44,7 @@ void logger::run() noexcept
         m_queue.receive(log, milliseconds_t(-1));
         log.message_id = m_message_count++;
 
-        for (log_sink* sink : *m_sinks) {
+        for (log_sink* sink : m_sinks) {
             if (sink->get_level() <= log.level)
                 sink->write(log);
         }

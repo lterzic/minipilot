@@ -27,6 +27,7 @@ inline constexpr milliseconds_t     TELEMETRY_PERIOD        = milliseconds_t(200
 inline constexpr size_t             LOG_MAX_MESSAGE_LENGTH  = 100;
 inline constexpr task_priority_e    LOGGER_TASK_PRIORITY    = TASK_PRIORITY_LOW;
 inline constexpr size_t             LOGGER_QUEUE_SIZE       = 4;
+inline constexpr size_t             LOGGER_MAX_SINKS        = 4;
 
 inline constexpr task_priority_e    ACCELEROMETER_READER_PRIORITY   = TASK_PRIORITY_VERY_HIGH;
 inline constexpr milliseconds_t     ACCELEROMETER_READER_PERIOD     = milliseconds_t(10);

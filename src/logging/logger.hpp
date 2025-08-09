@@ -23,7 +23,7 @@ public:
     template <typename... item_types>
     void log(log_level_e level, item_types&&... items) noexcept
     {
-        if (m_sinks == nullptr || m_sinks->empty()) {
+        if (m_sinks.empty()) {
             return;
         }
 
@@ -41,9 +41,9 @@ public:
     /**
      * Subscribe a new sink to the log event
      */
-    void set_sinks(etl::ilist<log_sink*>& sinks) noexcept
+    void add_sink(log_sink& sink) noexcept
     {
-        m_sinks = &sinks;
+        m_sinks.push_back(&sink);
     }
 
 private:
@@ -67,7 +67,7 @@ private:
     etl::format_spec m_format;
     
     // List of all subscribed handlers
-    etl::ilist<log_sink*>* m_sinks;
+    etl::list<log_sink*, LOGGER_MAX_SINKS> m_sinks;
 
     // Log queue
     emblib::queue<log_s, LOGGER_QUEUE_SIZE> m_queue;
