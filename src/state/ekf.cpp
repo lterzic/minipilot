@@ -236,8 +236,8 @@ void ekf::iteration(float dt) noexcept
         );
 
         // Update based on IMU data
-        auto accelerometer = m_sensor_manager.get_sensor_reader<accelerometer_reader>();
-        auto gyroscope = m_sensor_manager.get_sensor_reader<gyroscope_reader>();
+        auto accelerometer = m_sensor_manager.get_sensor_reader<sensor_type_e::ACCELEROMETER>();
+        auto gyroscope = m_sensor_manager.get_sensor_reader<sensor_type_e::GYROSCOPE>();
 
         // TODO: Add checking if data is ready
         if (accelerometer && gyroscope) {

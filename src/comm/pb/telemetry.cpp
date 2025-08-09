@@ -50,8 +50,8 @@ void telemetry::run() noexcept
             PB_SET(msg.state, rotation, state.rotationq.as_vector());
             msg.has_state = true;
 
-            auto accelerometer = m_sensor_manager.get_sensor_reader<accelerometer_reader>();
-            auto gyroscope = m_sensor_manager.get_sensor_reader<gyroscope_reader>();
+            auto accelerometer = m_sensor_manager.get_sensor_reader<sensor_type_e::ACCELEROMETER>();
+            auto gyroscope = m_sensor_manager.get_sensor_reader<sensor_type_e::GYROSCOPE>();
             PB_SET(msg.sensors.accelerometer, corrected, accelerometer->get_processed().cast<float>());
             PB_SET(msg.sensors.gyroscope, corrected, gyroscope->get_processed().cast<float>());
             msg.sensors.has_accelerometer = true;
