@@ -13,7 +13,11 @@ copter_control_pid::copter_control_pid(
     m_copter_params(copter_params),
     m_angular_velocity_pid(1, 0.2, 0),
     m_linear_acceleration_pid(1.4, 0.1, 0.1),
-    m_control_mode(control_mode_e::ANGULAR)
+    m_control_mode(control_mode_e::ANGULAR),
+    m_target_w(0),
+    m_target_v(0),
+    m_target_dir(0),
+    m_output({0})
 {}
 
 bool copter_control_pid::set_angular_velocity(vector3f velocity, float thrust) noexcept

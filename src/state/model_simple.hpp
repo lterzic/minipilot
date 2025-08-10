@@ -39,7 +39,10 @@ public:
     {
         return {
             .da_dv = matrix3f::diagonal(-m_linear_decay_coeff),
-            .ddw_dw = matrix3f::diagonal(-m_angular_decay_coeff)
+            .da_dq = matrixf<3, 4>(0),
+            .ddw_dv = matrix3f(0),
+            .ddw_dw = matrix3f::diagonal(-m_angular_decay_coeff),
+            .ddw_dq = matrixf<3, 4>(0)
         };
     }
 

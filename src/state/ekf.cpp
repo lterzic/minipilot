@@ -227,46 +227,44 @@ void ekf::iteration(float dt) noexcept
         wd_noise, wd_noise, wd_noise
     }).as_diagonal();
 
-    while (true) {
-        // Run the prediction step based on the current state
-        m_kalman.predict(
-            [this, dt](const auto& state) { return state_transition(state, dt); },
-            [this, dt](const auto& state) { return state_transition_jacob(state, dt); },
-            Q
+    // Run the prediction step based on the current state
+    m_kalman.predict(
+        [this, dt](const auto& state) { return state_transition(state, dt); },
+        [this, dt](const auto& state) { return state_transition_jacob(state, dt); },
+        Q
+    );
+
+    // Update based on IMU data
+    auto accelerometer = m_sensor_manager.get_sensor_reader<sensor_type_e::ACCELEROMETER>();
+    auto gyroscope = m_sensor_manager.get_sensor_reader<sensor_type_e::GYROSCOPE>();
+
+    // TODO: Add checking if data is ready
+    if (accelerometer && gyroscope) {
+        const vector3f a_in = accelerometer->get_processed().cast<float>();
+        const vector3f w_in = gyroscope->get_processed().cast<float>();
+        const vectorf<6> observation {
+            a_in(0), a_in(1), a_in(2),
+            w_in(0), w_in(1), w_in(2)
+        };
+
+        matrixf<6> R(0);
+        float acc_nd = accelerometer->get_sensor().get_noise_density();
+        float gyro_nd = gyroscope->get_sensor().get_noise_density();
+        R.set_submatrix(0, 0, matrix3f::diagonal(acc_nd * acc_nd / dt));
+        R.set_submatrix(3, 3, matrix3f::diagonal(gyro_nd * gyro_nd / dt));
+
+        m_kalman.update<6>(
+            [](const auto& state) { return update_acc_gyro(state); },
+            [](const auto& state) { return update_acc_gyro_jacob(state); },
+            R,
+            observation
         );
-
-        // Update based on IMU data
-        auto accelerometer = m_sensor_manager.get_sensor_reader<sensor_type_e::ACCELEROMETER>();
-        auto gyroscope = m_sensor_manager.get_sensor_reader<sensor_type_e::GYROSCOPE>();
-
-        // TODO: Add checking if data is ready
-        if (accelerometer && gyroscope) {
-            const vector3f a_in = accelerometer->get_processed().cast<float>();
-            const vector3f w_in = gyroscope->get_processed().cast<float>();
-            const vectorf<6> observation {
-                a_in(0), a_in(1), a_in(2),
-                w_in(0), w_in(1), w_in(2)
-            };
-
-            matrixf<6> R(0);
-            float acc_nd = accelerometer->get_sensor().get_noise_density();
-            float gyro_nd = gyroscope->get_sensor().get_noise_density();
-            R.set_submatrix(0, 0, matrix3f::diagonal(acc_nd * acc_nd / dt));
-            R.set_submatrix(3, 3, matrix3f::diagonal(gyro_nd * gyro_nd / dt));
-
-            m_kalman.update<6>(
-                [](const auto& state) { return update_acc_gyro(state); },
-                [](const auto& state) { return update_acc_gyro_jacob(state); },
-                R,
-                observation
-            );
-        }
-
-        // Position is integration of velocity and acceleration
-        const auto v = get_linear_velocity(m_kalman.get_state());
-        const auto a = get_linear_acceleration(m_kalman.get_state());
-        m_position += v * dt + a * (dt * dt / 2.f);
     }
+
+    // Position is integration of velocity and acceleration
+    const auto v = get_linear_velocity(m_kalman.get_state());
+    const auto a = get_linear_acceleration(m_kalman.get_state());
+    m_position += v * dt + a * (dt * dt / 2.f);
 }
 
 state_s ekf::create_state() const noexcept
