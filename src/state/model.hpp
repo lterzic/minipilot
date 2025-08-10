@@ -1,23 +1,21 @@
 #pragma once
 
-#include "vehicle.hpp"
+#include "util/math.hpp"
 
 namespace mp {
 
 /**
- * Adds required functionalities to a vehicle so it can be used
- * by the kalman filter
+ * Description of the kinematics of a particular model (vehicle)
  */
-class ekf_vehicle : public vehicle {
+class model {
 
 public:
     /**
      * Derivatives of linear and angular acceleration functions with
      * respect to state variables which might be used to calculate them
      * 
-     * @note `dy_dx` means derivative (jacobian) of y with respect to x
-     * @note `dw` is the angular acceleration (dw_dt), for others refer to
-     * `state_s` documentation
+     * @note `dy_dx` means derivative (jacobian) of vector `y` with respect to vector `x`
+     * @note `dw` is the angular acceleration (dw/dt)
      */
     struct jacobian_s {
         matrix3f da_dv;

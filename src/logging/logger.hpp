@@ -1,7 +1,7 @@
 #pragma once
 
-#include "log_handler.hpp"
-#include "task_config.hpp"
+#include "log_sink.hpp"
+#include "mp_config.hpp"
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
 #include <etl/list.h>
@@ -9,7 +9,7 @@
 
 namespace mp {
 
-class logger : private emblib::task {
+class logger : private emblib::task_static<1024> {
 
 public:
     /**
@@ -23,7 +23,7 @@ public:
     template <typename... item_types>
     void log(log_level_e level, item_types&&... items) noexcept
     {
-        if (m_handlers == nullptr || m_handlers->empty()) {
+        if (m_sinks.empty()) {
             return;
         }
 
@@ -39,11 +39,11 @@ public:
     }
 
     /**
-     * Subscribe a new handler to the log event
+     * Subscribe a new sink to the log event
      */
-    void set_handlers(etl::ilist<log_handler*>& handlers) noexcept
+    void add_sink(log_sink& sink) noexcept
     {
-        m_handlers = &handlers;
+        m_sinks.push_back(&sink);
     }
 
 private:
@@ -67,13 +67,10 @@ private:
     etl::format_spec m_format;
     
     // List of all subscribed handlers
-    etl::ilist<log_handler*>* m_handlers;
+    etl::list<log_sink*, LOGGER_MAX_SINKS> m_sinks;
 
     // Log queue
-    emblib::queue<log_s, TASK_LOGGER_QUEUE_SIZE> m_queue;
-
-    // Task stack
-    emblib::task_stack_t<TASK_LOGGER_STACK_SIZE> m_stack;
+    emblib::queue<log_s, LOGGER_QUEUE_SIZE> m_queue;
 };
 
 }

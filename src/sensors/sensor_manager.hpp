@@ -5,25 +5,35 @@
 
 namespace mp {
 
-/**
- * Platform sensors
- * 
- * @todo Sensor can be surrounded by #if MP_SENSORS_USE_<SENSOR>
- * to allow conditional compilation and replace with reference
- * instead of pointer
- */
-struct sensors_s {
-    accelerometer_reader* accelerometer;
-    gyroscope_reader* gyroscope;
+enum class sensor_type_e {
+    ACCELEROMETER,
+    GYROSCOPE
 };
 
 /**
  * Interface for the system towards sensors available on the platform
  */
 class sensor_manager {
+    struct readers_s {
+        accelerometer_reader*   accelerometer;
+        gyroscope_reader*       gyroscope;
+    };
 public:
-    explicit sensor_manager(sensors_s sensors) :
-        m_sensors(sensors)
+    /**
+     * Constructor for creating private reader instances for
+     * each provided sensor configuration
+     */
+    template <
+        accelerometer_config_s* accelerometer = nullptr,
+        gyroscope_config_s* gyroscope = nullptr
+    >
+    explicit sensor_manager();
+
+    /**
+     * Constructor for externally created reader instances
+     */
+    explicit sensor_manager(readers_s readers) :
+        m_readers(readers)
     {}
 
     /**
@@ -32,23 +42,43 @@ public:
      * @todo Once supporting multiple readers of the same
      * type, add index as the parameter and set 0 as default
      */
-    template <typename reader_type>
-    inline const reader_type* get_sensor_reader() const noexcept;
+    template <sensor_type_e SENSOR_TYPE>
+    inline const auto* get_sensor_reader() const noexcept;
 
 private:
-    sensors_s m_sensors;
+    readers_s m_readers;
 };
 
-template <>
-inline const accelerometer_reader* sensor_manager::get_sensor_reader() const noexcept
+template <
+    accelerometer_config_s* accelerometer,
+    gyroscope_config_s* gyroscope
+>
+sensor_manager::sensor_manager()
 {
-    return m_sensors.accelerometer;
+    // TODO: Accelerometer and gyroscope are mandatory so
+    // change to references, can't accept nullptr
+
+    if constexpr(accelerometer) {
+        static accelerometer_reader reader(*accelerometer);
+        m_readers.accelerometer = &reader;
+    }
+
+    if constexpr(gyroscope) {
+        static gyroscope_reader reader(*gyroscope);
+        m_readers.gyroscope = &reader;
+    }
 }
 
 template <>
-inline const gyroscope_reader* sensor_manager::get_sensor_reader() const noexcept
+inline const auto* sensor_manager::get_sensor_reader<sensor_type_e::ACCELEROMETER>() const noexcept
 {
-    return m_sensors.gyroscope;
+    return m_readers.accelerometer;
+}
+
+template <>
+inline const auto* sensor_manager::get_sensor_reader<sensor_type_e::GYROSCOPE>() const noexcept
+{
+    return m_readers.gyroscope;
 }
 
 }

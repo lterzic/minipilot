@@ -7,23 +7,13 @@
 namespace mp {
 
 /**
- * Data type for meters per second^2 with
- * float as the underlying type
- */
-using emblib::mpss_t;
-
-/**
- * Accelerometer sensor interface
- */
-using emblib::accelerometer;
-
-/**
  * Accelerometer config
  */
 struct accelerometer_config_s {
     // Device reference
-    accelerometer& device;
-    // Mutex in case the device is part of an IMU with other sensors
+    emblib::accelerometer& device;
+    // This mutex (if provided) is locked during reads
+    // Used when there are multiple sensors on one device
     emblib::mutex* mutex;
     // Mapping from the device space into the NED coordinate system
     matrix3f transform;
@@ -32,15 +22,17 @@ struct accelerometer_config_s {
 /**
  * Sensor task which provides accelerometer readings
  */
-class accelerometer_reader : public sensor_reader<accelerometer::data_t, vector<mpss_t, 3>> {
-
+class accelerometer_reader : public sensor_reader<
+    emblib::accelerometer::data_t,
+    vector<emblib::mpss_t, 3>
+> {
 public:
     explicit accelerometer_reader(const accelerometer_config_s& config);
 
 private:
     bool init(sensor_t& sensor) noexcept override;
 
-    vector<mpss_t, 3> process(const accelerometer::data_t& raw_data) noexcept override;
+    vector<emblib::mpss_t, 3> process(const sensor_t::data_t& raw_data) noexcept override;
 
 private:
     // Transform maps a potentially different coordinate space
@@ -49,7 +41,7 @@ private:
     // This can be calculated or read from the configuration
     // depending on if the vehicle is on stable ground before
     // starting
-    vector<mpss_t, 3> m_bias;
+    vector<emblib::mpss_t, 3> m_bias;
 
     // TODO: Add low-pass filter
 };

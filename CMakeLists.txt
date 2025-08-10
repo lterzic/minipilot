@@ -8,19 +8,21 @@ project(minipilot VERSION 1.0)
 
 # Source files for minipilot
 add_library(minipilot STATIC
-    src/vehicles/copter/copter.cpp
-    src/vehicles/copter/quadcopter.cpp
-    src/vehicles/copter/control/copter_controller_pid.cpp
-    src/tasks/task_telemetry.cpp
-    src/tasks/task_state_estimator.cpp
-    src/tasks/task_receiver.cpp
-    src/tasks/task_vehicle.cpp
-    src/state/ekf_inertial.cpp
+    src/comm/pb/pb_rx.cpp
+    src/comm/pb/pb_tx.cpp
+    src/comm/pb/log_sink_pb.cpp
+    src/comm/pb/rx_handler_command.cpp
+    src/comm/pb/telemetry.cpp
+    src/state/ekf.cpp
+    src/state/state_estimator_periodic.cpp
     src/logging/logger.cpp
-    src/logging/handlers/log_handler_string.cpp
+    src/logging/log_sink_text.cpp
     src/sensors/accelerometer.cpp
     src/sensors/gyroscope.cpp
-    src/main.cpp
+    src/vehicles/copter/copter.cpp
+    src/vehicles/copter/copter_control.cpp
+    src/vehicles/copter/copter_control_pid.cpp
+    src/vehicles/copter/quadcopter.cpp
 )
 
 # Header files to be used by minipilot
