@@ -29,11 +29,7 @@ gyroscope_reader::process(const sensor_t::data_t& raw_data) noexcept
     };
     vector<emblib::rps_t, 3> ned_vec = m_transform.matmul(raw_vec);
     
-    // TODO: Calculate drift from DC value by undersampling
-    // based on the sensor rate (task period)
-    m_drift.fill(emblib::rps_t(0));
-
-    return ned_vec - m_drift;
+    return ned_vec;
 }
 
 }

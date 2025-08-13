@@ -7,13 +7,19 @@
 
 namespace mp {
 
-inline constexpr size_t KALMAN_FILTER_STACK_SIZE = 25000;
-inline constexpr milliseconds_t KALMAN_FILTER_PERIOD = milliseconds_t(20);
-
 /**
  * Extended kalman filter based state estimator
  */
 class ekf : public state_estimator_periodic {
+    /**
+     * Stack size experimentally determined
+     */
+    static constexpr size_t STACK_SIZE = 25000;
+
+    /**
+     * Running at 50Hz by default
+     */
+    static constexpr auto PERIOD = milliseconds_t(20);
 
 public:
     /**
@@ -82,7 +88,7 @@ private:
     // of the kalman filter vector
     vector3f m_position;
 
-    emblib::task_stack_t<KALMAN_FILTER_STACK_SIZE> m_stack;
+    emblib::task_stack_t<STACK_SIZE> m_stack;
 };
 
 }

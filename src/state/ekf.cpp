@@ -37,7 +37,7 @@ ekf::ekf(
     const sensor_manager& sensor_manager,
     const model& model
 ) noexcept :
-    state_estimator_periodic(KALMAN_FILTER_PERIOD, m_stack),
+    state_estimator_periodic(PERIOD, m_stack),
     m_sensor_manager(sensor_manager),
     m_model(model),
     m_kalman({0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0})
@@ -274,7 +274,8 @@ state_s ekf::create_state() const noexcept
         .velocity = get_linear_velocity(m_kalman.get_state()),
         .acceleration = get_linear_acceleration(m_kalman.get_state()),
         .angular_velocity = get_angular_velocity(m_kalman.get_state()),
-        .rotationq = get_rotation_q(m_kalman.get_state())
+        .rotationq = get_rotation_q(m_kalman.get_state()),
+        .gyroscope_drift = get_gyro_drift(m_kalman.get_state())
     };
 }
 

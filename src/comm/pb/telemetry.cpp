@@ -60,13 +60,16 @@ void telemetry::run() noexcept
             msg.has_state = true;
 
             auto accelerometer = m_sensor_manager.get_sensor_reader<sensor_type_e::ACCELEROMETER>();
-            auto gyroscope = m_sensor_manager.get_sensor_reader<sensor_type_e::GYROSCOPE>();
             PB_SET(msg.sensors.accelerometer, raw, accelerometer->get_raw());
             PB_SET(msg.sensors.accelerometer, corrected, accelerometer->get_processed().cast<float>());
+            msg.sensors.has_accelerometer = true;
+            
+            auto gyroscope = m_sensor_manager.get_sensor_reader<sensor_type_e::GYROSCOPE>();
             PB_SET(msg.sensors.gyroscope, raw, gyroscope->get_raw());
             PB_SET(msg.sensors.gyroscope, corrected, gyroscope->get_processed().cast<float>());
-            msg.sensors.has_accelerometer = true;
+            PB_SET(msg.sensors.gyroscope, drift, state.gyroscope_drift);
             msg.sensors.has_gyroscope = true;
+
             msg.has_sensors = true;
         });
 

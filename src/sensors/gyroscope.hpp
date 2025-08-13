@@ -38,9 +38,6 @@ private:
     // Transform maps a potentially different coordinate space
     // of the readings into the NED coordinate system
     matrix<float, 3> m_transform;
-    // Currently estimated drift
-    vector<emblib::rps_t, 3> m_drift;
-    // TODO: Add a mutex and a getter method for the drift
 
     // TODO: Add band-pass filter
 };

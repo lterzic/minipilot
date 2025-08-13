@@ -33,6 +33,10 @@ struct state_s {
     vector3f angular_velocity {0, 0, 0};
     // Quaternion which maps the local frame to the global frame
     quaternionf rotationq {1, 0, 0, 0};
+    
+    // Current estimation of gyroscope drift
+    // TODO: Move into a separate struct and use this only for kinematics
+    vector3f gyroscope_drift;
 };
 
 /**
@@ -43,6 +47,9 @@ class state_estimator {
 public:
     /**
      * Get the current state
+     * @todo Rename `state_s` to `kinematics_s` and
+     * rename this to `get_kinematics` and separate sensor
+     * stuff like gyro drift
      */
     virtual state_s get_state() const noexcept = 0;
 };
