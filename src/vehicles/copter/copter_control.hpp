@@ -12,14 +12,14 @@ namespace mp {
 /**
  * Interface for controlling a `copter`
  */
-class copter_control : private emblib::task {
+class copter_control : private emblib::rtos::task {
 public:
     template <size_t STACK_SIZE>
     explicit copter_control(
         copter& copter,
         const state_estimator& state_estimator,
         milliseconds_t period,
-        emblib::task_stack_t<STACK_SIZE>& stack
+        emblib::rtos::task_stack<STACK_SIZE>& stack
     ) :
         task("Copter control", COPTER_CONTROL_PRIORITY, stack),
         m_copter(copter),

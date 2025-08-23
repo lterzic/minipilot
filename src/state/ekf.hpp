@@ -83,12 +83,12 @@ private:
     const model& m_model;
 
     // Kalman filter
-    emblib::kalman<KALMAN_DIM> m_kalman;
+    emblib::dsp::kalman<KALMAN_DIM> m_kalman;
     // Kept separately as it's not computed as part
     // of the kalman filter vector
     vector3f m_position;
 
-    emblib::task_stack_t<STACK_SIZE> m_stack;
+    emblib::rtos::task_stack<STACK_SIZE> m_stack;
 };
 
 }

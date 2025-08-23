@@ -34,11 +34,11 @@ private:
     float m_target_dir;
     actuation_s m_output;
     
-    emblib::pid<vector3f, float> m_angular_velocity_pid;
-    emblib::pid<vector3f, float> m_linear_acceleration_pid;
+    emblib::dsp::pid<vector3f, float> m_angular_velocity_pid;
+    emblib::dsp::pid<vector3f, float> m_linear_acceleration_pid;
 
-    emblib::mutex m_mutex;
-    emblib::task_stack_t<1024> m_stack;
+    emblib::rtos::mutex m_mutex;
+    emblib::rtos::task_stack<1024> m_stack;
 };
 
 }

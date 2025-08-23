@@ -15,9 +15,9 @@ struct rx_handler {
     virtual void handle(const mp_pb_link_UplinkMessage& message) noexcept = 0;
 };
 
-class pb_rx : private emblib::task_static<1024> {
+class pb_rx : private emblib::rtos::static_task<1024> {
 public:
-    explicit pb_rx(emblib::io::istream<char>& rx_dev) noexcept;
+    explicit pb_rx(emblib::io::istream& rx_dev) noexcept;
 
     /**
      * Set the handler for a certain type of received message
@@ -34,7 +34,7 @@ private:
     // Size of this map should be equal to number of payload types
     etl::unordered_map<pb_size_t, rx_handler*, 4> m_handlers;
     // Serial data receive device
-    emblib::io::istream<char>& m_rx_dev;
+    emblib::io::istream& m_rx_dev;
 };
 
 }

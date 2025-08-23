@@ -30,7 +30,7 @@ public:
      * @todo Add system information like vehicle id, session id,
      * etc. so that it can be sent in downlink messages
      */
-    explicit pb_tx(emblib::io::ostream<char>& tx_dev) noexcept;
+    explicit pb_tx(emblib::io::ostream& tx_dev) noexcept;
 
     /**
      * Send a downlink message
@@ -46,11 +46,11 @@ private:
     size_t m_message_id;
 
     // Serial data transmit device
-    emblib::io::ostream<char>& m_tx_dev;
+    emblib::io::ostream& m_tx_dev;
     // Mutex for ensuring a single user
-    emblib::mutex m_mutex;
+    emblib::rtos::mutex m_mutex;
     // Semaphore to signal the end of the async write
-    emblib::semaphore m_write_smphr;
+    emblib::rtos::semaphore m_write_smphr;
 };
 
 }

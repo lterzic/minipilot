@@ -3,7 +3,7 @@
 
 namespace mp {
 
-log_sink_text::log_sink_text(emblib::io::ostream<char>& dev) :
+log_sink_text::log_sink_text(emblib::io::ostream& dev) :
     m_dev(dev)
 {}
 

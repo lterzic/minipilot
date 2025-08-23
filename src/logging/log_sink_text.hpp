@@ -6,12 +6,12 @@ namespace mp {
 
 class log_sink_text : public log_sink {
 public:
-    explicit log_sink_text(emblib::io::ostream<char>& dev) noexcept;
+    explicit log_sink_text(emblib::io::ostream& dev) noexcept;
 
     void write(const log_s& log) noexcept override;
 
 private:
-    emblib::io::ostream<char>& m_dev;
+    emblib::io::ostream& m_dev;
 };
 
 }

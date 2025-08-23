@@ -4,7 +4,7 @@ namespace mp {
 
 void copter_control::run() noexcept
 {
-    float dt = emblib::seconds<float>(m_period).value();
+    float dt = emblib::units::seconds<float>(m_period).value();
 
     while (true) {
         state_s state = m_state_estimator.get_state();
