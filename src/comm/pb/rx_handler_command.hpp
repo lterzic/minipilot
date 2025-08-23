@@ -10,7 +10,7 @@ public:
     /**
      * Execute the command on the appropriate vehicle type
      */
-    void handle(const pb_mp_UplinkMessage& msg) noexcept override;
+    void handle(const mp_pb_link_UplinkMessage& msg) noexcept override;
 
 private:
     copter_control* m_copter;

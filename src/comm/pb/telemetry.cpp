@@ -5,7 +5,7 @@
 
 namespace mp {
 
-static void pb_set(pb_mp_Vector3f& pb_vec, bool& pb_has_field, const vector3f& mp_vec)
+static void pb_set(mp_pb_Vector3f& pb_vec, bool& pb_has_field, const vector3f& mp_vec)
 {
     pb_vec.x = mp_vec(0);
     pb_vec.y = mp_vec(1);
@@ -14,7 +14,7 @@ static void pb_set(pb_mp_Vector3f& pb_vec, bool& pb_has_field, const vector3f& m
 }
 
 template <typename unit_type, size_t SIZE>
-static void pb_set(pb_mp_Vector3f& pb_vec, bool& pb_has_field, const etl::array<unit_type, SIZE>& array)
+static void pb_set(mp_pb_Vector3f& pb_vec, bool& pb_has_field, const etl::array<unit_type, SIZE>& array)
 {
     pb_vec.x = array[0].value();
     pb_vec.y = array[1].value();
@@ -22,7 +22,7 @@ static void pb_set(pb_mp_Vector3f& pb_vec, bool& pb_has_field, const etl::array<
     pb_has_field = true;
 }
 
-static void pb_set(pb_mp_Vector4f& pb_vec, bool& pb_has_field, const vector4f& mp_vec)
+static void pb_set(mp_pb_Vector4f& pb_vec, bool& pb_has_field, const vector4f& mp_vec)
 {
     pb_vec.w = mp_vec(0);
     pb_vec.x = mp_vec(1);
@@ -46,8 +46,8 @@ void telemetry::run() noexcept
 {
     while (true) {
         m_tx.send_downlink([this](auto& payload, auto& payload_type) {
-            payload_type = pb_mp_DownlinkMessage_telemetry_tag;
-            pb_mp_Telemetry& msg = payload.telemetry;
+            payload_type = mp_pb_link_DownlinkMessage_telemetry_tag;
+            mp_pb_link_Telemetry& msg = payload.telemetry;
 
             msg.timestamp_ms = get_time_since_start().value();
             

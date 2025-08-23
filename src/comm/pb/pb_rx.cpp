@@ -13,8 +13,8 @@ pb_rx::pb_rx(emblib::io::istream<char>& rx_dev) :
 void pb_rx::run()
 {
     while (true) {
-        char recv_buf[sizeof(pb_mp_UplinkMessage)];
-        pb_mp_UplinkMessage recv_msg = pb_mp_UplinkMessage_init_zero;
+        char recv_buf[sizeof(mp_pb_link_UplinkMessage)];
+        mp_pb_link_UplinkMessage recv_msg = mp_pb_link_UplinkMessage_init_zero;
 
         // Read status is negative in case the read operation failed, else
         // it is the size of the received message in bytes
@@ -39,7 +39,7 @@ void pb_rx::run()
         }
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, read_status);
-        if (pb_decode(&buf_istream, pb_mp_UplinkMessage_fields, &recv_msg)) {
+        if (pb_decode(&buf_istream, mp_pb_link_UplinkMessage_fields, &recv_msg)) {
             // TODO (Optional): Add buffering (queue) for parsed messages
             // to decouple handling time from parsing time and call handler elsewhere
             auto handler = m_handlers.find(recv_msg.which_payload);

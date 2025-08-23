@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pb/mp/link.nanopb.h"
+#include "pb/link/link.nanopb.h"
 #include <emblib/io/istream.hpp>
 #include <emblib/rtos/task.hpp>
 #include <etl/unordered_map.h>
@@ -12,7 +12,7 @@ struct rx_handler {
      * Message payload should always be the same as the
      * payload this handler is registered for
      */
-    virtual void handle(const pb_mp_UplinkMessage& message) noexcept = 0;
+    virtual void handle(const mp_pb_link_UplinkMessage& message) noexcept = 0;
 };
 
 class pb_rx : private emblib::task_static<1024> {

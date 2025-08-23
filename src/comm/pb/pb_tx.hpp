@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pb/mp/link.nanopb.h"
+#include "pb/link/link.nanopb.h"
 #include <emblib/io/ostream.hpp>
 #include <emblib/rtos/mutex.hpp>
 #include <emblib/rtos/semaphore.hpp>
@@ -21,7 +21,7 @@ public:
      * the second is the payload type selector
      */
     using payload_cb_t = etl::delegate<void(
-        pb_mp_DownlinkMessage::_pb_mp_DownlinkMessage_payload&,
+        mp_pb_link_DownlinkMessage::_mp_pb_link_DownlinkMessage_payload&,
         pb_size_t&
     )>;
 
