@@ -23,7 +23,7 @@ copter_control_pid::copter_control_pid(
 bool copter_control_pid::set_angular_velocity(vector3f velocity, float thrust) noexcept
 {
     // TODO: Add bounds checking and return false if out of bounds
-    emblib::scoped_lock lock(m_mutex);
+    emblib::rtos::scoped_lock lock(m_mutex);
     m_control_mode = control_mode_e::ANGULAR;
     m_target_w = velocity;
     m_output.thrust = thrust;
@@ -34,7 +34,7 @@ bool copter_control_pid::set_linear_velocity(vector3f velocity, float dir) noexc
 {
     // TODO: Add bounds checking
     // TODO: Reset linear pid to avoid previous integral accumulation glitches
-    emblib::scoped_lock lock(m_mutex);
+    emblib::rtos::scoped_lock lock(m_mutex);
     m_control_mode = control_mode_e::LINEAR;
     m_target_v = velocity;
     m_target_dir = dir;
@@ -44,7 +44,7 @@ bool copter_control_pid::set_linear_velocity(vector3f velocity, float dir) noexc
 copter_control_pid::actuation_s copter_control_pid::iterate(const state_s& state, float dt) noexcept
 {
     // To prevent changing the target values during algorithm execution
-    emblib::scoped_lock lock(m_mutex);
+    emblib::rtos::scoped_lock lock(m_mutex);
 
     if (m_control_mode == control_mode_e::LINEAR) {
         const vector3f& v = state.velocity;

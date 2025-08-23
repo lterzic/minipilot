@@ -1,5 +1,6 @@
 #include "logger.hpp"
 #include "util/chrono.hpp"
+#include <emblib/rtos/scheduler.hpp>
 
 namespace mp {
 
@@ -10,7 +11,7 @@ logger& logger::get_instance() noexcept
 }
 
 logger::logger() noexcept :
-    task_static("Task logger", LOGGER_TASK_PRIORITY),
+    static_task("Task logger", LOGGER_TASK_PRIORITY),
     m_message_count(0)
 {
     m_format.precision(3);
@@ -21,7 +22,7 @@ void logger::flush_log(log_s& log, log_level_e level) noexcept
     log.level = level;
     log.time_since_start = get_time_since_start();
     
-    if (task::is_scheduler_running()) {
+    if (emblib::rtos::is_scheduler_running()) {
         m_queue.send(log, milliseconds_t(-1));
     } else {
         // Message count is incremented here if running in bare-metal

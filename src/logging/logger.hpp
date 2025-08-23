@@ -9,7 +9,7 @@
 
 namespace mp {
 
-class logger : private emblib::task_static<1024> {
+class logger : private emblib::rtos::static_task<1024> {
 
 public:
     /**
@@ -70,7 +70,7 @@ private:
     etl::list<log_sink*, LOGGER_MAX_SINKS> m_sinks;
 
     // Log queue
-    emblib::queue<log_s, LOGGER_QUEUE_SIZE> m_queue;
+    emblib::rtos::queue<log_s, LOGGER_QUEUE_SIZE> m_queue;
 };
 
 }

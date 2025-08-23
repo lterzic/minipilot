@@ -1,7 +1,7 @@
 #pragma once
 
 #include "copter.hpp"
-#include <emblib/driver/actuator/motor.hpp>
+#include <emblib/devices/actuators/motor.hpp>
 
 namespace mp {
 
@@ -17,7 +17,7 @@ struct quadcopter_params_s : public copter_params_s {
 };
 
 struct quadcopter_actuators_s {
-    emblib::motor &fl, &fr, &bl, &br;
+    emblib::devices::motor &fl, &fr, &bl, &br;
 };
 
 class quadcopter : public copter {

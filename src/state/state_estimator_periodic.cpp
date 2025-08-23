@@ -4,7 +4,7 @@ namespace mp {
 
 void state_estimator_periodic::run() noexcept
 {
-    float dt = emblib::seconds<float>(m_period).value();
+    float dt = emblib::units::seconds<float>(m_period).value();
 
     while (true) {
         iteration(dt);

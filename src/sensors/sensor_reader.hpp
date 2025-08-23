@@ -1,7 +1,7 @@
 #pragma once
 
 #include "logging/logging.hpp"
-#include <emblib/driver/sensor/sensor.hpp>
+#include <emblib/devices/sensors/sensor.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/mutex.hpp>
 
@@ -12,19 +12,19 @@ namespace mp {
  * Allows for raw data processing through the `process` method
  */
 template <typename raw_data_type, typename out_data_type = raw_data_type>
-class sensor_reader : private emblib::task_static<512> {
+class sensor_reader : private emblib::rtos::static_task<512> {
 
 public:
-    using sensor_t = emblib::sensor<raw_data_type>;
+    using sensor_t = emblib::devices::sensor<raw_data_type>;
 
 public:
     explicit sensor_reader(
         sensor_t& sensor,
-        emblib::mutex* sensor_mutex,
+        emblib::rtos::mutex* sensor_mutex,
         task_priority_e task_priority,
         milliseconds_t task_period
     ) :
-        task_static(create_task_name(sensor).c_str(), task_priority),
+        static_task(create_task_name(sensor).c_str(), task_priority),
         m_sensor(sensor),
         m_sensor_mutex(sensor_mutex),
         m_task_period(task_period)
@@ -36,7 +36,7 @@ public:
      */
     raw_data_type get_raw() const noexcept
     {
-        emblib::scoped_lock lock(m_read_mutex);
+        emblib::rtos::scoped_lock lock(m_read_mutex);
         return m_last_raw;
     }
 
@@ -45,7 +45,7 @@ public:
      */
     out_data_type get_processed() const noexcept
     {
-        emblib::scoped_lock lock(m_read_mutex);
+        emblib::rtos::scoped_lock lock(m_read_mutex);
         return m_last_processed;
     }
 
@@ -100,10 +100,10 @@ private:
     // for example if one IMU provides both accelerometer
     // and gyroscope data. This is needed to make sure
     // both tasks don't read at the same time
-    emblib::mutex* m_sensor_mutex;
+    emblib::rtos::mutex* m_sensor_mutex;
     sensor_t& m_sensor;
     
-    mutable emblib::mutex m_read_mutex;
+    mutable emblib::rtos::mutex m_read_mutex;
     raw_data_type m_last_raw;
     out_data_type m_last_processed;
 };
@@ -150,7 +150,7 @@ inline void sensor_reader<raw_data_type, out_data_type>::run() noexcept
             // on this mutex while the shared data is not being updated
             auto processed_data = process(read_data);
 
-            emblib::scoped_lock lock(m_read_mutex);
+            emblib::rtos::scoped_lock lock(m_read_mutex);
             m_last_raw = read_data;
             m_last_processed = processed_data;
 
