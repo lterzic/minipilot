@@ -8,11 +8,13 @@ project(minipilot VERSION 1.0)
 
 # Source files for minipilot
 add_library(minipilot STATIC
-    src/comm/pb/pb_rx.cpp
-    src/comm/pb/pb_tx.cpp
-    src/comm/pb/log_sink_pb.cpp
-    src/comm/pb/rx_handler_command.cpp
-    src/comm/pb/telemetry.cpp
+    src/link/handshake.cpp
+    src/link/link.cpp
+    src/link/rx.cpp
+    src/link/tx.cpp
+    src/link/link_modules/command_handler.cpp
+    src/link/link_modules/link_log_sink.cpp
+    src/link/link_modules/telemetry.cpp
     src/state/ekf.cpp
     src/state/state_estimator_periodic.cpp
     src/logging/logger.cpp

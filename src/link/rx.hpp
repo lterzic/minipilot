@@ -7,6 +7,10 @@
 
 namespace mp {
 
+/**
+ * Handler for one type of uplink message payload
+ * @note Handlers are executed in the receiver thread context
+ */
 struct rx_handler {
     /**
      * Message payload should always be the same as the
@@ -15,9 +19,14 @@ struct rx_handler {
     virtual void handle(const mp_pb_link_UplinkMessage& message) noexcept = 0;
 };
 
-class pb_rx : private emblib::rtos::static_task<1024> {
+/**
+ * Receiver thread
+ * 
+ * Parses received messages and calls the appropriate handler
+ */
+class rx : private emblib::rtos::static_task<1024> {
 public:
-    explicit pb_rx(emblib::io::istream& rx_dev) noexcept;
+    explicit rx(emblib::io::istream& rx_dev) noexcept;
 
     /**
      * Set the handler for a certain type of received message

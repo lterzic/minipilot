@@ -1,8 +1,8 @@
-#include "rx_handler_command.hpp"
+#include "command_handler.hpp"
 
 namespace mp {
 
-rx_handler_command::rx_handler_command(copter_control* copter) noexcept :
+command_handler::command_handler(copter_control* copter) noexcept :
     m_copter(copter)
 {}
 
@@ -28,7 +28,7 @@ static void handle_copter(copter_control* copter, const mp_pb_link_CopterCommand
     }
 }
 
-void rx_handler_command::handle(const mp_pb_link_UplinkMessage& msg) noexcept
+void command_handler::handle(const mp_pb_link_UplinkMessage& msg) noexcept
 {
     const mp_pb_link_Command& command = msg.payload.command;
     switch (command.which_vehicle) {

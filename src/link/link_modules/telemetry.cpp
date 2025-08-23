@@ -32,7 +32,7 @@ static void pb_set(mp_pb_Vector4f& pb_vec, bool& pb_has_field, const vector4f& m
 }
 
 telemetry::telemetry(
-    pb_tx& tx,
+    tx& tx,
     const sensor_manager& sensor_manager,
     const state_estimator& state_estimator
 ) :

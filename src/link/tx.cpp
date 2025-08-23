@@ -1,15 +1,17 @@
-#include "pb_tx.hpp"
+#include "tx.hpp"
 #include "logging/logging.hpp"
 #include <pb_encode.h>
 
 namespace mp {
 
-pb_tx::pb_tx(emblib::io::ostream& tx_dev) :
+tx::tx(emblib::io::ostream& tx_dev) :
     m_tx_dev(tx_dev)
 {}
 
-bool pb_tx::send_downlink(payload_cb_t payload_cb)
+bool tx::send_downlink(payload_cb_t payload_cb)
 {
+    // Create an empty message and fill the payload
+    // using the caller provided callback
     mp_pb_link_DownlinkMessage msg;
     payload_cb(msg.payload, msg.which_payload);
 
@@ -17,6 +19,7 @@ bool pb_tx::send_downlink(payload_cb_t payload_cb)
     msg.message_id = m_message_id++;
     // TODO: Fill in the rest of the downlink message data
     
+    // Encode the message into a byte array
     // TODO: Replace the log message string with a fixed size char
     // buffer in proto and then replace sizeof(...) with pb_mp_DownlinkMessage_size
     // Here we assume that sizeof(pb_mp_Log) < sizeof(pb_mp_Telemetry) so no extra
@@ -36,7 +39,7 @@ bool pb_tx::send_downlink(payload_cb_t payload_cb)
         // If the async write doesn't finish in the given time, abort the operation
         if (!m_write_smphr.wait(TX_WRITE_TIMEOUT)) {
             m_tx_dev.abort_async_write();
-            log_error("Failed to send downlink message!");
+            log_error("TX write timeout!");
             return false;
         }
     } else {

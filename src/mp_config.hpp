@@ -16,7 +16,9 @@ enum task_priority_e : size_t {
     TASK_PRIORITY_VERY_HIGH = 5
 };
 
+inline constexpr task_priority_e    HANDSHAKE_PRIORITY      = TASK_PRIORITY_VERY_HIGH;
 inline constexpr task_priority_e    RX_TASK_PRIORITY        = TASK_PRIORITY_HIGH;
+inline constexpr milliseconds_t     RX_FAIL_SLEEP           = milliseconds_t(50);
 inline constexpr milliseconds_t     TX_WRITE_TIMEOUT        = milliseconds_t(50);
 
 inline constexpr task_priority_e    TELEMETRY_TASK_PRIORITY = TASK_PRIORITY_MEDIUM;

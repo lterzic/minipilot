@@ -9,11 +9,18 @@
 namespace mp {
 
 /**
+ * Transmitter
+ * 
+ * Creates final output (downlink) messages from the provided payloads and
+ * manages multiple writers accessing the underlying transmit serial device.
+ * All of the processing of the output messages is done in the calling
+ * task's context.
+ * 
  * @todo Make this a task and instead of holding a mutex while writing,
  * copy the downlink message into a queue and then encode and send from
  * this task's context using async write and waiting for notification
  */
-class pb_tx {
+class tx {
 public:
     /**
      * Callback for filling in the payload data
@@ -30,11 +37,13 @@ public:
      * @todo Add system information like vehicle id, session id,
      * etc. so that it can be sent in downlink messages
      */
-    explicit pb_tx(emblib::io::ostream& tx_dev) noexcept;
+    explicit tx(emblib::io::ostream& tx_dev) noexcept;
 
     /**
      * Send a downlink message
-     * @note Blocking
+     * @note Blocking - this method processes the message and starts
+     * an async write, then blocks the calling task's context until
+     * the write operation completes
      * @todo Instead of encoding and sending the message in
      * the caller context, can convert this to a task and copy
      * to a queue, then process in this task's context

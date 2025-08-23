@@ -1,11 +1,11 @@
-#include "pb_rx.hpp"
+#include "link/rx.hpp"
 #include "vehicles/copter/copter_control.hpp"
 
 namespace mp {
 
-class rx_handler_command : public rx_handler {
+class command_handler : public rx_handler {
 public:
-    explicit rx_handler_command(copter_control* copter);
+    explicit command_handler(copter_control* copter);
 
     /**
      * Execute the command on the appropriate vehicle type
