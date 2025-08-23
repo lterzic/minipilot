@@ -19,17 +19,17 @@ gyroscope_reader::init(sensor_t& sensor) noexcept
     return true;
 }
 
-vector<emblib::rps_t, 3>
+vector<gyroscope_units, 3>
 gyroscope_reader::process(const sensor_t::data_t& raw_data) noexcept
 {
-    vector<emblib::rps_t, 3> raw_vec {
-        emblib::rps_t(raw_data[0]),
-        emblib::rps_t(raw_data[1]),
-        emblib::rps_t(raw_data[2])
+    vector<gyroscope_units, 3> raw_vec {
+        gyroscope_units(raw_data[0]),
+        gyroscope_units(raw_data[1]),
+        gyroscope_units(raw_data[2])
     };
-    vector<emblib::rps_t, 3> ned_vec = m_transform.matmul(raw_vec);
+    vector<gyroscope_units, 3> aligned_vec = m_transform.matmul(raw_vec);
     
-    return ned_vec;
+    return aligned_vec;
 }
 
 }

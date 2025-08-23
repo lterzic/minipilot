@@ -2,7 +2,7 @@
 
 #include "sensor_reader.hpp"
 #include "util/math.hpp"
-#include <emblib/driver/sensor/gyroscope.hpp>
+#include <emblib/devices/sensors/gyroscope.hpp>
 
 namespace mp {
 
@@ -11,20 +11,25 @@ namespace mp {
  */
 struct gyroscope_config_s {
     // Device reference
-    emblib::gyroscope& device;
+    emblib::devices::gyroscope& device;
     // This mutex (if provided) is locked during reads
     // Used when there are multiple sensors on one device
-    emblib::mutex* mutex;
+    emblib::rtos::mutex* mutex;
     // Mapping from the device space into the NED coordinate system
     matrix3f transform;
 };
 
 /**
+ * Output units of a gyroscope
+ */
+using gyroscope_units = emblib::devices::gyroscope_units;
+
+/**
  * Sensor task which provides gyroscope readings
  */
 class gyroscope_reader : public sensor_reader<
-    emblib::gyroscope::data_t,
-    vector<emblib::rps_t, 3>
+    emblib::devices::gyroscope::data_t,
+    vector<gyroscope_units, 3>
 > {
 public:
     explicit gyroscope_reader(const gyroscope_config_s& config);
@@ -32,7 +37,7 @@ public:
 private:
     bool init(sensor_t& sensor) noexcept override;
 
-    vector<emblib::rps_t, 3> process(const sensor_t::data_t& raw_data) noexcept override;
+    vector<gyroscope_units, 3> process(const sensor_t::data_t& raw_data) noexcept override;
 
 private:
     // Transform maps a potentially different coordinate space

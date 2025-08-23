@@ -18,23 +18,23 @@ accelerometer_reader::init(sensor_t& sensor) noexcept
 {
     // TODO: Get bias from the saved settings or if not available
     // warn the user and and ask to read multiple samples to calculate bias
-    m_bias.fill(emblib::mpss_t(0));
+    m_bias.fill(accelerometer_units(0));
     return true;
 }
 
-vector<emblib::mpss_t, 3>
+vector<accelerometer_units, 3>
 accelerometer_reader::process(const sensor_t::data_t& raw_data) noexcept
 {
     // TODO: Update emblib so that casts don'd do lazy eval
-    vector<emblib::mpss_t, 3> raw_vec {
-        emblib::mpss_t(raw_data[0]),
-        emblib::mpss_t(raw_data[1]),
-        emblib::mpss_t(raw_data[2])
+    vector<accelerometer_units, 3> raw_vec {
+        accelerometer_units(raw_data[0]),
+        accelerometer_units(raw_data[1]),
+        accelerometer_units(raw_data[2])
     };
-    vector<emblib::mpss_t, 3> ned_vec = m_transform.matmul(raw_vec);
+    vector<accelerometer_units, 3> aligned_vec = m_transform.matmul(raw_vec);
     
     // TODO: Add (optional) low-pass filtering
-    return ned_vec - m_bias;
+    return aligned_vec - m_bias;
 }
 
 }
