@@ -1,8 +1,8 @@
 #pragma once
 
-#include "rx.hpp"
-#include "tx.hpp"
-#include "handshake.hpp"
+#include "link/rx.hpp"
+#include "link/tx.hpp"
+#include "link/handshake.hpp"
 #include <etl/optional.h>
 
 namespace mp {

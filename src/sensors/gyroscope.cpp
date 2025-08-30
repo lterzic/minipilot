@@ -1,5 +1,5 @@
-#include "gyroscope.hpp"
-#include "mp_config.hpp"
+#include "sensors/gyroscope.hpp"
+#include "common/config.hpp"
 
 namespace mp {
 

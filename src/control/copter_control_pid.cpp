@@ -1,6 +1,6 @@
-#include "copter_control_pid.hpp"
-#include "mp_config.hpp"
-#include "util/constants.hpp"
+#include "control/copter_control_pid.hpp"
+#include "common/config.hpp"
+#include "common/constants.hpp"
 
 namespace mp {
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.14)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -21,24 +21,25 @@ add_library(minipilot STATIC
     src/logging/log_sink_text.cpp
     src/sensors/accelerometer.cpp
     src/sensors/gyroscope.cpp
-    src/vehicles/copter/copter.cpp
-    src/vehicles/copter/copter_control.cpp
-    src/vehicles/copter/copter_control_pid.cpp
-    src/vehicles/copter/quadcopter.cpp
+    src/vehicles/copter.cpp
+    src/vehicles/quadcopter.cpp
+    src/control/copter_control.cpp
+    src/control/copter_control_pid.cpp
 )
 
-# Header files to be used by minipilot
-target_include_directories(minipilot PRIVATE
+# Library users should only use header files
+# accessible through mp/ prefix
+target_include_directories(minipilot
+PUBLIC
     "${PROJECT_SOURCE_DIR}/src"
-)
-
-# Header files to be used by external porting projects
-target_include_directories(minipilot INTERFACE
+    "${PROJECT_SOURCE_DIR}/include/mp"
+INTERFACE
     "${PROJECT_SOURCE_DIR}/include"
 )
 
 # Minipilot compiler and linker options
-target_compile_options(minipilot PUBLIC
+target_compile_options(minipilot
+PUBLIC
     -fno-rtti
     -fno-exceptions
     -fdata-sections
@@ -49,7 +50,8 @@ target_compile_options(minipilot PUBLIC
     # -Wextra
     # -Wpedantic
 )
-target_link_options(minipilot PUBLIC
+target_link_options(minipilot
+PUBLIC
     -flto
     -Wl,-Map=${CMAKE_PROJECT_NAME}.map
     -Wl,--gc-sections
@@ -58,13 +60,11 @@ target_link_options(minipilot PUBLIC
 
 # Add path to emblib configuration
 add_library(emblib_config INTERFACE)
-target_include_directories(emblib_config INTERFACE
-    "${PROJECT_SOURCE_DIR}/src"
-)
+target_include_directories(emblib_config INTERFACE "${PROJECT_SOURCE_DIR}/src/libconfig")
 
 # FreeRTOS configuration
 add_library(freertos_config INTERFACE)
-target_include_directories(freertos_config SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(freertos_config SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src/libconfig)
 target_compile_definitions(freertos_config INTERFACE projCOVERAGE_TEST=0)
 
 # Set the protoc path for nanopb
@@ -85,7 +85,8 @@ add_subdirectory("lib/minipilot-proto")
 add_subdirectory("protobuf")
 
 # Link dependency libraries to minipilot
-target_link_libraries(minipilot PUBLIC
+target_link_libraries(minipilot
+PUBLIC
     emblib
     minipilot-proto-nanopb
 )

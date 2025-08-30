@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mp_config.hpp"
+#include "common/config.hpp"
 #include "state/state_estimator.hpp"
 #include <emblib/rtos/mutex.hpp>
 #include <emblib/rtos/task.hpp>

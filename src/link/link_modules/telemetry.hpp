@@ -3,7 +3,7 @@
 #include "link/tx.hpp"
 #include "sensors/sensor_manager.hpp"
 #include "state/state_estimator.hpp"
-#include "emblib/rtos/task.hpp"
+#include <emblib/rtos/task.hpp>
 
 namespace mp {
 

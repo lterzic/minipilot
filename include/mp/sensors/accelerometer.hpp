@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sensor_reader.hpp"
-#include "util/math.hpp"
+#include "common/math.hpp"
+#include "sensors/sensor_reader.hpp"
 #include <emblib/devices/sensors/accelerometer.hpp>
 
 namespace mp {

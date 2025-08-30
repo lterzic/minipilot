@@ -1,5 +1,5 @@
 #include "link/rx.hpp"
-#include "vehicles/copter/copter_control.hpp"
+#include "control/copter_control.hpp"
 
 namespace mp {
 

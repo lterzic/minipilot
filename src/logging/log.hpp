@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mp_config.hpp"
-#include "util/chrono.hpp"
+#include "common/chrono.hpp"
+#include "common/config.hpp"
 
 namespace mp {
 

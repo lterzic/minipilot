@@ -1,5 +1,5 @@
 #include "handshake.hpp"
-#include "mp_config.hpp"
+#include "common/config.hpp"
 
 namespace mp {
 

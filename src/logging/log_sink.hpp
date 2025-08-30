@@ -1,6 +1,6 @@
 #pragma once
 
-#include "log.hpp"
+#include "logging/log.hpp"
 #include <emblib/io/ostream.hpp>
 
 namespace mp {

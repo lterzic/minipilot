@@ -1,6 +1,6 @@
 #pragma once
 
-#include "copter_control.hpp"
+#include "control/copter_control.hpp"
 #include <emblib/dsp/pid.hpp>
 #include <emblib/rtos/mutex.hpp>
 

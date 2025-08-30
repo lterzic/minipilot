@@ -1,5 +1,5 @@
 #include "telemetry.hpp"
-#include "mp_config.hpp"
+#include "common/config.hpp"
 
 #define PB_SET(struct, field, value) pb_set(struct.field, struct.has_ ## field, value)
 

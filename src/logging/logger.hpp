@@ -1,7 +1,7 @@
 #pragma once
 
-#include "log_sink.hpp"
-#include "mp_config.hpp"
+#include "common/config.hpp"
+#include "logging/log_sink.hpp"
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
 #include <etl/list.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/chrono.hpp"
+#include "common/chrono.hpp"
 #include <cstddef>
 
 namespace mp {

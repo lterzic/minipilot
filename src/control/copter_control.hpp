@@ -1,10 +1,10 @@
 #pragma once
 
-#include "copter.hpp"
-#include "mp_config.hpp"
+#include "common/chrono.hpp"
+#include "common/config.hpp"
+#include "common/math.hpp"
 #include "state/state_estimator.hpp"
-#include "util/chrono.hpp"
-#include "util/math.hpp"
+#include "vehicles/copter.hpp"
 #include <emblib/rtos/task.hpp>
 
 namespace mp {

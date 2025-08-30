@@ -1,6 +1,6 @@
 #pragma once
 
-#include "log_sink.hpp"
+#include "logging/log_sink.hpp"
 
 namespace mp {
 

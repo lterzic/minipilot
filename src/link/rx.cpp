@@ -1,5 +1,5 @@
 #include "rx.hpp"
-#include "mp_config.hpp"
+#include "common/config.hpp"
 #include "logging/logging.hpp"
 #include <pb_decode.h>
 

@@ -1,4 +1,4 @@
-#include "log_sink_text.hpp"
+#include "logging/log_sink_text.hpp"
 #include <etl/string.h>
 
 namespace mp {

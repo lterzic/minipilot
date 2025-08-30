@@ -1,5 +1,5 @@
-#include "accelerometer.hpp"
-#include "mp_config.hpp"
+#include "sensors/accelerometer.hpp"
+#include "common/config.hpp"
 
 namespace mp {
 

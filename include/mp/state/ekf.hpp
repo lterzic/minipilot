@@ -1,8 +1,8 @@
 #pragma once
 
-#include "model.hpp"
-#include "state_estimator_periodic.hpp"
 #include "sensors/sensor_manager.hpp"
+#include "state/model.hpp"
+#include "state/state_estimator_periodic.hpp"
 #include <emblib/dsp/kalman.hpp>
 
 namespace mp {
