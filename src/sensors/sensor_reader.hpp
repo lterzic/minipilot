@@ -27,7 +27,8 @@ public:
         static_task(create_task_name(sensor).c_str(), task_priority),
         m_sensor(sensor),
         m_sensor_mutex(sensor_mutex),
-        m_task_period(task_period)
+        m_task_period(task_period),
+        m_sample_count(0)
     {}
     virtual ~sensor_reader() = default;
 
@@ -47,6 +48,15 @@ public:
     {
         emblib::rtos::scoped_lock lock(m_read_mutex);
         return m_last_processed;
+    }
+
+    /**
+     * Get the count of the current available sample
+     */
+    size_t get_sample_count() const noexcept
+    {
+        emblib::rtos::scoped_lock lock(m_read_mutex);
+        return m_sample_count;
     }
 
     /**
@@ -106,6 +116,7 @@ private:
     mutable emblib::rtos::mutex m_read_mutex;
     raw_data_type m_last_raw;
     out_data_type m_last_processed;
+    size_t m_sample_count;
 };
 
 /**
@@ -153,6 +164,7 @@ inline void sensor_reader<raw_data_type, out_data_type>::run() noexcept
             emblib::rtos::scoped_lock lock(m_read_mutex);
             m_last_raw = read_data;
             m_last_processed = processed_data;
+            m_sample_count++;
 
             // TODO: Once pub/sub system implemented, publish values from here
         } else {

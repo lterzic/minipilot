@@ -29,12 +29,17 @@ public:
      * 4 - rotation quaternion
      * 3 - angular velocity
      * 3 - gyro drift
+     * @note Public since used by ekf.cpp static functions
      */
     static constexpr size_t KALMAN_DIM = 16;
 
-    // Convenience typedef
+    /**
+     * Convenience typedef
+     * @note Public since used by ekf.cpp static functions
+     */
     using state_vec_t = vectorf<KALMAN_DIM>;
 
+public:
     explicit ekf(
         const sensor_manager& sensor_manager,
         const model& model
@@ -64,23 +69,15 @@ private:
      */
     matrixf<KALMAN_DIM> state_transition_jacob(const state_vec_t& state, float dt) const noexcept;
 
-    /**
-     * Calculate the expected readings of an accelerometer and gyroscope
-     */
-    static vectorf<6> update_acc_gyro(const state_vec_t& state) noexcept;
-
-    /**
-     * Accelerometer and gyroscope reading jacobian
-     */
-    static matrixf<6, KALMAN_DIM> update_acc_gyro_jacob(const state_vec_t& state) noexcept;
-    
-    
-
 private:
     // Sensor manager
     const sensor_manager& m_sensor_manager;
     // Model used for prediction
     const model& m_model;
+    // Sample counts for each sensor to determine
+    // if new data is available
+    size_t m_sample_count_accelerometer;
+    size_t m_sample_count_gyroscope;
 
     // Kalman filter
     emblib::dsp::kalman<KALMAN_DIM> m_kalman;

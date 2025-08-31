@@ -45,7 +45,7 @@ telemetry::telemetry(
 void telemetry::run() noexcept
 {
     while (true) {
-        m_tx.send_downlink([this](auto& payload, auto& payload_type) {
+        auto payload_cb = [this](auto& payload, auto& payload_type) {
             payload_type = mp_pb_link_DownlinkMessage_telemetry_tag;
             mp_pb_link_Telemetry& msg = payload.telemetry;
 
@@ -71,7 +71,8 @@ void telemetry::run() noexcept
             msg.sensors.has_gyroscope = true;
 
             msg.has_sensors = true;
-        });
+        };
+        m_tx.send_downlink(payload_cb);
 
         sleep_periodic(TELEMETRY_PERIOD);
     }

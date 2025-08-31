@@ -33,6 +33,7 @@ static vector3f get_gyro_drift(const ekf::state_vec_t& state) noexcept
     return {state(13), state(14), state(15)};
 }
 
+// Initialize the state and underlying task implementation
 ekf::ekf(
     const sensor_manager& sensor_manager,
     const model& model
@@ -40,7 +41,9 @@ ekf::ekf(
     state_estimator_periodic(PERIOD, m_stack),
     m_sensor_manager(sensor_manager),
     m_model(model),
-    m_kalman({0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+    m_kalman({0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}),
+    m_sample_count_accelerometer(0),
+    m_sample_count_gyroscope(0)
 {}
 
 // For implementation details view docs for this task
@@ -154,33 +157,20 @@ ekf::state_transition_jacob(const state_vec_t& state, float dt) const noexcept
     return result;
 }
 
-vectorf<6> ekf::update_acc_gyro(const state_vec_t& state) noexcept
+static vectorf<3> map_state_to_accelerometer(const ekf::state_vec_t& state)
 {
     const auto a = get_linear_acceleration(state);
     const auto q = get_rotation_q(state);
-    const auto w = get_angular_velocity(state);
-    const auto wd = get_gyro_drift(state);
 
-    // Expected accelerometer reading = model acc + gravity mapped
-    // to the local reference frame
-    const vector3f a_exp = q.conjugate().rotate_vec(a - GV);
-
-    // Expected gyroscope reading = model ang vel + gyro drift
-    const vector3f w_exp = w + wd;
-
-    return {
-        a_exp(0), a_exp(1), a_exp(2),
-        w_exp(0), w_exp(1), w_exp(2)
-    };
+    // Accelerometer readings are acceleration - gravity vector
+    // in the local reference frame (+ noise)
+    return q.conjugate().rotate_vec(a - GV);
 }
 
-matrixf<6, ekf::KALMAN_DIM> ekf::update_acc_gyro_jacob(const state_vec_t& state) noexcept
+static matrixf<3, ekf::KALMAN_DIM> map_state_to_accelerometer_jacobian(const ekf::state_vec_t& state)
 {
-    matrixf<6, KALMAN_DIM> result {0};
-
     const auto a = get_linear_acceleration(state);
-    const auto q = get_rotation_q(state);
-    const auto qv = q.as_vector();
+    const auto qv = get_rotation_q(state).as_vector();
 
     const float ax = a(0), ay = a(1), az = a(2);
     const float qw = qv(0), qx = qv(1), qy = qv(2), qz = qv(3);
@@ -199,16 +189,30 @@ matrixf<6, ekf::KALMAN_DIM> ekf::update_acc_gyro_jacob(const state_vec_t& state)
         {2.f*(ax*qy - ay*qx + qw*(az + G)), 2.f*(ax*qz - ay*qw - qx*(az + G)), 2.f*(ax*qw + ay*qz - qy*(az + G)), 2*(ax*qx + ay*qy + qz*(az + G))}
     };
 
-    result.set_submatrix(0, 3, da_da);
-    result.set_submatrix(0, 6, da_dq);
+    matrixf<3, ekf::KALMAN_DIM> jacobian(0);
+    jacobian.set_submatrix(0, 3, da_da);
+    jacobian.set_submatrix(0, 6, da_dq);
+    return jacobian;
+}
 
+static vectorf<3> map_state_to_gyroscope(const ekf::state_vec_t& state)
+{
+    const auto w = get_angular_velocity(state);
+    const auto wd = get_gyro_drift(state);
+
+    return w + wd;
+}
+
+static matrixf<3, ekf::KALMAN_DIM> map_state_to_gyroscope_jacobian(const ekf::state_vec_t& state)
+{
+    matrixf<3, ekf::KALMAN_DIM> jacobian(0);
+    
     // d(w_exp)/d(w)
-    result(3, 10) = result(4, 11) = result(5, 12) = 1.f;
-
+    jacobian(0, 10) = jacobian(1, 11) = jacobian(2, 12) = 1.f;
     // d(w_exp)/d(wd)
-    result(3, 13) = result(4, 14) = result(5, 15) = 1.f;
+    jacobian(0, 13) = jacobian(1, 14) = jacobian(2, 15) = 1.f;
 
-    return result;
+    return jacobian;
 }
 
 void ekf::iteration(float dt) noexcept
@@ -228,37 +232,50 @@ void ekf::iteration(float dt) noexcept
     }).as_diagonal();
 
     // Run the prediction step based on the current state
-    m_kalman.predict(
-        [this, dt](const auto& state) { return state_transition(state, dt); },
-        [this, dt](const auto& state) { return state_transition_jacob(state, dt); },
-        Q
-    );
+    auto transition = [this, dt](const auto& state) { return state_transition(state, dt); };
+    auto jacobian = [this, dt](const auto& state) { return state_transition_jacob(state, dt); };
+    m_kalman.predict(transition, jacobian, Q);
 
     // Update based on IMU data
     auto accelerometer = m_sensor_manager.get_sensor_reader<sensor_type_e::ACCELEROMETER>();
     auto gyroscope = m_sensor_manager.get_sensor_reader<sensor_type_e::GYROSCOPE>();
 
-    // TODO: Add checking if data is ready
-    if (accelerometer && gyroscope) {
-        const vector3f a_in = accelerometer->get_processed().cast<float>();
-        const vector3f w_in = gyroscope->get_processed().cast<float>();
-        const vectorf<6> observation {
-            a_in(0), a_in(1), a_in(2),
-            w_in(0), w_in(1), w_in(2)
-        };
+    if (accelerometer) {
+        size_t current_count = accelerometer->get_sample_count();
 
-        matrixf<6> R(0);
-        float acc_nd = accelerometer->get_sensor().get_noise_density();
-        float gyro_nd = gyroscope->get_sensor().get_noise_density();
-        R.set_submatrix(0, 0, matrix3f::diagonal(acc_nd * acc_nd / dt));
-        R.set_submatrix(3, 3, matrix3f::diagonal(gyro_nd * gyro_nd / dt));
+        // If there is new accelerometer data available
+        if (current_count > m_sample_count_accelerometer) {
+            m_sample_count_accelerometer = current_count;
+            float acc_nd = accelerometer->get_sensor().get_noise_density();
 
-        m_kalman.update<6>(
-            [](const auto& state) { return update_acc_gyro(state); },
-            [](const auto& state) { return update_acc_gyro_jacob(state); },
-            R,
-            observation
-        );
+            const vector3f acc = accelerometer->get_processed().cast<float>();
+            const matrix3f cov = matrix3f::diagonal(acc_nd * acc_nd / dt);
+            m_kalman.update<3>(
+                etl::make_delegate<map_state_to_accelerometer>(),
+                etl::make_delegate<map_state_to_accelerometer_jacobian>(),
+                cov,
+                acc
+            );
+        }
+    }
+
+    if (gyroscope) {
+        size_t current_count = gyroscope->get_sample_count();
+
+        // If there is new gyroscope data available
+        if (current_count > m_sample_count_gyroscope) {
+            m_sample_count_gyroscope = current_count;
+            float gyro_nd = gyroscope->get_sensor().get_noise_density();
+
+            const vector3f ang = gyroscope->get_processed().cast<float>();
+            const matrix3f cov = matrix3f::diagonal(gyro_nd * gyro_nd / dt);
+            m_kalman.update<3>(
+                etl::make_delegate<map_state_to_gyroscope>(),
+                etl::make_delegate<map_state_to_gyroscope_jacobian>(),
+                cov,
+                ang
+            );
+        }
     }
 
     // Position is integration of velocity and acceleration
