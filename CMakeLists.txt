@@ -25,6 +25,7 @@ add_library(minipilot STATIC
     src/control/copter_control.cpp
     src/control/copter_control_pid.cpp
     src/telemetry/telemetry.cpp
+    src/parameters/parameter_manager.cpp
 )
 
 # Library users should only use header files
