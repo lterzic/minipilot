@@ -1,9 +1,20 @@
-#include "telemetry.hpp"
 #include "common/config.hpp"
+#include "telemetry/telemetry.hpp"
 
 #define PB_SET(struct, field, value) pb_set(struct.field, struct.has_ ## field, value)
 
 namespace mp {
+
+telemetry::telemetry(
+    tx& tx,
+    const sensor_manager& sensor_manager,
+    const state_estimator& state_estimator
+) :
+    static_task("Telemetry", TELEMETRY_TASK_PRIORITY),
+    m_tx(tx),
+    m_sensor_manager(sensor_manager),
+    m_state_estimator(state_estimator)
+{}
 
 static void pb_set(mp_pb_Vector3f& pb_vec, bool& pb_has_field, const vector3f& mp_vec)
 {
@@ -30,17 +41,6 @@ static void pb_set(mp_pb_Vector4f& pb_vec, bool& pb_has_field, const vector4f& m
     pb_vec.z = mp_vec(3);
     pb_has_field = true;
 }
-
-telemetry::telemetry(
-    tx& tx,
-    const sensor_manager& sensor_manager,
-    const state_estimator& state_estimator
-) :
-    static_task("Telemetry", TELEMETRY_TASK_PRIORITY),
-    m_tx(tx),
-    m_sensor_manager(sensor_manager),
-    m_state_estimator(state_estimator)
-{}
 
 void telemetry::run() noexcept
 {

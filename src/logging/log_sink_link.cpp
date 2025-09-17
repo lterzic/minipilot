@@ -1,9 +1,9 @@
-#include "link_log_sink.hpp"
+#include "logging/log_sink_link.hpp"
 #include <pb_encode.h>
 
 namespace mp {
 
-link_log_sink::link_log_sink(tx& tx) :
+log_sink_link::log_sink_link(tx& tx) :
     m_tx(tx)
 {}
 
@@ -16,7 +16,7 @@ static bool encode_log_data(pb_ostream_t *stream, const pb_field_iter_t *field, 
     return pb_encode_string(stream, (uint8_t*)log->data, strnlen(log->data, sizeof(log->data)));
 }
 
-void link_log_sink::write(const log_s& log) noexcept
+void log_sink_link::write(const log_s& log) noexcept
 {
     auto payload_cb = [&log](auto& payload, auto& payload_type) {
         payload_type = mp_pb_link_DownlinkMessage_log_tag;

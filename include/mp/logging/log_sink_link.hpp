@@ -6,9 +6,9 @@
 
 namespace mp {
 
-class link_log_sink : public log_sink {
+class log_sink_link : public log_sink {
 public:
-    explicit link_log_sink(tx& tx) noexcept;
+    explicit log_sink_link(tx& tx) noexcept;
 
     void write(const log_s& log) noexcept override;
 
