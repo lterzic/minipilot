@@ -23,17 +23,6 @@ namespace mp {
 class tx {
 public:
     /**
-     * Callback for filling in the payload data
-     * First argument is the union for all payload types,
-     * the second is the payload type selector
-     */
-    using payload_cb_t = etl::delegate<void(
-        mp_pb_link_DownlinkMessage::_mp_pb_link_DownlinkMessage_payload&,
-        pb_size_t&
-    )>;
-
-public:
-    /**
      * @todo Add system information like vehicle id, session id,
      * etc. so that it can be sent in downlink messages
      */
@@ -48,7 +37,14 @@ public:
      * the caller context, can convert this to a task and copy
      * to a queue, then process in this task's context
      */
-    bool send_downlink(payload_cb_t payload_cb) noexcept;
+    bool send_downlink(mp_pb_link_DownlinkMessage& msg) noexcept;
+
+    /**
+     * Helper method for a specific payload type
+     * @note Implemented for each payload using template specialization
+     */
+    template <typename payload_type>
+    bool send_downlink(etl::delegate<void(payload_type&)>&& payload_cb) noexcept;
 
 private:
     // Message counter
@@ -61,5 +57,23 @@ private:
     // Semaphore to signal the end of the async write
     emblib::rtos::semaphore m_write_smphr;
 };
+
+template <>
+inline bool tx::send_downlink(etl::delegate<void(mp_pb_telemetry_Downlink&)>&& payload_cb) noexcept
+{
+    mp_pb_link_DownlinkMessage msg = {0};
+    msg.which_payload = mp_pb_link_DownlinkMessage_telemetry_tag;
+    payload_cb(msg.payload.telemetry);
+    return send_downlink(msg);
+}
+
+template <>
+inline bool tx::send_downlink(etl::delegate<void(mp_pb_logging_Downlink&)>&& payload_cb) noexcept
+{
+    mp_pb_link_DownlinkMessage msg = {0};
+    msg.which_payload = mp_pb_link_DownlinkMessage_logging_tag;
+    payload_cb(msg.payload.logging);
+    return send_downlink(msg);
+}
 
 }

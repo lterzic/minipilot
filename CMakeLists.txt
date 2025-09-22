@@ -12,7 +12,6 @@ add_library(minipilot STATIC
     src/link/link.cpp
     src/link/rx.cpp
     src/link/tx.cpp
-    src/link/link_modules/command_handler.cpp
     src/state/ekf.cpp
     src/state/state_estimator_periodic.cpp
     src/logging/logger.cpp

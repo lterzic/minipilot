@@ -2,7 +2,7 @@
 
 #include "link/tx.hpp"
 #include "logging/log_sink.hpp"
-#include "pb/link/logging/log.nanopb.h"
+#include "pb/logging/log.nanopb.h"
 
 namespace mp {
 

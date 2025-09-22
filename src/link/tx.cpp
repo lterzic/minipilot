@@ -8,13 +8,8 @@ tx::tx(emblib::io::ostream& tx_dev) :
     m_tx_dev(tx_dev)
 {}
 
-bool tx::send_downlink(payload_cb_t payload_cb)
+bool tx::send_downlink(mp_pb_link_DownlinkMessage& msg)
 {
-    // Create an empty message and fill the payload
-    // using the caller provided callback
-    mp_pb_link_DownlinkMessage msg;
-    payload_cb(msg.payload, msg.which_payload);
-
     emblib::rtos::scoped_lock lock(m_mutex);
     msg.message_id = m_message_id++;
     // TODO: Fill in the rest of the downlink message data

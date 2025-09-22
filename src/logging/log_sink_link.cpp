@@ -18,17 +18,17 @@ static bool encode_log_data(pb_ostream_t *stream, const pb_field_iter_t *field, 
 
 void log_sink_link::write(const log_s& log) noexcept
 {
-    auto payload_cb = [&log](auto& payload, auto& payload_type) {
-        payload_type = mp_pb_link_DownlinkMessage_log_tag;
-        mp_pb_link_Log& msg = payload.log;
+    auto payload_cb = [&log](mp_pb_logging_Downlink& downlink) {
+        mp_pb_logging_Log& msg = downlink.payload.log;
+        downlink.which_payload = mp_pb_logging_Downlink_log_tag;
 
         msg.timestamp_ms = log.time_since_start.value();
-        msg.level = static_cast<mp_pb_link_LogLevel>((int)log.level + 1);
+        msg.level = static_cast<mp_pb_logging_LogLevel>((int)log.level + 1);
         msg.message_id = log.message_id;
         msg.message.arg = const_cast<log_s*>(&log);
         msg.message.funcs.encode = &encode_log_data;
     };
-    m_tx.send_downlink(payload_cb);
+    m_tx.send_downlink<mp_pb_logging_Downlink>(payload_cb);
 }
 
 }
