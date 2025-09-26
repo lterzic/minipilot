@@ -3,8 +3,8 @@
 #include "common/chrono.hpp"
 #include "common/config.hpp"
 #include "common/math.hpp"
+#include "copter/copter.hpp"
 #include "state/state_estimator.hpp"
-#include "vehicles/copter.hpp"
 #include <emblib/rtos/task.hpp>
 
 namespace mp {
@@ -12,16 +12,16 @@ namespace mp {
 /**
  * Interface for controlling a `copter`
  */
-class copter_control : private emblib::rtos::task {
+class copter_controller : private emblib::rtos::task {
 public:
     template <size_t STACK_SIZE>
-    explicit copter_control(
+    explicit copter_controller(
         copter& copter,
         const state_estimator& state_estimator,
         milliseconds_t period,
         emblib::rtos::task_stack<STACK_SIZE>& stack
     ) :
-        task("Copter control", COPTER_CONTROL_PRIORITY, stack),
+        task("Copter control", COPTER_CONTROLLER_PRIORITY, stack),
         m_copter(copter),
         m_state_estimator(state_estimator),
         m_period(period)

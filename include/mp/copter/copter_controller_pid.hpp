@@ -1,14 +1,14 @@
 #pragma once
 
-#include "control/copter_control.hpp"
+#include "copter/copter_controller.hpp"
 #include <emblib/dsp/pid.hpp>
 #include <emblib/rtos/mutex.hpp>
 
 namespace mp {
 
-class copter_control_pid : public copter_control {
+class copter_controller_pid : public copter_controller {
 public:
-    explicit copter_control_pid(
+    explicit copter_controller_pid(
         copter& copter,
         const state_estimator& state_estimator,
         const copter_params_s& copter_params

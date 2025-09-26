@@ -8,23 +8,23 @@ project(minipilot VERSION 1.0)
 
 # Source files for minipilot
 add_library(minipilot STATIC
+    src/copter/copter.cpp
+    src/copter/copter_controller.cpp
+    src/copter/copter_controller_pid.cpp
+    src/copter/quadcopter.cpp
     src/link/handshake.cpp
     src/link/link.cpp
     src/link/rx.cpp
     src/link/tx.cpp
-    src/state/ekf.cpp
-    src/state/state_estimator_periodic.cpp
     src/logging/logger.cpp
     src/logging/log_sink_link.cpp
     src/logging/log_sink_text.cpp
+    src/parameters/parameter_manager.cpp
     src/sensors/accelerometer.cpp
     src/sensors/gyroscope.cpp
-    src/vehicles/copter.cpp
-    src/vehicles/quadcopter.cpp
-    src/control/copter_control.cpp
-    src/control/copter_control_pid.cpp
+    src/state/ekf.cpp
+    src/state/state_estimator_periodic.cpp    
     src/telemetry/telemetry.cpp
-    src/parameters/parameter_manager.cpp
 )
 
 # Library users should only use header files

@@ -1,15 +1,15 @@
-#include "control/copter_control_pid.hpp"
+#include "copter/copter_controller_pid.hpp"
 #include "common/config.hpp"
 #include "common/constants.hpp"
 
 namespace mp {
 
-copter_control_pid::copter_control_pid(
+copter_controller_pid::copter_controller_pid(
     copter& copter,
     const state_estimator& state_estimator,
     const copter_params_s& copter_params
 ) noexcept :
-    copter_control(copter, state_estimator, COPTER_CONTROL_PID_PERIOD, m_stack),
+    copter_controller(copter, state_estimator, COPTER_CONTROLLER_PID_PERIOD, m_stack),
     m_copter_params(copter_params),
     m_angular_velocity_pid(1, 0.2, 0),
     m_linear_acceleration_pid(1.4, 0.1, 0.1),
@@ -20,7 +20,7 @@ copter_control_pid::copter_control_pid(
     m_output({0})
 {}
 
-bool copter_control_pid::set_angular_velocity(vector3f velocity, float thrust) noexcept
+bool copter_controller_pid::set_angular_velocity(vector3f velocity, float thrust) noexcept
 {
     // TODO: Add bounds checking and return false if out of bounds
     emblib::rtos::scoped_lock lock(m_mutex);
@@ -30,7 +30,7 @@ bool copter_control_pid::set_angular_velocity(vector3f velocity, float thrust) n
     return true;
 }
 
-bool copter_control_pid::set_linear_velocity(vector3f velocity, float dir) noexcept
+bool copter_controller_pid::set_linear_velocity(vector3f velocity, float dir) noexcept
 {
     // TODO: Add bounds checking
     // TODO: Reset linear pid to avoid previous integral accumulation glitches
@@ -41,7 +41,7 @@ bool copter_control_pid::set_linear_velocity(vector3f velocity, float dir) noexc
     return true;
 }
 
-copter_control_pid::actuation_s copter_control_pid::iterate(const state_s& state, float dt) noexcept
+copter_controller_pid::actuation_s copter_controller_pid::iterate(const state_s& state, float dt) noexcept
 {
     // To prevent changing the target values during algorithm execution
     emblib::rtos::scoped_lock lock(m_mutex);

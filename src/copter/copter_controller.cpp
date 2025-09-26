@@ -1,8 +1,8 @@
-#include "copter_control.hpp"
+#include "copter_controller.hpp"
 
 namespace mp {
 
-void copter_control::run() noexcept
+void copter_controller::run() noexcept
 {
     float dt = emblib::units::seconds<float>(m_period).value();
 

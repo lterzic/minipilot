@@ -37,7 +37,7 @@ inline constexpr milliseconds_t     GYROSCOPE_READER_PERIOD         = millisecon
 
 // TODO: Add state estimator priorities here
 
-inline constexpr task_priority_e    COPTER_CONTROL_PRIORITY         = TASK_PRIORITY_HIGH;
-inline constexpr milliseconds_t     COPTER_CONTROL_PID_PERIOD       = milliseconds_t(40);
+inline constexpr task_priority_e    COPTER_CONTROLLER_PRIORITY      = TASK_PRIORITY_HIGH;
+inline constexpr milliseconds_t     COPTER_CONTROLLER_PID_PERIOD    = milliseconds_t(40);
 
 }
