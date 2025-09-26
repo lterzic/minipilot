@@ -22,8 +22,10 @@ add_library(minipilot STATIC
     src/parameters/parameter_manager.cpp
     src/sensors/accelerometer.cpp
     src/sensors/gyroscope.cpp
+    src/sensors/sensor_telemetry.cpp
     src/state/ekf.cpp
-    src/state/state_estimator_periodic.cpp    
+    src/state/state_estimator_periodic.cpp
+    src/state/state_telemetry.cpp
     src/telemetry/telemetry.cpp
 )
 
