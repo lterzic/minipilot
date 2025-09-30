@@ -27,7 +27,9 @@ struct copter_params_s {
 class copter {
 
 public:
-    explicit copter(copter_params_s& params) noexcept;
+    explicit copter(copter_params_s& params) noexcept :
+        m_params(params)
+    {}
 
     /**
      * Calculate and set actuator values to produce the given thrust and torque

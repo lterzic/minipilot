@@ -2,18 +2,27 @@
 
 namespace mp {
 
-void copter_controller::run() noexcept
+copter_controller::copter_controller() noexcept
 {
-    float dt = emblib::units::seconds<float>(m_period).value();
+    set_angular_controls({0, 0});
+}
 
-    while (true) {
-        state_s state = m_state_estimator.get_state();
-        actuation_s actuation = iterate(state, dt);
+bool
+copter_controller::set_angular_controls(angular_controls_s input) noexcept
+{
+    // TODO: Add bounds checking and return false if out of bounds
+    emblib::rtos::scoped_lock lock(m_mutex);
+    m_controls = input;
+    return true;
+}
 
-        m_copter.actuate(actuation.thrust, actuation.torque);
-        
-        sleep_periodic(m_period);
-    }
+bool
+copter_controller::set_linear_controls(linear_controls_s input) noexcept
+{
+    // TODO: Add bounds checking and return false if out of bounds
+    emblib::rtos::scoped_lock lock(m_mutex);
+    m_controls = input;
+    return true;
 }
 
 }

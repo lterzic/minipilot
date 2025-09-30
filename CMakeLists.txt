@@ -8,7 +8,6 @@ project(minipilot VERSION 1.0)
 
 # Source files for minipilot
 add_library(minipilot STATIC
-    src/copter/copter.cpp
     src/copter/copter_controller.cpp
     src/copter/copter_controller_pid.cpp
     src/copter/quadcopter.cpp

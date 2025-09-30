@@ -32,12 +32,12 @@ public:
         m_actuators(actuators)
     {}
 
-private:
     /**
      * Computes the needed speeds via inverse_mma and assigns them to the appropriate motors
      */
     bool actuate(float thrust, vector3f torque) noexcept override;
 
+private:
     /**
      * Compute the thrust based on current motor speeds
      * @note Inverse of the `actuate` method

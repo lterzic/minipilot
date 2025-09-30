@@ -1,49 +1,16 @@
 #pragma once
 
-#include "common/chrono.hpp"
-#include "common/config.hpp"
 #include "common/math.hpp"
-#include "copter/copter.hpp"
-#include "state/state_estimator.hpp"
-#include <emblib/rtos/task.hpp>
+#include <emblib/rtos/mutex.hpp>
+#include <etl/variant.h>
 
 namespace mp {
 
 /**
  * Interface for controlling a `copter`
  */
-class copter_controller : private emblib::rtos::task {
+class copter_controller {
 public:
-    template <size_t STACK_SIZE>
-    explicit copter_controller(
-        copter& copter,
-        const state_estimator& state_estimator,
-        milliseconds_t period,
-        emblib::rtos::task_stack<STACK_SIZE>& stack
-    ) :
-        task("Copter control", COPTER_CONTROLLER_PRIORITY, stack),
-        m_copter(copter),
-        m_state_estimator(state_estimator),
-        m_period(period)
-    {}
-
-    /**
-     * Set the desired angular velocity vector and thrust
-     * @param velocity Angular velocity vector in forward-right-down system in radians per second
-     * @param thrust Thrust in the "UP" direction in Newtons
-     * @returns `false` if the given angular velocity or thrust can't be achieved
-     */
-    virtual bool set_angular_velocity(vector3f velocity, float thrust) noexcept = 0;
-
-    /**
-     * Set the desired velocity vector and direction
-     * @param velocity Velocity vector in the global NED coordinate system in meters per second
-     * @param dir Direction in radians with 0 being North, going clockwise
-     * @returns `false` if the given velocity can't be achieved
-     */
-    virtual bool set_linear_velocity(vector3f velocity, float dir) noexcept = 0;
-
-protected:
     struct actuation_s {
         // Thrust in Newtons in the "UP" direction
         float thrust;
@@ -51,23 +18,64 @@ protected:
         vector3f torque;
     };
 
-private:
+    struct angular_controls_s {
+        // Angular velocity vector in radians per second
+        vector3f velocity;
+        // Thrust in the "UP" direction in Newtons
+        float thrust;
+    };
+
+    struct linear_controls_s {
+        // Velocity vector in meters per second
+        vector3f velocity;
+        // Direction in radians with 0 being North, increasing clockwise
+        float direction;
+    };
+
+public:
+    /**
+     * By default initialize input to angular mode with 0 thrust and angular velocity
+     */
+    copter_controller() noexcept;
+
+    /**
+     * Set the desired angular velocity vector and thrust
+     * @returns `false` if the given angular velocity or thrust can't be achieved
+     */
+    bool set_angular_controls(angular_controls_s input) noexcept;
+
+    /**
+     * Set the desired velocity vector and direction
+     * @returns `false` if the given velocity can't be achieved
+     */
+    bool set_linear_controls(linear_controls_s input) noexcept;
+
     /**
      * Get the required actuation to achieve the last set command
      */
-    virtual actuation_s iterate(const state_s& state, float dt) noexcept = 0;
+    virtual actuation_s iterate(float dt) noexcept = 0;
+
+protected:
+    /**
+     * Current control mode can be either angular or linear
+     * @note Index 0 represents angular controls, and index 1 linear
+     */
+    using control_v = etl::variant<angular_controls_s, linear_controls_s>;
 
     /**
-     * Run an iteration of the control algorithm and assign
-     * actuation values to the copter vehicle
+     * Get current controls
      */
-    void run() noexcept override;
+    control_v get_controls() const noexcept
+    {
+        emblib::rtos::scoped_lock lock(m_mutex);
+        return m_controls;
+    }
 
 private:
-    copter& m_copter;
-    const state_estimator& m_state_estimator;
-    
-    milliseconds_t m_period;
+    // For protecting controls while writing
+    mutable emblib::rtos::mutex m_mutex;
+    // Current controls
+    control_v m_controls;
 };
 
 }
