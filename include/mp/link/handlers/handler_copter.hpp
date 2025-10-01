@@ -1,0 +1,20 @@
+#pragma once
+
+#include "copter/copter_controller.hpp"
+#include "common/pb.hpp"
+#include "link/rx.hpp"
+
+namespace mp {
+
+class handle_copter {
+public:
+    handle_copter(rx& rx, copter_controller& controller);
+
+private:
+    void handle(const mp_pb_link_UplinkMessage& msg);
+
+private:
+    copter_controller& m_controller;
+};
+
+}

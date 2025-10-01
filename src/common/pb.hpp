@@ -34,4 +34,9 @@ inline void pb_set(mp_pb_Vector4f& pb_vec, bool& pb_has_field, const vector4f& m
     pb_has_field = true;
 }
 
+inline vector3f pb_vector3f(const mp_pb_Vector3f& pb_vec)
+{
+    return {pb_vec.x, pb_vec.y, pb_vec.z};
+}
+
 }

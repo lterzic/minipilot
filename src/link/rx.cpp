@@ -47,7 +47,7 @@ void rx::run()
             // If a handler for this payload exists, run it in this thread's context
             auto handler = m_handlers.find(recv_msg.which_payload);
             if (handler != m_handlers.end())
-                handler->second->handle(recv_msg);
+                handler->second(recv_msg);
         }
     }
 }
