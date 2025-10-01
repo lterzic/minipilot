@@ -1,26 +1,25 @@
 #pragma once
 
-#include "sensor_manager.hpp"
+#include "sensors/sensor_manager.hpp"
 #include "state/state_estimator.hpp"
 #include "telemetry/telemetry.hpp"
 
 namespace mp {
 
-class sensor_telemetry {
+class channel_sensors {
 public:
-    sensor_telemetry(
+    channel_sensors(
+        telemetry& telemetry,
         const sensor_manager& sensor_manager,
-        const state_estimator& state_estimator,
-        telemetry& telemetry
+        const state_estimator& state_estimator
     );
 
 private:
-    void channel_sensors(telemetry::channel_payload_u& channel) const;
+    void set(telemetry::channel_payload_u& channel) const;
 
 private:
     const sensor_manager& m_sensor_manager;
     const state_estimator& m_state_estimator;
-    telemetry& m_telemetry;
 };
 
 }

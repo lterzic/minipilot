@@ -1,25 +1,24 @@
-#include "sensors/sensor_telemetry.hpp"
+#include "telemetry/channels/channel_sensors.hpp"
 #include "common/pb.hpp"
 
 namespace mp {
 
-sensor_telemetry::sensor_telemetry(
+channel_sensors::channel_sensors(
+    telemetry& telemetry,
     const sensor_manager& sensor_manager,
-    const state_estimator& state_estimator,
-    telemetry& telemetry
+    const state_estimator& state_estimator
 ) :
     m_sensor_manager(sensor_manager),
-    m_state_estimator(state_estimator),
-    m_telemetry(telemetry)
+    m_state_estimator(state_estimator)
 {
-    assert(m_telemetry.add_channel(
+    assert(telemetry.add_channel(
         mp_pb_telemetry_Channel_sensors_tag,
-        etl::make_delegate<sensor_telemetry, &sensor_telemetry::channel_sensors>(*this)
+        etl::make_delegate<channel_sensors, &channel_sensors::set>(*this)
     ));
 }
 
 void
-sensor_telemetry::channel_sensors(telemetry::channel_payload_u& channel) const noexcept
+channel_sensors::set(telemetry::channel_payload_u& channel) const noexcept
 {
     auto accelerometer = m_sensor_manager.get_sensor_reader<sensor_type_e::ACCELEROMETER>();
     if (accelerometer) {

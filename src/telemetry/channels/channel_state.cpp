@@ -1,23 +1,22 @@
-#include "state/state_telemetry.hpp"
+#include "telemetry/channels/channel_state.hpp"
 #include "common/pb.hpp"
 
 namespace mp {
 
-state_telemetry::state_telemetry(
-    const state_estimator& state_estimator,
-    telemetry& telemetry
+channel_state::channel_state(
+    telemetry& telemetry,
+    const state_estimator& state_estimator
 ) :
-    m_state_estimator(state_estimator),
-    m_telemetry(telemetry)
+    m_state_estimator(state_estimator)
 {
-    assert(m_telemetry.add_channel(
+    assert(telemetry.add_channel(
         mp_pb_telemetry_Channel_state_tag,
-        etl::make_delegate<state_telemetry, &state_telemetry::channel_state>(*this)
+        etl::make_delegate<channel_state, &channel_state::set>(*this)
     ));
 }
 
 void
-state_telemetry::channel_state(telemetry::channel_payload_u& channel) const noexcept
+channel_state::set(telemetry::channel_payload_u& channel) const noexcept
 {
     state_s state = m_state_estimator.get_state();
     PB_SET(channel.state, position, state.position);
