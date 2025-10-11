@@ -8,7 +8,7 @@ class State:
     # Velocity in inertial frame (m/s)
     velocity: np.ndarray = np.zeros(3)
     # Quaternion (w, x, y, z) - inertial to body frame
-    quaternion: np.ndarray = np.array([1, 0, 0, 0])
+    quaternion: np.ndarray = np.array([1.0, 0, 0, 0])
     # Angular velocity in body frame (rad/s)
     angular_velocity: np.ndarray = np.zeros(3)
 

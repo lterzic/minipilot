@@ -1,6 +1,6 @@
 import numpy as np
 from dataclasses import dataclass
-from core.state import *
+from sim.core.state import State
 
 @dataclass
 class RigidbodyProperties:
@@ -34,7 +34,7 @@ class Rigidbody:
         dq_dt = b @ (self.state.quaternion * 0.5)
         dw_dt = self.props.inertia_inv @ (torque - np.cross(w, self.props.inertia @ w))
 
-        return np.array([dp_dt, dv_dt, dq_dt, dw_dt])
+        return np.concatenate([dp_dt, dv_dt, dq_dt, dw_dt])
 
     def step_rk4(self, dt: float, force: np.ndarray, torque: np.ndarray) -> State:
         state_arr = self.state.to_array()
