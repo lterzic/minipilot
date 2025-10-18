@@ -10,9 +10,8 @@ if(NOT EXISTS ${VENV_DIR})
     execute_process(
         COMMAND python3 -m venv ${VENV_DIR}
     )
+    # Install the packages
+    execute_process(
+        COMMAND ${VENV_PIP} install -e ${CMAKE_CURRENT_SOURCE_DIR}
+    )
 endif()
-
-# Install the packages
-execute_process(
-    COMMAND ${VENV_PIP} install -e ${CMAKE_CURRENT_SOURCE_DIR}
-)
