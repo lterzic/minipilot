@@ -74,7 +74,20 @@ set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/lib/minipilot-proto/lib)
 set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
 
 # Setup the python environment
-add_subdirectory("python")
+set(VENV_DIR ${CMAKE_CURRENT_BINARY_DIR}/venv)
+set(VENV_PIP ${VENV_DIR}/bin/pip)
+set(VENV_PYTHON ${VENV_DIR}/bin/python3)
+
+if(NOT EXISTS ${VENV_DIR})
+    # Create the virtual environment
+    execute_process(
+        COMMAND python3 -m venv ${VENV_DIR}
+    )
+    # Install the packages
+    execute_process(
+        COMMAND ${VENV_PIP} install -e ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+endif()
 
 # Dependencies
 add_subdirectory("lib/emblib")
