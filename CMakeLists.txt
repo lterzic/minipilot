@@ -77,6 +77,7 @@ set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
 set(VENV_DIR ${CMAKE_CURRENT_BINARY_DIR}/venv)
 set(VENV_PIP ${VENV_DIR}/bin/pip)
 set(VENV_PYTHON ${VENV_DIR}/bin/python3)
+set(Python_EXECUTABLE "${VENV_PYTHON}")
 
 if(NOT EXISTS ${VENV_DIR})
     # Create the virtual environment
@@ -95,6 +96,7 @@ add_subdirectory("lib/emblib/drivers/rtos/freertos")
 add_subdirectory("lib/emblib/drivers/math/eigen")
 add_subdirectory("lib/nanopb")
 add_subdirectory("lib/minipilot-proto")
+add_subdirectory("lib/pybind11")
 
 # Generate protobuf cpp files from sources
 add_subdirectory("protobuf")

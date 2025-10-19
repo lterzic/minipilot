@@ -7,3 +7,6 @@
 [submodule "lib/minipilot-proto"]
 	path = lib/minipilot-proto
 	url = https://github.com/lterzic/minipilot-proto
+[submodule "lib/pybind11"]
+	path = lib/pybind11
+	url = https://github.com/pybind/pybind11.git
