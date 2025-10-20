@@ -41,7 +41,7 @@ INTERFACE
 
 # Minipilot compiler and linker options
 target_compile_options(minipilot
-PUBLIC
+PRIVATE
     -fno-rtti
     -fno-exceptions
     -fdata-sections
@@ -53,7 +53,7 @@ PUBLIC
     # -Wpedantic
 )
 target_link_options(minipilot
-PUBLIC
+PRIVATE
     -flto
     -Wl,-Map=${CMAKE_PROJECT_NAME}.map
     -Wl,--gc-sections
@@ -96,10 +96,15 @@ add_subdirectory("lib/emblib/drivers/rtos/freertos")
 add_subdirectory("lib/emblib/drivers/math/eigen")
 add_subdirectory("lib/nanopb")
 add_subdirectory("lib/minipilot-proto")
-add_subdirectory("lib/pybind11")
 
 # Generate protobuf cpp files from sources
 add_subdirectory("protobuf")
+
+# Setup tests if working on this project
+if (PROJECT_IS_TOP_LEVEL)
+    add_subdirectory("lib/pybind11")
+    add_subdirectory("tests/binds")
+endif()
 
 # Link dependency libraries to minipilot
 target_link_libraries(minipilot
