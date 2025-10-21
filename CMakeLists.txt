@@ -74,7 +74,7 @@ set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/lib/minipilot-proto/lib)
 set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
 
 # Setup the python environment
-set(VENV_DIR ${CMAKE_CURRENT_BINARY_DIR}/venv)
+set(VENV_DIR ${CMAKE_CURRENT_SOURCE_DIR}/venv)
 set(VENV_PIP ${VENV_DIR}/bin/pip)
 set(VENV_PYTHON ${VENV_DIR}/bin/python3)
 set(Python_EXECUTABLE "${VENV_PYTHON}")

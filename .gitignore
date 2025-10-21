@@ -1,4 +1,5 @@
 .vscode
 build
-gen
+venv
+protobuf/gen
 *.egg-info
