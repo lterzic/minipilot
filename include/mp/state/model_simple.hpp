@@ -1,6 +1,6 @@
 #pragma once
 
-#include "model.hpp"
+#include "state/model.hpp"
 
 namespace mp {
 
