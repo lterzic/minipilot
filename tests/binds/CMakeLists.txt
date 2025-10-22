@@ -1,5 +1,5 @@
 # Create a CMake dynamic library
-pybind11_add_module(mpbind ekf.cpp)
+pybind11_add_module(mpbind binds.cpp)
 
 # Override minipilot flags to include runtime type information
 target_compile_options(minipilot
