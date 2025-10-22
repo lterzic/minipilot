@@ -1,6 +1,12 @@
 # Create a CMake dynamic library
 pybind11_add_module(mpbind ekf.cpp)
 
+# Override minipilot flags to include runtime type information
+target_compile_options(minipilot
+PUBLIC
+    -frtti
+)
+
 # Link minipilot to allow using mp files
 target_link_libraries(mpbind
 PRIVATE
@@ -16,4 +22,4 @@ execute_process(
 )
 
 # Create a .pth file to allow importing the bind python module
-file(WRITE ${VENV_SITE_PACKAGES}/binds.pth ${CMAKE_CURRENT_BINARY_DIR}/..)
+file(WRITE ${VENV_SITE_PACKAGES}/binds.pth ${CMAKE_CURRENT_BINARY_DIR})
