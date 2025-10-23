@@ -8,7 +8,7 @@ namespace mp {
 /**
  * State estimation algorithm interface
  */
-class state_estimator_algo {
+class state_estimator {
 public:
     struct sensors_s {
         // Accelerometer data in m/s^2, noise density in

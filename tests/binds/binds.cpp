@@ -24,10 +24,10 @@ PYBIND11_MODULE(mpbind, m, py::mod_gil_not_used()) {
         .def_readwrite("rotationq", &mp::state_s::rotationq)
         .def_readwrite("gyroscope_drift", &mp::state_s::gyroscope_drift);
 
-    py::class_<mp::state_estimator_algo::sensors_s>(m, "sensors_s")
+    py::class_<mp::state_estimator::sensors_s>(m, "sensors_s")
         .def(py::init<>())
-        .def_readwrite("accelerometer", &mp::state_estimator_algo::sensors_s::accelerometer)
-        .def_readwrite("gyroscope", &mp::state_estimator_algo::sensors_s::gyroscope);
+        .def_readwrite("accelerometer", &mp::state_estimator::sensors_s::accelerometer)
+        .def_readwrite("gyroscope", &mp::state_estimator::sensors_s::gyroscope);
     
     py::class_<mp::ekf>(m, "ekf")
         .def(py::init<const mp::model&>())

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "state/model.hpp"
-#include "state/state_estimator_algo.hpp"
+#include "state/state_estimator.hpp"
 #include <emblib/dsp/kalman.hpp>
 
 namespace mp {
@@ -9,7 +9,7 @@ namespace mp {
 /**
  * Extended kalman filter based state estimator
  */
-class ekf final : public state_estimator_algo {
+class ekf final : public state_estimator {
 public:
     /**
      * Dimension of the state vector used by the kalman filter
