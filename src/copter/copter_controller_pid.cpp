@@ -4,10 +4,10 @@
 namespace mp {
 
 copter_controller_pid::copter_controller_pid(
-    const state_estimator& state_estimator,
+    const state_estimator_task& state_estimator_task,
     const copter_params_s& copter_params
 ) noexcept :
-    m_state_estimator(state_estimator),
+    m_state_estimator_task(state_estimator_task),
     m_copter_params(copter_params),
     m_angular_velocity_pid(1, 0.2, 0),
     m_linear_acceleration_pid(1.4, 0.1, 0.1)
@@ -19,7 +19,7 @@ copter_controller_pid::actuation_s
 copter_controller_pid::iterate(float dt) noexcept
 {
     // Get current copter state
-    state_s state = m_state_estimator.get_state();
+    state_s state = m_state_estimator_task.get_state();
     // Get current input
     control_v controls = get_controls();
 

@@ -5,9 +5,9 @@ namespace mp {
 
 channel_state::channel_state(
     telemetry& telemetry,
-    const state_estimator& state_estimator
+    const state_estimator_task& state_estimator_task
 ) :
-    m_state_estimator(state_estimator)
+    m_state_estimator_task(state_estimator_task)
 {
     assert(telemetry.add_channel(
         mp_pb_telemetry_Channel_state_tag,
@@ -18,7 +18,7 @@ channel_state::channel_state(
 void
 channel_state::set(telemetry::channel_payload_u& channel) const noexcept
 {
-    state_s state = m_state_estimator.get_state();
+    state_s state = m_state_estimator_task.get_state();
     PB_SET(channel.state, position, state.position);
     PB_SET(channel.state, velocity, state.velocity);
     PB_SET(channel.state, acceleration, state.acceleration);

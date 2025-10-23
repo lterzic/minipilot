@@ -9,6 +9,7 @@ setup(
         "matplotlib>=3.10.5",
         "sympy>=1.14",
         "protobuf==5.29.4",
-        "notebook>=7.4.5"
+        "notebook>=7.4.5",
+        "pybind11==3.0.1"
     ],
 )

@@ -1,16 +1,16 @@
-#include "state/state_estimator.hpp"
+#include "state/state_estimator_task.hpp"
 
 namespace mp {
 
 void
-state_estimator::run() noexcept
+state_estimator_task::run() noexcept
 {
     float dt = emblib::units::seconds<float>(m_period).value();
 
     size_t acc_count = 0;
     size_t gyro_count = 0;
     while (true) {
-        state_estimator_algo::sensors_s sensors;
+        state_estimator::sensors_s sensors;
         
         auto acc = m_sensor_manager.get_sensor_reader<sensor_type_e::ACCELEROMETER>();
         if (acc) {
@@ -36,7 +36,7 @@ state_estimator::run() noexcept
             }
         }
 
-        auto state = m_algorithm.update(dt, sensors);
+        auto state = m_estimator.update(dt, sensors);
         m_state_mutex.lock();
         m_state = state;
         m_state_mutex.unlock();
