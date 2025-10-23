@@ -1,9 +1,9 @@
-#include "state/state_estimator.hpp"
+#include "state/state_estimator_task.hpp"
 
 namespace mp {
 
 void
-state_estimator::run() noexcept
+state_estimator_task::run() noexcept
 {
     float dt = emblib::units::seconds<float>(m_period).value();
 

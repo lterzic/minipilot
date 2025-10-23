@@ -12,10 +12,10 @@ namespace mp {
  * Periodically runs the state estimation algorithm and
  * safely exposes the calculated state using a mutex
  */
-class state_estimator : private emblib::rtos::task {
+class state_estimator_task : private emblib::rtos::task {
 public:
     template <size_t STACK_SIZE>
-    explicit state_estimator(
+    explicit state_estimator_task(
         state_estimator_algo& algorithm,
         milliseconds_t period,
         const sensor_manager& sensor_manager,
