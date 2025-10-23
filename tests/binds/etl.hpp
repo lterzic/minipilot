@@ -2,17 +2,22 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <etl/array.h>
 #include <etl/optional.h>
 #include <etl/utility.h>
 
 namespace pybind11::detail {
 namespace py = pybind11;
 
-// Works for any optional-like type that has has_value(), value(), reset(), emplace()
+// Type casting for etl::optional
 template <typename T>
 struct type_caster<etl::optional<T>> : public optional_caster<etl::optional<T>> {};
 
-// Treat etl::pair like a 2-tuple. Requires .first and .second (ETL has them)
+// Type casting for etl::array
+template <typename T, size_t SIZE>
+struct type_caster<etl::array<T, SIZE>> : public array_caster<etl::array<T, SIZE>, T, false, SIZE> {};
+
+// Type casting for etl::pair
 template <class A, class B>
 struct type_caster<etl::pair<A,B>> {
     using Pair = etl::pair<A,B>;
