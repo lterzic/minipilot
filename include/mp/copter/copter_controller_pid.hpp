@@ -2,25 +2,20 @@
 
 #include "copter/copter.hpp"
 #include "copter/copter_controller.hpp"
-#include "state/state_estimator_task.hpp"
 #include <emblib/dsp/pid.hpp>
-#include <emblib/rtos/mutex.hpp>
 
 namespace mp {
 
 class copter_controller_pid : public copter_controller {
 public:
     explicit copter_controller_pid(
-        const state_estimator_task& state_estimator_task,
         const copter_params_s& copter_params
     );
 
-    actuation_s iterate(float dt) noexcept override;
+    actuation_s update(float dt, const control_v& controls, const state_s& state) noexcept override;
 
 private:
-    const state_estimator_task& m_state_estimator_task;
     const copter_params_s& m_copter_params;
-
     angular_controls_s m_angular_target;
     
     emblib::dsp::pid<vector3f, float> m_angular_velocity_pid;

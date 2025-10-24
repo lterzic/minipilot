@@ -1,8 +1,9 @@
 #include "link/handlers/handler_copter.hpp"
+#include "common/pb.hpp"
 
 namespace mp {
 
-handle_copter::handle_copter(rx& rx, copter_controller& controller) :
+handle_copter::handle_copter(rx& rx, copter_controller_task& controller) :
     m_controller(controller)
 {
     assert(rx.set_handler(

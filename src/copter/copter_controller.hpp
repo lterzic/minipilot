@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/math.hpp"
-#include <emblib/rtos/mutex.hpp>
+#include "state/state.hpp"
 #include <etl/variant.h>
 
 namespace mp {
@@ -32,50 +32,18 @@ public:
         float direction;
     };
 
-public:
-    /**
-     * By default initialize input to angular mode with 0 thrust and angular velocity
-     */
-    copter_controller() noexcept;
-
-    /**
-     * Set the desired angular velocity vector and thrust
-     * @returns `false` if the given angular velocity or thrust can't be achieved
-     */
-    bool set_angular_controls(angular_controls_s input) noexcept;
-
-    /**
-     * Set the desired velocity vector and direction
-     * @returns `false` if the given velocity can't be achieved
-     */
-    bool set_linear_controls(linear_controls_s input) noexcept;
-
-    /**
-     * Get the required actuation to achieve the last set command
-     */
-    virtual actuation_s iterate(float dt) noexcept = 0;
-
-protected:
     /**
      * Current control mode can be either angular or linear
      * @note Index 0 represents angular controls, and index 1 linear
      */
     using control_v = etl::variant<angular_controls_s, linear_controls_s>;
 
+public:
     /**
-     * Get current controls
+     * Compute the required actuation to achieve the desired control input
+     * based on the current vehicle state
      */
-    control_v get_controls() const noexcept
-    {
-        emblib::rtos::scoped_lock lock(m_mutex);
-        return m_controls;
-    }
-
-private:
-    // For protecting controls while writing
-    mutable emblib::rtos::mutex m_mutex;
-    // Current controls
-    control_v m_controls;
+    virtual actuation_s update(float dt, const control_v& controls, const state_s& state) noexcept = 0;
 };
 
 }

@@ -3,52 +3,67 @@
 #include "common/config.hpp"
 #include "copter/copter.hpp"
 #include "copter/copter_controller.hpp"
+#include "state/state_estimator_task.hpp"
 #include <emblib/rtos/task.hpp>
+#include <emblib/rtos/mutex.hpp>
 
 namespace mp {
 
 /**
  * Periodically executes the control algorithm and sends
- * the actuation data to the vehicle.
- * @note If the vehicle type is known at compile time, it
- * should be passed as the template argument
+ * the actuation data to the vehicle
  */
-template <
-    size_t STACK_SIZE,
-    typename controller_type = copter_controller,
-    typename copter_type = copter
->
-class copter_controller_task : private emblib::rtos::static_task<STACK_SIZE> {
+class copter_controller_task : private emblib::rtos::task {
 public:
+    template <size_t STACK_SIZE>
     copter_controller_task(
-        controller_type& controller,
-        copter_type& copter,
+        copter_controller& controller,
+        copter& copter,
+        const state_estimator_task& state_estimator_task,
         milliseconds_t period,
+        emblib::rtos::task_stack<STACK_SIZE>& stack,
         task_priority_e priority = TASK_PRIORITY_HIGH
     ) noexcept :
-        copter_controller_task::static_task("copter controller task", priority),
+        task("copter controller task", priority, stack),
         m_controller(controller),
         m_copter(copter),
+        m_state_estimator_task(state_estimator_task),
         m_period(period)
     {}
 
-private:
-    void run() noexcept override
+    /**
+     * Set the desired angular velocity vector and thrust
+     * @returns `false` if the given angular velocity or thrust can't be achieved
+     */
+    bool set_angular_controls(copter_controller::angular_controls_s input) noexcept
     {
-        // Assuming delta time doesn't change between iterations
-        float dt = emblib::units::seconds<float>(m_period).value();
+        // TODO: Add bounds checking and return false if out of bounds
+        emblib::rtos::scoped_lock lock(m_control_mutex);
+        m_controls = input;
+        return true;
+    }
 
-        while (true) {
-            auto actuation = m_controller.iterate(dt);
-            m_copter.actuate(actuation.thrust, actuation.torque);
-
-            this->sleep_periodic(m_period);
-        }
+    /**
+     * Set the desired velocity vector and direction
+     * @returns `false` if the given velocity can't be achieved
+     */
+    bool set_linear_controls(copter_controller::linear_controls_s input) noexcept
+    {
+        // TODO: Add bounds checking and return false if out of bounds
+        emblib::rtos::scoped_lock lock(m_control_mutex);
+        m_controls = input;
+        return true;
     }
 
 private:
-    controller_type& m_controller;
-    copter_type& m_copter;
+    void run() noexcept override;
+
+private:
+    copter_controller& m_controller;
+    copter& m_copter;
+    const state_estimator_task& m_state_estimator_task;
+    mutable emblib::rtos::mutex m_control_mutex;
+    copter_controller::control_v m_controls;
     milliseconds_t m_period;
 };
 
