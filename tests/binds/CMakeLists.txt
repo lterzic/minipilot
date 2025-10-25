@@ -1,5 +1,10 @@
 # Create a CMake dynamic library
-pybind11_add_module(mpbind binds.cpp)
+pybind11_add_module(state state.cpp)
+pybind11_add_module(math math.cpp)
+
+# Link minipilot to allow using mp files
+target_link_libraries(state PRIVATE minipilot)
+target_link_libraries(math PRIVATE minipilot)
 
 # Override minipilot flags to include runtime type information
 target_compile_options(minipilot
@@ -7,11 +12,8 @@ PUBLIC
     -frtti
 )
 
-# Link minipilot to allow using mp files
-target_link_libraries(mpbind
-PRIVATE
-    minipilot
-)
+set(CMAKE_BUILD_TYPE Debug)
+add_compile_options(-g -O0)
 
 # Find the path to the venv site-packages folder
 execute_process(
@@ -22,4 +24,4 @@ execute_process(
 )
 
 # Create a .pth file to allow importing the bind python module
-file(WRITE ${VENV_SITE_PACKAGES}/binds.pth ${CMAKE_CURRENT_BINARY_DIR})
+file(WRITE ${VENV_SITE_PACKAGES}/binds.pth ${CMAKE_CURRENT_BINARY_DIR}/..)
