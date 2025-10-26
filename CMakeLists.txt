@@ -73,22 +73,8 @@ target_compile_definitions(freertos_config INTERFACE projCOVERAGE_TEST=0)
 set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/lib/minipilot-proto/lib)
 set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
 
-# Setup the python environment
-set(VENV_DIR ${CMAKE_CURRENT_SOURCE_DIR}/venv)
-set(VENV_PIP ${VENV_DIR}/bin/pip)
-set(VENV_PYTHON ${VENV_DIR}/bin/python3)
-set(Python_EXECUTABLE "${VENV_PYTHON}")
-
-if(NOT EXISTS ${VENV_DIR})
-    # Create the virtual environment
-    execute_process(
-        COMMAND python3 -m venv ${VENV_DIR}
-    )
-    # Install the packages
-    execute_process(
-        COMMAND ${VENV_PIP} install -e ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-endif()
+# Python environment setup
+add_subdirectory("python")
 
 # Dependencies
 add_subdirectory("lib/emblib")
@@ -99,12 +85,6 @@ add_subdirectory("lib/minipilot-proto")
 
 # Generate protobuf cpp files from sources
 add_subdirectory("protobuf")
-
-# Setup tests if working on this project
-if (PROJECT_IS_TOP_LEVEL)
-    add_subdirectory("lib/pybind11")
-    add_subdirectory("tests/binds")
-endif()
 
 # Link dependency libraries to minipilot
 target_link_libraries(minipilot

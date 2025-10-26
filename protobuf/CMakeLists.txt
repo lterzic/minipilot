@@ -17,7 +17,7 @@ file(MAKE_DIRECTORY ${PROTO_GEN_DIR})
 execute_process(COMMAND
     ${CMAKE_COMMAND} -E env 
     "PATH=${PROTOC_DIR}:$PATH"
-    ${VENV_PYTHON} ${NANOPB_GEN}
+    ${Python_EXECUTABLE} ${NANOPB_GEN}
     -I ${PROTO_SRC_DIR}
     -D ${PROTO_GEN_DIR}
     -e ".nanopb"

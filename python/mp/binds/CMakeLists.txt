@@ -24,4 +24,4 @@ execute_process(
 )
 
 # Create a .pth file to allow importing the bind python module
-file(WRITE ${VENV_SITE_PACKAGES}/binds.pth ${CMAKE_CURRENT_BINARY_DIR}/..)
+file(WRITE ${VENV_SITE_PACKAGES}/binds.pth ${CMAKE_CURRENT_BINARY_DIR}/../..)
