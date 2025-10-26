@@ -12,7 +12,22 @@ PYBIND11_MODULE(math, m, py::mod_gil_not_used()) {
         .def("get_base", [](const mp::vector3f& v) {
             return v.get_base();
         });
+
+    // Used for ekf process noise matrix
+    py::class_<mp::matrixf<16>>(m, "matrix16f")
+        .def(py::init([](float v, float a, float q, float w, float wd) {
+            return mp::vectorf<16>({
+                v, v, v,
+                a, a, a,
+                q, q, q, q,
+                w, w, w,
+                wd, wd, wd
+            }).as_diagonal();
+        }));
     
     py::class_<mp::quaternionf>(m, "quaternionf")
-        .def(py::init<float, float, float, float>());
+        .def(py::init<float, float, float, float>())
+        .def("as_vector", [](const mp::quaternionf& q) {
+            return q.as_vector().get_base();
+        });
 }

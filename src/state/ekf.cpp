@@ -52,18 +52,18 @@ ekf::state_transition(const state_vec_t& state, float dt) const noexcept
     // Acceleration is computed by the vehicle based on current actuator settings and the
     // dynamical model of the vehicle, and the velocity is the integration of acceleration
     vector3f v_next = v + dt * a;
-    vector3f a_next = m_model.get_linear_acceleration(v, q);
+    vector3f a_next = m_model.get_linear_acceleration(v, a, q);
 
     // Quaternion is updated according to the approximation of the first derivative of
     // the quaternion (w.r.t. time) as a function of angular velocity in the local frame
-    const float w1 = w(0);
-    const float w2 = w(1);
-    const float w3 = w(2);
+    const float wx = w(0);
+    const float wy = w(1);
+    const float wz = w(2);
     const matrixf<4> b {
-        {0, -w1, -w2, -w3},
-        {w1, 0, w3, -w2},
-        {w2, -w3, 0, w1},
-        {w3, w2, -w1, 0}
+        {0, -wx, -wy, -wz},
+        {wx, 0, wz, -wy},
+        {wy, -wz, 0, wx},
+        {wz, wy, -wx, 0}
     };
     
     vector4f qv = q.as_vector();
@@ -101,32 +101,34 @@ ekf::state_transition_jacob(const state_vec_t& state, float dt) const noexcept
 
     // Not const because some matrices are multiplied by dt before
     // being inserted into the result matrix
-    auto jacobian = m_model.get_jacobian(v, w, qv);
+    auto jacobian = m_model.get_jacobian(v, a, qv, w);
 
     // v_next = v + dt * a
     result(0, 0) = result(1, 1) = result(2, 2) = 1; // dv_dv
     result(0, 3) = result(1, 4) = result (2, 5) = dt; // dv_da
 
-    // a_next = f(v, q)
+    // a_next = f(v, a, q)
     result.set_submatrix(3, 0, jacobian.da_dv);
+    result.set_submatrix(3, 3, jacobian.da_da);
     result.set_submatrix(3, 6, jacobian.da_dq);
     
     const float wx = w(0), wy = w(1), wz = w(2);
     const float qw = qv(0), qx = qv(1), qy = qv(2), qz = qv(3);
+    const float dt2 = dt / 2.f;
     
     // q_next = q + (dt/2) b(w)*q
     const matrixf<4> dq_dq {
-        {1, -dt/2*wx, -dt/2*wy, -dt/2*wz},
-        {dt/2*wx, 1, dt/2*wz, -dt/2*wy},
-        {dt/2*wy, -dt/2*wz, 1, dt/2*wx},
-        {dt/2*wz, dt/2*wy, -dt/2*wx, 1}
+        {1, -dt2*wx, -dt2*wy, -dt2*wz},
+        {dt2*wx, 1, dt2*wz, -dt2*wy},
+        {dt2*wy, -dt2*wz, 1, dt2*wx},
+        {dt2*wz, dt2*wy, -dt2*wx, 1}
     };
     const matrixf<4, 3> dq_dw = matrixf<4, 3> {
         {-qx, -qy, -qz},
         {qw, -qz, qy},
         {qz, qw, -qx},
         {-qy, qx, qw}
-    } * (dt/2);
+    } * dt2;
     result.set_submatrix(6, 6, dq_dq);
     result.set_submatrix(6, 10, dq_dw);
 
@@ -178,9 +180,9 @@ static matrixf<3, ekf::KALMAN_DIM> map_state_to_accelerometer_jacobian(const ekf
 
     // d(a_exp)/d(qv)
     const matrixf<3, 4> da_dq {
-        {2.f*(ax*qw + ay*qz - qy*(az + G)), 2.f*(ax*qx + ay*qy + qz*(az + G)), 2.f*(-ax*qy + ay*qx - qw*(az + G)), 2*(-ax*qz + ay*qw + qx*(az + G))},
-        {2.f*(-ax*qz + ay*qw + qx*(az + G)), 2.f*(ax*qy - ay*qx + qw*(az + G)), 2.f*(ax*qx + ay*qy + qz*(az + G)), 2*(-ax*qw - ay*qz + qy*(az + G))},
-        {2.f*(ax*qy - ay*qx + qw*(az + G)), 2.f*(ax*qz - ay*qw - qx*(az + G)), 2.f*(ax*qw + ay*qz - qy*(az + G)), 2*(ax*qx + ay*qy + qz*(az + G))}
+        {2.f*(ax*qw + ay*qz - qy*(az - G)), 2.f*(ax*qx + ay*qy + qz*(az - G)), 2.f*(-ax*qy + ay*qx - qw*(az - G)), 2.f*(-ax*qz + ay*qw + qx*(az - G))},
+        {2.f*(-ax*qz + ay*qw + qx*(az - G)), 2.f*(ax*qy - ay*qx + qw*(az - G)), 2.f*(ax*qx + ay*qy + qz*(az - G)), 2.f*(-ax*qw - ay*qz + qy*(az - G))},
+        {2.f*(ax*qy - ay*qx + qw*(az - G)), 2.f*(ax*qz - ay*qw - qx*(az - G)), 2.f*(ax*qw + ay*qz - qy*(az - G)), 2.f*(ax*qx + ay*qy + qz*(az - G))}
     };
 
     matrixf<3, ekf::KALMAN_DIM> jacobian(0);
@@ -212,24 +214,10 @@ static matrixf<3, ekf::KALMAN_DIM> map_state_to_gyroscope_jacobian(const ekf::st
 state_s
 ekf::update(float dt, const sensors_s& sensors) noexcept
 {
-    // TODO: Get Q from the vehicle
-    constexpr float v_noise = 1;
-    constexpr float a_noise = 5e-1;
-    constexpr float q_noise = 1e-1;
-    constexpr float w_noise = 5e-1;
-    constexpr float wd_noise = 1e-2;
-    const auto Q = vectorf<KALMAN_DIM>({
-        v_noise, v_noise, v_noise,
-        a_noise, a_noise, a_noise,
-        q_noise, q_noise, q_noise, q_noise,
-        w_noise, w_noise, w_noise,
-        wd_noise, wd_noise, wd_noise
-    }).as_diagonal();
-
     // Run the prediction step based on the current state
     auto transition = [this, dt](const auto& state) { return state_transition(state, dt); };
     auto jacobian = [this, dt](const auto& state) { return state_transition_jacob(state, dt); };
-    m_kalman.predict(transition, jacobian, Q);
+    m_kalman.predict(transition, jacobian, m_model.get_process_noise());
 
     if (sensors.accelerometer) {
         float acc_nd = sensors.accelerometer->second;

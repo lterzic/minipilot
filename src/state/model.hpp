@@ -19,6 +19,7 @@ public:
      */
     struct jacobian_s {
         matrix3f da_dv;
+        matrix3f da_da;
         matrixf<3, 4> da_dq;
         matrix3f ddw_dv;
         matrix3f ddw_dw;
@@ -29,13 +30,12 @@ public:
     /**
      * Calculate the model's expected acceleration in the global (inertial) reference
      * frame based on the current state (velocity and rotation) in [m/s^2]
-     * @param v Linear velocity in the global reference frame
-     * @param q Rotation quaternion which transforms the local frame to global
      * @todo Can add typedef for vectors in the global and local reference frames
      * @todo Rename to `get_a`
      */
     virtual vector3f get_linear_acceleration(
         const vector3f& v,
+        const vector3f& a,
         const quaternionf& q
     ) const noexcept = 0;
 
@@ -56,11 +56,17 @@ public:
      */
     virtual jacobian_s get_jacobian(
         const vector3f& v,
-        const vector3f& w,
-        const vector4f& qv
+        const vector3f& a,
+        const vector4f& qv,
+        const vector3f& w
     ) const noexcept = 0;
 
-    /// @todo Add get_process_noise() which returns the covariance matrix
+    /**
+     * Get process noise
+     * @todo Matrix dimension should be ekf::KALMAN_DIM, need to fix
+     * circular include
+     */
+    virtual matrixf<16> get_process_noise() const noexcept = 0;
 };
 
 }
