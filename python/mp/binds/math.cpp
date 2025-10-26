@@ -9,6 +9,9 @@ PYBIND11_MODULE(math, m, py::mod_gil_not_used()) {
         .def(py::init([](float a, float b, float c) {
             return mp::vector3f({a, b, c});
         }))
+        .def(py::init([](const Eigen::Matrix<float, 3, 1>& eigenv) {
+            return mp::vector3f({eigenv(0), eigenv(1), eigenv(2)});
+        }))
         .def("get_base", [](const mp::vector3f& v) {
             return v.get_base();
         });
