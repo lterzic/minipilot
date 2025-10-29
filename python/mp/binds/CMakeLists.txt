@@ -1,10 +1,12 @@
 # Create a CMake dynamic library
 pybind11_add_module(state state.cpp)
 pybind11_add_module(math math.cpp)
+pybind11_add_module(copter copter.cpp)
 
 # Link minipilot to allow using mp files
 target_link_libraries(state PRIVATE minipilot)
 target_link_libraries(math PRIVATE minipilot)
+target_link_libraries(copter PRIVATE minipilot)
 
 # Override minipilot flags to include runtime type information
 target_compile_options(minipilot

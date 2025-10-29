@@ -5,6 +5,7 @@
 #include <etl/array.h>
 #include <etl/optional.h>
 #include <etl/utility.h>
+#include <etl/variant.h>
 
 namespace pybind11::detail {
 namespace py = pybind11;
@@ -12,6 +13,10 @@ namespace py = pybind11;
 // Type casting for etl::optional
 template <typename T>
 struct type_caster<etl::optional<T>> : public optional_caster<etl::optional<T>> {};
+
+// Type casting for etl::variant
+template <typename ...T>
+struct type_caster<etl::variant<T...>> : public variant_caster<etl::variant<T...>> {};
 
 // Type casting for etl::array
 template <typename T, size_t SIZE>

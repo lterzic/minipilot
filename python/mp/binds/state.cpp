@@ -1,6 +1,5 @@
 #include "etl.hpp"
 #include <pybind11/pybind11.h>
-#include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 #include <mp/state/ekf.hpp>
 
