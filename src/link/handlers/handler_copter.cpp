@@ -20,13 +20,13 @@ handle_copter::handle(const mp_pb_link_UplinkMessage& msg) noexcept
     case mp_pb_copter_Uplink_set_angular_velocity_tag:
         // If failed to set, can return false response or log a warning
         m_controller.set_angular_controls({
-            .velocity = pb_vector3f(copter_msg.payload.set_angular_velocity.angular_velocity),
+            .angular_velocity = pb_vector3f(copter_msg.payload.set_angular_velocity.angular_velocity),
             .thrust = copter_msg.payload.set_angular_velocity.thrust
         });
         break;
     case mp_pb_copter_Uplink_set_linear_velocity_tag:
         m_controller.set_linear_controls({
-            .velocity = pb_vector3f(copter_msg.payload.set_linear_velocity.linear_velocity),
+            .linear_velocity = pb_vector3f(copter_msg.payload.set_linear_velocity.linear_velocity),
             .direction = copter_msg.payload.set_linear_velocity.direction
         });
         break;

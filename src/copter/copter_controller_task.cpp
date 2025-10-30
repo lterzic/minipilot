@@ -15,8 +15,13 @@ copter_controller_task::run() noexcept
         auto controls = m_controls;
         m_control_mutex.unlock();
 
-        auto actuation = m_controller.update(dt, controls, state);
-        m_copter.actuate(actuation.thrust, actuation.torque);
+        if (controls.is_type<copter_controller::angular_controls_s>()) {
+            auto actuation = m_controller.update_angular(etl::get<0>(controls), state, dt);
+            m_copter.actuate(actuation);
+        } else {
+            auto actuation = m_controller.update_linear(etl::get<1>(controls), state, dt);
+            m_copter.actuate(actuation);
+        }
 
         sleep_periodic(m_period);
     }

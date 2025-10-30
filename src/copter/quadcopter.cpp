@@ -4,9 +4,9 @@
 
 namespace mp {
 
-bool quadcopter::actuate(float thrust, vector3f torque) noexcept
+bool quadcopter::actuate(const copter_actuation_s& input) noexcept
 {
-    motor_values_s required_throttle = inverse_mma(thrust, torque);
+    motor_values_s required_throttle = inverse_mma(input.thrust, input.torque);
 
     // TODO: Handle write failure and assert throttles are between 0 and 1
     m_actuators.fl.write_throttle(required_throttle.fl);

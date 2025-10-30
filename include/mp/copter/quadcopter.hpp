@@ -35,7 +35,7 @@ public:
     /**
      * Computes the needed speeds via inverse_mma and assigns them to the appropriate motors
      */
-    bool actuate(float thrust, vector3f torque) noexcept override;
+    bool actuate(const copter_actuation_s& input) noexcept override;
 
 private:
     /**
