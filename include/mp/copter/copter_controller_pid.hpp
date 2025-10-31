@@ -12,8 +12,11 @@ public:
         const copter_params_s& copter_params
     );
 
-    copter_actuation_s update_angular(const angular_controls_s& input, const state_s& state, float dt) noexcept override;
-    copter_actuation_s update_linear(const linear_controls_s& input, const state_s& state, float dt) noexcept override;
+    copter_actuation_s update(const controls_v& input, const state_s& state, float dt) noexcept override;
+
+private:
+    copter_actuation_s update_angular(const angular_controls_s& input, const state_s& state, float dt) noexcept;
+    angular_controls_s update_linear(const linear_controls_s& input, const state_s& state, float dt) noexcept;
 
 private:
     const copter_params_s& m_copter_params;

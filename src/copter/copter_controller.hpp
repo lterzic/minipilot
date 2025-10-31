@@ -2,6 +2,7 @@
 
 #include "common/math.hpp"
 #include "state/state.hpp"
+#include <etl/variant.h>
 
 namespace mp {
 
@@ -24,24 +25,21 @@ public:
         float direction;
     };
 
+    /**
+     * Copter can be controlled using either mode
+     */
+    using controls_v = etl::variant<angular_controls_s, linear_controls_s>;
+
 public:
     /**
      * Run an iteration of the algorithm using angular control input
      */
-    virtual copter_actuation_s update_angular(
-        const angular_controls_s& input,
+    virtual copter_actuation_s update(
+        const controls_v& input,
         const state_s& state,
         float dt
     ) noexcept = 0;
 
-    /**
-     * Run an iteration of the algorithm using linear control input
-     */
-    virtual copter_actuation_s update_linear(
-        const linear_controls_s& input,
-        const state_s& state,
-        float dt
-    ) noexcept = 0;
 };
 
 }

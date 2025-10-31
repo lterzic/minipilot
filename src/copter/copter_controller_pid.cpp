@@ -25,7 +25,7 @@ copter_controller_pid::update_angular(const angular_controls_s& input, const sta
     return {input.thrust, torque};
 }
 
-copter_actuation_s
+copter_controller::angular_controls_s
 copter_controller_pid::update_linear(const linear_controls_s& input, const state_s& state, float dt) noexcept
 {
     const vector3f& v = state.velocity;
@@ -42,16 +42,27 @@ copter_controller_pid::update_linear(const linear_controls_s& input, const state
 
     // TODO: Add yaw rotation based on m_target_dir
 
-    const angular_controls_s angular {
+    return angular_controls_s {
         // Since the cross product is between to normalized vectors, its max magnitude is
         // 1 when the angle is PI/2, so this constant is the maximum magnitude of target w
         .angular_velocity = target_w_dir * 2.f,
         // TODO: Fix thrust to not overshoot during rotation
         .thrust = target_thrust_g.norm()
     };
+}
 
-    // Run the angular control part of the algorithm
-    return update_angular(angular, state, dt);
+copter_actuation_s
+copter_controller_pid::update(const controls_v& input, const state_s& state, float dt) noexcept
+{
+    bool input_angular = input.is_type<copter_controller::angular_controls_s>();
+    
+    // If input is angular, get the controls directly, else compute them from
+    // the linear control part of the algorithm
+    auto ang_controls = input_angular ?
+        etl::get<copter_controller::angular_controls_s>(input) :
+        update_linear(etl::get<copter_controller::linear_controls_s>(input), state, dt);
+
+    return update_angular(ang_controls, state, dt);
 }
 
 }

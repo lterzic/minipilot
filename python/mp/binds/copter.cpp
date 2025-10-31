@@ -25,6 +25,5 @@ PYBIND11_MODULE(copter, m, py::mod_gil_not_used()) {
     
     py::class_<mp::copter_controller_pid>(m, "copter_controller_pid")
         .def(py::init<const mp::copter_params_s&>())
-        .def("update_angular", &mp::copter_controller_pid::update_angular)
-        .def("update_linear", &mp::copter_controller_pid::update_linear);
+        .def("update", &mp::copter_controller_pid::update);
 }

@@ -6,7 +6,6 @@
 #include "state/state_estimator_task.hpp"
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/mutex.hpp>
-#include <etl/variant.h>
 
 namespace mp {
 
@@ -64,7 +63,7 @@ private:
     copter& m_copter;
     const state_estimator_task& m_state_estimator_task;
     mutable emblib::rtos::mutex m_control_mutex;
-    etl::variant<copter_controller::angular_controls_s, copter_controller::linear_controls_s> m_controls;
+    copter_controller::controls_v m_controls;
     milliseconds_t m_period;
 };
 
