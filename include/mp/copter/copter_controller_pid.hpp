@@ -8,7 +8,15 @@ namespace mp {
 
 class copter_controller_pid : public copter_controller {
 public:
+    // TODO: Define this in proto and include here
+    struct params_s {
+        float ang_p, ang_i, ang_d;
+        float lin_p, lin_i, lin_d;
+    };
+
+public:
     explicit copter_controller_pid(
+        const params_s& params,
         const copter_params_s& copter_params
     );
 

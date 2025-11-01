@@ -4,11 +4,12 @@
 namespace mp {
 
 copter_controller_pid::copter_controller_pid(
+    const params_s& params,
     const copter_params_s& copter_params
 ) noexcept :
     m_copter_params(copter_params),
-    m_angular_velocity_pid(1, 0.2, 0),
-    m_linear_acceleration_pid(1.4, 0.1, 0.1)
+    m_angular_velocity_pid(params.ang_p, params.ang_i, params.ang_d),
+    m_linear_acceleration_pid(params.lin_p, params.lin_i, params.lin_d)
 {}
 
 copter_actuation_s
