@@ -10,6 +10,7 @@ setup(
         "sympy>=1.14",
         "protobuf==5.29.4",
         "notebook>=7.4.5",
-        "pybind11==3.0.1"
+        "pybind11==3.0.1",
+        "jupytext"
     ],
 )
