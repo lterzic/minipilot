@@ -9,7 +9,8 @@ copter_controller_pid::copter_controller_pid(
 ) noexcept :
     m_copter_params(copter_params),
     m_angular_velocity_pid(params.ang_p, params.ang_i, params.ang_d),
-    m_linear_acceleration_pid(params.lin_p, params.lin_i, params.lin_d)
+    m_linear_acceleration_pid(params.lin_p, params.lin_i, params.lin_d),
+    m_tilt_coeff(params.tilt_coeff)
 {}
 
 copter_actuation_s
@@ -46,9 +47,9 @@ copter_controller_pid::update_linear(const linear_controls_s& input, const state
     return angular_controls_s {
         // Since the cross product is between to normalized vectors, its max magnitude is
         // 1 when the angle is PI/2, so this constant is the maximum magnitude of target w
-        .angular_velocity = target_w_dir * 2.f,
-        // TODO: Fix thrust to not overshoot during rotation
-        .thrust = target_thrust_g.norm()
+        .angular_velocity = target_w_dir * m_tilt_coeff,
+        // Should not overshoot the target vertical velocity during rotation
+        .thrust = etl::max(target_thrust_l.dot(UP), 0.f)
     };
 }
 

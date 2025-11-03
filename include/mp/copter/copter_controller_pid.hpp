@@ -12,6 +12,7 @@ public:
     struct params_s {
         float ang_p, ang_i, ang_d;
         float lin_p, lin_i, lin_d;
+        float tilt_coeff;
     };
 
 public:
@@ -31,6 +32,7 @@ private:
     
     emblib::dsp::pid<vector3f, float> m_angular_velocity_pid;
     emblib::dsp::pid<vector3f, float> m_linear_acceleration_pid;
+    float m_tilt_coeff;
 };
 
 }

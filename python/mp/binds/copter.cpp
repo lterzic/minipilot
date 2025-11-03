@@ -1,11 +1,14 @@
 #include "etl.hpp"
 #include <pybind11/pybind11.h>
+#include <pybind11/iostream.h>
 #include <mp/copter/quadcopter.hpp>
 #include <mp/copter/copter_controller_pid.hpp>
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(copter, m, py::mod_gil_not_used()) {
+    py::add_ostream_redirect(m, "copter_ostream_redirect");
+
     py::class_<mp::copter_params_s>(m, "copter_params_s")
         .def(py::init<float, mp::matrix3f, float>())
         .def_readwrite("mass", &mp::copter_params_s::mass)
@@ -31,5 +34,5 @@ PYBIND11_MODULE(copter, m, py::mod_gil_not_used()) {
         .def("update", &mp::copter_controller_pid::update);
 
     py::class_<mp::copter_controller_pid::params_s>(m, "copter_controller_pid_params_s")
-        .def(py::init<float, float, float, float, float, float>());
+        .def(py::init<float, float, float, float, float, float, float>());
 }
