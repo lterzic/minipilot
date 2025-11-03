@@ -2,6 +2,7 @@
 
 #include "accelerometer.hpp"
 #include "gyroscope.hpp"
+#include "link/telemetry.hpp"
 
 namespace mp {
 
@@ -13,7 +14,8 @@ enum class sensor_type_e {
 /**
  * Interface for the system towards sensors available on the platform
  */
-class sensor_manager {
+class sensor_manager :
+    private telemetry_producer<mp_pb_telemetry_Channel_sensors_tag> {
     struct readers_s {
         accelerometer_reader*   accelerometer;
         gyroscope_reader*       gyroscope;
@@ -44,6 +46,12 @@ public:
      */
     template <sensor_type_e SENSOR_TYPE>
     inline const auto* get_sensor_reader() const noexcept;
+
+private:
+    /**
+     * Generate telemetry data for available sensors
+     */
+    bool set_telemetry(payload_u& payload) const noexcept override;
 
 private:
     readers_s m_readers;

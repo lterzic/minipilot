@@ -1,5 +1,5 @@
 #include "common/config.hpp"
-#include "telemetry/telemetry.hpp"
+#include "link/telemetry.hpp"
 #include <pb_encode.h>
 
 namespace mp {
@@ -8,24 +8,6 @@ telemetry::telemetry(tx& tx) :
     static_task("Telemetry", TELEMETRY_TASK_PRIORITY),
     m_tx(tx)
 {}
-
-bool
-telemetry::add_channel(pb_size_t channel_type, channel_cb cb) noexcept
-{
-    if (m_channels[channel_type].full())
-        return false;
-    m_channels[channel_type].push_back(cb);
-    return true;
-}
-
-bool
-telemetry::add_subscription(pb_size_t channel_type, size_t channel_source) noexcept
-{
-    if (m_subscriptions.full())
-        return false;
-    m_subscriptions.insert({channel_type, channel_source});
-    return true;
-}
 
 static bool
 encode_channel_sources(pb_ostream_t* stream, const pb_field_t* field, void* const* arg) noexcept
@@ -70,7 +52,7 @@ telemetry::encode_channels(pb_ostream_t* stream, const pb_field_t* field, void* 
         mp_pb_telemetry_Channel channel;
         channel.source = source;
         channel.which_payload = ch;
-        instance->m_channels[ch][source](channel.payload);
+        instance->m_channels[ch][source]->set_telemetry(channel.payload);
 
         if (!pb_encode_tag_for_field(stream, field))
             return false;

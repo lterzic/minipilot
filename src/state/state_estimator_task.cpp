@@ -1,4 +1,5 @@
 #include "state/state_estimator_task.hpp"
+#include "common/pb.hpp"
 
 namespace mp {
 
@@ -43,6 +44,19 @@ state_estimator_task::run() noexcept
 
         sleep_periodic(m_period);
     }
+}
+
+bool
+state_estimator_task::set_telemetry(payload_u& payload) const noexcept
+{
+    state_s state = get_state();
+    PB_SET(payload.state, position, state.position);
+    PB_SET(payload.state, velocity, state.velocity);
+    PB_SET(payload.state, acceleration, state.acceleration);
+    PB_SET(payload.state, angular_velocity, state.angular_velocity);
+    PB_SET(payload.state, rotation, state.rotationq.as_vector());
+    
+    return true;
 }
 
 }

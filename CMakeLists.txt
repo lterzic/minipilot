@@ -15,6 +15,7 @@ add_library(minipilot STATIC
     src/link/link.cpp
     src/link/rx.cpp
     src/link/tx.cpp
+    src/link/telemetry.cpp
     src/link/handlers/handler_copter.cpp
     src/logging/logger.cpp
     src/logging/log_sink_link.cpp
@@ -22,11 +23,9 @@ add_library(minipilot STATIC
     src/parameters/parameter_manager.cpp
     src/sensors/accelerometer.cpp
     src/sensors/gyroscope.cpp
+    src/sensors/sensor_manager.cpp
     src/state/ekf.cpp
     src/state/state_estimator_task.cpp
-    src/telemetry/channels/channel_sensors.cpp
-    src/telemetry/channels/channel_state.cpp
-    src/telemetry/telemetry.cpp
 )
 
 # Library users should only use header files

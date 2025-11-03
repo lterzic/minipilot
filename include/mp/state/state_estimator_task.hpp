@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/config.hpp"
+#include "link/telemetry.hpp"
 #include "sensors/sensor_manager.hpp"
 #include "state/state_estimator.hpp"
 #include <emblib/rtos/mutex.hpp>
@@ -12,7 +13,9 @@ namespace mp {
  * Periodically runs the state estimation algorithm and
  * safely exposes the calculated state using a mutex
  */
-class state_estimator_task : private emblib::rtos::task {
+class state_estimator_task :
+    private emblib::rtos::task,
+    private telemetry_producer<mp_pb_telemetry_Channel_state_tag> {
 public:
     template <size_t STACK_SIZE>
     explicit state_estimator_task(
@@ -39,6 +42,8 @@ public:
 
 private:
     void run() noexcept override;
+
+    bool set_telemetry(payload_u& payload) const noexcept override;
 
 private:
     // State estimation algorithm
