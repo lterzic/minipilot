@@ -14,10 +14,6 @@
 # ---
 
 # %%
-# %load_ext autoreload
-# %autoreload 2
-
-# %%
 from mp.utils.symbolic import *
 import sympy as sy
 
@@ -61,7 +57,6 @@ a_exp.jacobian(a), sy.simplify(a_exp.jacobian(qv))
 import numpy as np
 import matplotlib.pyplot as plt
 from mp.binds.state import *
-from mp.binds.math import *
 
 
 # %%
@@ -84,9 +79,11 @@ acc_std = np.sqrt((acc_nd ** 2) * imu_fs)
 gyro_std = np.sqrt((gyro_nd ** 2) * imu_fs)
 
 # %%
-model_acc = lambda v, a, q: vector3f(a.get_base() * 0.98)
-model_ang = lambda v, w, q: vector3f(w.get_base() * -0.8)
-model_q = lambda: matrix16f(1, 8e-2, 1e-4, 1e-8, 2e-10)
+q_matrix = lambda v, a, q, w, wd: np.diag(np.array([v,v,v,a,a,a,q,q,q,q,w,w,w,wd,wd,wd], dtype=np.float32))
+
+model_acc = lambda v, a, q: a * 0.98
+model_ang = lambda v, w, q: w * -0.8
+model_q = lambda: q_matrix(1, 8e-2, 1e-4, 1e-8, 2e-10)
 cm = custom_model(model_acc, model_ang, model_q)
 est = ekf(cm)
 
@@ -95,17 +92,17 @@ def sensors_f(state, t):
     gyro_sim = np.array([0, 0, 0.1 * (t > 2)]) + np.random.randn(3) * gyro_std
     
     s = sensors_s()
-    s.accelerometer = (vector3f(*acc_sim), acc_nd)
-    s.gyroscope = (vector3f(*gyro_sim), gyro_nd)
+    s.accelerometer = (acc_sim, acc_nd)
+    s.gyroscope = (gyro_sim, gyro_nd)
     return s
-t, res = simulate(est, sensors_f, 50)
+t, res = simulate(est, sensors_f, 10)
 
 # %%
-acc = np.array([s.acceleration.get_base() for s in res])
-vel = np.array([s.velocity.get_base() for s in res])
+acc = np.array([s.acceleration for s in res])
+vel = np.array([s.velocity for s in res])
 rot = np.array([s.rotationq.as_vector() for s in res])
-ang = np.array([s.angular_velocity.get_base() for s in res])
-drift = np.array([s.gyroscope_drift.get_base() for s in res])
+ang = np.array([s.angular_velocity for s in res])
+drift = np.array([s.gyroscope_drift for s in res])
 
 fig, ax = plt.subplots(2, 2, figsize=[12, 9])
 

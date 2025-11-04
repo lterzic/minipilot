@@ -1,4 +1,5 @@
 #include "etl.hpp"
+#include "math.hpp"
 #include <pybind11/pybind11.h>
 #include <pybind11/iostream.h>
 #include <mp/copter/quadcopter.hpp>

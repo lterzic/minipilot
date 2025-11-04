@@ -1,4 +1,5 @@
 #include "etl.hpp"
+#include "math.hpp"
 #include <pybind11/pybind11.h>
 #include <pybind11/functional.h>
 #include <mp/state/ekf.hpp>
@@ -72,6 +73,12 @@ PYBIND11_MODULE(state, m, py::mod_gil_not_used()) {
             decltype(custom_model::m_acc),
             decltype(custom_model::m_ang),
             decltype(custom_model::m_qmat)>());
+
+    py::class_<mp::quaternionf>(m, "quaternionf")
+        .def(py::init<float, float, float, float>())
+        .def("as_vector", [](const mp::quaternionf& q) {
+            return q.as_vector();
+        });
 
     py::class_<mp::state_s>(m, "state_s")
         .def(py::init<>())
