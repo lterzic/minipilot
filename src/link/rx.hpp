@@ -10,18 +10,30 @@
 namespace mp {
 
 /**
+ * Handler for one type of uplink message payload
+ * @note Handlers are executed in the receiver thread context
+ */
+struct rx_handler {
+    /**
+     * Payload union
+     */
+    using payload_u = mp_pb_link_Uplink::_mp_pb_link_Uplink_payload;
+
+    /**
+     * Process the received messages
+     * @note It is guaranteed that the payload matches the
+     * register payload tag when calling `rx::set_handler`
+     */
+    virtual void handle(payload_u& payload) noexcept = 0;
+};
+
+/**
  * Receiver thread
  * 
  * Parses received messages and calls the appropriate handler
  */
 class rx : public emblib::rtos::static_task<1024> {
 public:
-    /**
-     * Handler for one type of uplink message payload
-     * @note Handlers are executed in the receiver thread context
-     */
-    using handler_cb = etl::delegate<void (const mp_pb_link_Uplink&)>;
-
     /**
      * Timeout information to handle failed connections
      */
@@ -38,14 +50,14 @@ public:
     /**
      * Set the handler for a certain type of received message
      */
-    bool set_handler(pb_size_t payload_type, handler_cb cb) noexcept;
+    bool set_handler(pb_size_t payload_type, rx_handler& handler) noexcept;
 
 private:
     void run() noexcept override;
 
 private:
     // Size of this map should be equal to number of payload types
-    etl::unordered_map<pb_size_t, handler_cb, 4> m_handlers;
+    etl::unordered_map<pb_size_t, rx_handler*, 4> m_handlers;
     // Serial data receive device
     emblib::io::istream& m_rx_dev;
     // Timeout information

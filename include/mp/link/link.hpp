@@ -42,6 +42,11 @@ private:
     // Receiver and transmitter
     rx m_rx;
     tx m_tx;
+
+    // Link modules are friends so that rx and tx can be accessed
+    // without exposing them with getters or as public
+    friend class link_copter;
+    friend class link_logging;
 };
 
 }

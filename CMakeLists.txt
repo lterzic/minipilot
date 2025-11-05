@@ -16,9 +16,9 @@ add_library(minipilot STATIC
     src/link/rx.cpp
     src/link/tx.cpp
     src/link/telemetry.cpp
-    src/link/handlers/handler_copter.cpp
+    src/link/modules/link_copter.cpp
+    src/link/modules/link_logging.cpp
     src/logging/logger.cpp
-    src/logging/log_sink_link.cpp
     src/logging/log_sink_text.cpp
     src/parameters/parameter_manager.cpp
     src/sensors/accelerometer.cpp

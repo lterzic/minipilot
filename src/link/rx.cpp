@@ -12,11 +12,11 @@ rx::rx(emblib::io::istream& rx_dev, timeout_s timeout) :
 {}
 
 bool
-rx::set_handler(pb_size_t payload_type, handler_cb cb) noexcept
+rx::set_handler(pb_size_t payload_type, rx_handler& handler) noexcept
 {
     if (m_handlers.find(payload_type) != m_handlers.end())
         return false;
-    m_handlers[payload_type] = cb;
+    m_handlers[payload_type] = &handler;
     return true;
 }
 
@@ -63,7 +63,7 @@ rx::run() noexcept
             // If a handler for this payload exists, run it in this thread's context
             auto handler = m_handlers.find(recv_msg.which_payload);
             if (handler != m_handlers.end())
-                handler->second(recv_msg);
+                handler->second->handle(recv_msg.payload);
         }
     }
 }
