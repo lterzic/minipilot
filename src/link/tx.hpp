@@ -40,13 +40,6 @@ public:
     bool send_downlink(mp_pb_link_Downlink& msg) noexcept;
 
     /**
-     * Helper method for a specific payload type
-     * @note Implemented for each payload using template specialization
-     */
-    template <typename payload_type>
-    bool send_downlink(etl::delegate<void(payload_type&)>&& payload_cb) noexcept;
-
-    /**
      * Prevent TX from sending messages until `tx::resume` is called
      */
     void suspend() noexcept
@@ -77,23 +70,5 @@ private:
     // Semaphore to signal the end of the async write
     emblib::rtos::semaphore m_write_smphr;
 };
-
-template <>
-inline bool tx::send_downlink(etl::delegate<void(mp_pb_telemetry_Downlink&)>&& payload_cb) noexcept
-{
-    mp_pb_link_Downlink msg = {0};
-    msg.which_payload = mp_pb_link_Downlink_telemetry_tag;
-    payload_cb(msg.payload.telemetry);
-    return send_downlink(msg);
-}
-
-template <>
-inline bool tx::send_downlink(etl::delegate<void(mp_pb_logging_Downlink&)>&& payload_cb) noexcept
-{
-    mp_pb_link_Downlink msg = {0};
-    msg.which_payload = mp_pb_link_Downlink_logging_tag;
-    payload_cb(msg.payload.logging);
-    return send_downlink(msg);
-}
 
 }

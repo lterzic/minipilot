@@ -23,17 +23,20 @@ encode_log_data(pb_ostream_t *stream, const pb_field_iter_t *field, void * const
 void
 link_logging::write(const log_s& log) noexcept
 {
-    auto payload_cb = [&log](mp_pb_logging_Downlink& downlink) {
-        mp_pb_logging_Log& msg = downlink.payload.log;
-        downlink.which_payload = mp_pb_logging_Downlink_log_tag;
-
-        msg.timestamp_ms = log.time_since_start.value();
-        msg.level = static_cast<mp_pb_logging_LogLevel>((int)log.level + 1);
-        msg.message_id = log.message_id;
-        msg.message.arg = const_cast<log_s*>(&log);
-        msg.message.funcs.encode = &encode_log_data;
-    };
-    m_tx.send_downlink<mp_pb_logging_Downlink>(payload_cb);
+    mp_pb_link_Downlink msg = {0};
+    msg.which_payload = mp_pb_link_Downlink_logging_tag;
+    
+    mp_pb_logging_Downlink& log_downlink = msg.payload.logging;
+    log_downlink.which_payload = mp_pb_logging_Downlink_log_tag;
+    
+    mp_pb_logging_Log& log_msg = log_downlink.payload.log;
+    log_msg.timestamp_ms = log.time_since_start.value();
+    log_msg.level = static_cast<mp_pb_logging_LogLevel>((int)log.level + 1);
+    log_msg.message_id = log.message_id;
+    log_msg.message.arg = const_cast<log_s*>(&log);
+    log_msg.message.funcs.encode = &encode_log_data;
+    
+    m_tx.send_downlink(msg);
 }
 
 void
