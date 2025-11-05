@@ -17,10 +17,14 @@ handshake::handshake(
 void
 handshake::run() noexcept
 {
-    // Currently no handshake implementation so just start the link
-    m_handshake_cb();
-    
-    // TODO: Suspend here (currently exiting since no suspend implementation yet)
+    while (true) {
+        // Currently no handshake implementation so just start the link
+        m_handshake_cb();
+        
+        // This task is suspended by the link from the callback while there
+        // is an active connection. Once the current connection is lost, this
+        // task will be resumed by the link.
+    }
 }
 
 }

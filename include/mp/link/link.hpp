@@ -3,7 +3,6 @@
 #include "link/rx.hpp"
 #include "link/tx.hpp"
 #include "link/handshake.hpp"
-#include <etl/optional.h>
 
 namespace mp {
 
@@ -26,20 +25,23 @@ private:
      * mid session
      * @todo Add handshake (link) parameters as the argument
      */
-    void on_handshake() noexcept;
+    void on_handshake();
+
+    /**
+     * If the receiver (RX) does not receive any message within
+     * some time interval, it will be assumed that the connection
+     * is lost. This method is than called to restart the handshake
+     * thread to allow new connection to be formed. At that point
+     * the old connection is invalidated.
+     */
+    void on_disconnect();
 
 private:
-    // These devices are used both for rx and tx and handshake
-    emblib::io::istream& m_rx_dev;
-    emblib::io::ostream& m_tx_dev;
-
-    // RX and TX are created only when the handshake is completed
-    // Using optional to avoid using pointers and heap
-    etl::optional<rx> m_rx;
-    etl::optional<tx> m_tx;
-
     // Handshake thread
     handshake m_handshake;
+    // Receiver and transmitter
+    rx m_rx;
+    tx m_tx;
 };
 
 }

@@ -10,7 +10,7 @@ public:
     handle_copter(rx& rx, copter_controller_task& controller);
 
 private:
-    void handle(const mp_pb_link_UplinkMessage& msg);
+    void handle(const mp_pb_link_Uplink& msg);
 
 private:
     copter_controller_task& m_controller;

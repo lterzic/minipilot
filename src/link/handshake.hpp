@@ -16,13 +16,13 @@ namespace mp {
  * a callback with link parameters to signal to minipilot that a link is valid.
  * This callback is provided by the `link` class.
  */
-class handshake : private emblib::rtos::static_task<1024> {
+class handshake : public emblib::rtos::static_task<1024> {
 public:
     /**
      * Handshake callback
      * @todo Add link parameters as argument
      */
-    using handshake_cb = etl::delegate<void()>;
+    using handshake_cb = etl::delegate<void ()>;
 
 public:
     explicit handshake(

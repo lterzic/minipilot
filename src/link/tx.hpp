@@ -37,7 +37,7 @@ public:
      * the caller context, can convert this to a task and copy
      * to a queue, then process in this task's context
      */
-    bool send_downlink(mp_pb_link_DownlinkMessage& msg) noexcept;
+    bool send_downlink(mp_pb_link_Downlink& msg) noexcept;
 
     /**
      * Helper method for a specific payload type
@@ -46,9 +46,29 @@ public:
     template <typename payload_type>
     bool send_downlink(etl::delegate<void(payload_type&)>&& payload_cb) noexcept;
 
+    /**
+     * Prevent TX from sending messages until `tx::resume` is called
+     */
+    void suspend() noexcept
+    {
+        emblib::rtos::scoped_lock lock(m_mutex);
+        m_suspend = true;
+    }
+
+    /**
+     * Allow sending messages
+     */
+    void resume() noexcept
+    {
+        emblib::rtos::scoped_lock lock(m_mutex);
+        m_suspend = false;
+    }
+
 private:
     // Message counter
     size_t m_message_id;
+    // If this is true, messages can't be sent
+    bool m_suspend;
 
     // Serial data transmit device
     emblib::io::ostream& m_tx_dev;
@@ -61,8 +81,8 @@ private:
 template <>
 inline bool tx::send_downlink(etl::delegate<void(mp_pb_telemetry_Downlink&)>&& payload_cb) noexcept
 {
-    mp_pb_link_DownlinkMessage msg = {0};
-    msg.which_payload = mp_pb_link_DownlinkMessage_telemetry_tag;
+    mp_pb_link_Downlink msg = {0};
+    msg.which_payload = mp_pb_link_Downlink_telemetry_tag;
     payload_cb(msg.payload.telemetry);
     return send_downlink(msg);
 }
@@ -70,8 +90,8 @@ inline bool tx::send_downlink(etl::delegate<void(mp_pb_telemetry_Downlink&)>&& p
 template <>
 inline bool tx::send_downlink(etl::delegate<void(mp_pb_logging_Downlink&)>&& payload_cb) noexcept
 {
-    mp_pb_link_DownlinkMessage msg = {0};
-    msg.which_payload = mp_pb_link_DownlinkMessage_logging_tag;
+    mp_pb_link_Downlink msg = {0};
+    msg.which_payload = mp_pb_link_Downlink_logging_tag;
     payload_cb(msg.payload.logging);
     return send_downlink(msg);
 }

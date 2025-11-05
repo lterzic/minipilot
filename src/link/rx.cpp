@@ -5,16 +5,27 @@
 
 namespace mp {
 
-rx::rx(emblib::io::istream& rx_dev) :
-    static_task("PB rx task", RX_TASK_PRIORITY),
-    m_rx_dev(rx_dev)
+rx::rx(emblib::io::istream& rx_dev, timeout_s timeout) :
+    static_task("rx", RX_TASK_PRIORITY),
+    m_rx_dev(rx_dev),
+    m_timeout(timeout)
 {}
 
-void rx::run()
+bool
+rx::set_handler(pb_size_t payload_type, handler_cb cb) noexcept
+{
+    if (m_handlers.find(payload_type) != m_handlers.end())
+        return false;
+    m_handlers[payload_type] = cb;
+    return true;
+}
+
+void
+rx::run() noexcept
 {
     while (true) {
-        char recv_buf[sizeof(mp_pb_link_UplinkMessage)];
-        mp_pb_link_UplinkMessage recv_msg = mp_pb_link_UplinkMessage_init_zero;
+        char recv_buf[sizeof(mp_pb_link_Uplink)];
+        mp_pb_link_Uplink recv_msg = mp_pb_link_Uplink_init_zero;
 
         // Read status is negative in case the read operation failed, else
         // it is the size of the received message in bytes
@@ -32,15 +43,20 @@ void rx::run()
             continue;
         }
 
-        // Wait infinitely for received data
-        wait_notification(milliseconds_t(-1));
+        // Wait for the next message for predefined time, if it's not
+        // received, assume that the connection is lost
+        if (!wait_notification(m_timeout.timeout)) {
+            m_timeout.cb();
+            continue;
+        }
+
         if (read_status <= 0) {
             log_error("Receiver read error!");
             continue;
         }
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, read_status);
-        if (pb_decode(&buf_istream, mp_pb_link_UplinkMessage_fields, &recv_msg)) {
+        if (pb_decode(&buf_istream, mp_pb_link_Uplink_fields, &recv_msg)) {
             // TODO (Optional): Add buffering (queue) for parsed messages
             // to decouple handling time from parsing time and call handler elsewhere
 

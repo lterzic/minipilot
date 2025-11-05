@@ -7,13 +7,13 @@ handle_copter::handle_copter(rx& rx, copter_controller_task& controller) :
     m_controller(controller)
 {
     assert(rx.set_handler(
-        mp_pb_link_UplinkMessage_copter_tag,
+        mp_pb_link_Uplink_copter_tag,
         etl::make_delegate<handle_copter, &handle_copter::handle>(*this)
     ));
 }
 
 void
-handle_copter::handle(const mp_pb_link_UplinkMessage& msg) noexcept
+handle_copter::handle(const mp_pb_link_Uplink& msg) noexcept
 {
     auto& copter_msg = msg.payload.copter;
     switch (copter_msg.which_payload) {

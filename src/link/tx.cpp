@@ -8,9 +8,15 @@ tx::tx(emblib::io::ostream& tx_dev) :
     m_tx_dev(tx_dev)
 {}
 
-bool tx::send_downlink(mp_pb_link_DownlinkMessage& msg)
+bool tx::send_downlink(mp_pb_link_Downlink& msg)
 {
     emblib::rtos::scoped_lock lock(m_mutex);
+
+    // If the transmitter is suspended, can't send messages
+    if (m_suspend) {
+        return false;
+    }
+
     msg.message_id = m_message_id++;
     // TODO: Fill in the rest of the downlink message data
     
@@ -19,10 +25,10 @@ bool tx::send_downlink(mp_pb_link_DownlinkMessage& msg)
     // buffer in proto and then replace sizeof(...) with pb_mp_DownlinkMessage_size
     // Here we assume that sizeof(pb_mp_Log) < sizeof(pb_mp_Telemetry) so no extra
     // size is added to this buffer
-    char out_buffer[sizeof(mp_pb_link_DownlinkMessage)];
+    char out_buffer[sizeof(mp_pb_link_Downlink)];
     pb_ostream_t pb_ostream = pb_ostream_from_buffer((pb_byte_t*)out_buffer, sizeof(out_buffer));
     
-    if (pb_encode(&pb_ostream, mp_pb_link_DownlinkMessage_fields, &msg)) {
+    if (pb_encode(&pb_ostream, mp_pb_link_Downlink_fields, &msg)) {
         auto write_cb = [this](ssize_t status) {
             m_write_smphr.signal_from_isr();
         };
