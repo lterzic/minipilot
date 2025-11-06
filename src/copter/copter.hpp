@@ -14,6 +14,8 @@ struct copter_params_s {
     matrix3f moment_of_inertia;
     // Linear drag coefficient
     float lin_drag_c;
+    // Angular drag coefficient
+    float ang_drag_c;
 };
 
 /**

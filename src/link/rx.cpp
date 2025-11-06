@@ -46,8 +46,13 @@ rx::run() noexcept
         // Wait for the next message for predefined time, if it's not
         // received, assume that the connection is lost
         if (!wait_notification(m_timeout.timeout)) {
-            m_timeout.cb();
-            continue;
+            m_rx_dev.abort_async_read();
+            
+            // Make sure that a message wasn't received during the abort
+            if (read_status == -1) {
+                m_timeout.cb();
+                continue;
+            }
         }
 
         if (read_status <= 0) {

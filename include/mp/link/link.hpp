@@ -47,6 +47,7 @@ private:
     // without exposing them with getters or as public
     friend class link_copter;
     friend class link_logging;
+    friend class telemetry;
 };
 
 }

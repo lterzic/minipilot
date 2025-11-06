@@ -4,9 +4,9 @@
 
 namespace mp {
 
-telemetry::telemetry(tx& tx) :
+telemetry::telemetry(link& link) :
     static_task("Telemetry", TELEMETRY_TASK_PRIORITY),
-    m_tx(tx)
+    m_tx(link.m_tx)
 {}
 
 bool
@@ -72,7 +72,7 @@ telemetry::encode_channels(pb_ostream_t* stream, const pb_field_t* field, void* 
     auto* instance = static_cast<telemetry*>(*arg);
 
     for (auto [channel_tag, producer_id] : instance->m_subscriptions) {
-        mp_pb_telemetry_Channel channel;
+        mp_pb_telemetry_Channel channel = {0};
         channel.source = producer_id;
         channel.which_payload = channel_tag;
         instance->m_channels[channel_tag][producer_id]->produce(channel.payload);
@@ -90,6 +90,7 @@ telemetry::run() noexcept
 {
     // Do an initial broadcast
     broadcast();
+    sleep(milliseconds_t(10));
 
     while (true) {
         mp_pb_link_Downlink msg = {0};

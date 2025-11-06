@@ -21,11 +21,7 @@ bool tx::send_downlink(mp_pb_link_Downlink& msg)
     // TODO: Fill in the rest of the downlink message data
     
     // Encode the message into a byte array
-    // TODO: Replace the log message string with a fixed size char
-    // buffer in proto and then replace sizeof(...) with pb_mp_DownlinkMessage_size
-    // Here we assume that sizeof(pb_mp_Log) < sizeof(pb_mp_Telemetry) so no extra
-    // size is added to this buffer
-    char out_buffer[sizeof(mp_pb_link_Downlink)];
+    char out_buffer[256];
     pb_ostream_t pb_ostream = pb_ostream_from_buffer((pb_byte_t*)out_buffer, sizeof(out_buffer));
     
     if (pb_encode(&pb_ostream, mp_pb_link_Downlink_fields, &msg)) {

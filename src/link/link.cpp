@@ -15,7 +15,7 @@ link::link(
     m_rx(
         rx_dev,
         rx::timeout_s {
-            milliseconds_t(5000),
+            RX_TIMEOUT,
             etl::make_delegate<link, &link::on_disconnect>(*this)
         }),
     m_tx(tx_dev)
@@ -32,9 +32,13 @@ void link::on_handshake()
 
     // TODO: Get session data from the handshake
     
-    m_handshake.suspend();
     m_tx.resume();
     m_rx.resume();
+    // TODO: This is currently suspended after tx and rx are resumed
+    // since it's suspended from the handshake context as there is no
+    // handshake algorithm. Once the handshake task has an ISR context
+    // then this can be done before the other two are resumed.
+    m_handshake.suspend();
 }
 
 void link::on_disconnect()

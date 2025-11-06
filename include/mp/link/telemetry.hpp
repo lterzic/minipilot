@@ -35,7 +35,7 @@ public:
     using channel_map = etl::unordered_map<pb_size_t, etl::vector<telemetry_producer*, 1>, 4>;
 
 public:
-    explicit telemetry(tx& tx);
+    explicit telemetry(link& link);
 
     /**
      * Add a subscriber for a specific channel
