@@ -34,20 +34,15 @@ void link::on_handshake()
     
     m_tx.resume();
     m_rx.resume();
-    // TODO: This is currently suspended after tx and rx are resumed
-    // since it's suspended from the handshake context as there is no
-    // handshake algorithm. Once the handshake task has an ISR context
-    // then this can be done before the other two are resumed.
     m_handshake.suspend();
 }
 
 void link::on_disconnect()
 {
     // TODO: Invalidate the current session
-    // TODO: Make sure that this is called from a valid context
-    m_rx.suspend();
-    m_tx.suspend();
     m_handshake.resume();
+    m_tx.suspend();
+    m_rx.suspend();
 }
 
 }

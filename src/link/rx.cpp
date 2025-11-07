@@ -35,8 +35,11 @@ rx::run() noexcept
             notify_from_isr();
         };
         
+        // Clear notifications if any exist
+        wait_notification(milliseconds_t(0), true);
+
         if (!m_rx_dev.read_async(recv_buf, sizeof(recv_buf), read_cb)) {
-            log_warning("Receiver read start fail!");
+            log_warning("rx read start error");
             // Receiver might be cleaning up from the last receive operation
             // so sleep to give some time to become ready
             sleep(RX_FAIL_SLEEP);
@@ -48,15 +51,24 @@ rx::run() noexcept
         if (!wait_notification(m_timeout.timeout)) {
             m_rx_dev.abort_async_read();
             
-            // Make sure that a message wasn't received during the abort
+            // Notification must exist here since either the read finished
+            // during the abort call, or the abort forced the callback
+            // TODO: If abort specification is changed such that it doesn't
+            // trigger the callback, the timeout here can be set to 0
+            if (!wait_notification(milliseconds_t(1))) {
+                log_error("rx read abort error");
+            }
+
+            // Read status -1 means that the operation was aborted, ie. timed out
             if (read_status == -1) {
+                log_warning("rx timeout");
                 m_timeout.cb();
                 continue;
             }
         }
 
         if (read_status <= 0) {
-            log_error("Receiver read error!");
+            log_error("rx read error");
             continue;
         }
 
@@ -69,6 +81,8 @@ rx::run() noexcept
             auto handler = m_handlers.find(recv_msg.which_payload);
             if (handler != m_handlers.end())
                 handler->second->handle(recv_msg.payload);
+        } else {
+            log_error("rx decode error");
         }
     }
 }
