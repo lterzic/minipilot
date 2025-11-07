@@ -29,10 +29,10 @@ struct state_s {
     vector3f velocity {0, 0, 0};
     // (Linear) acceleration of the CoM in the global reference frame
     vector3f acceleration {0, 0, 0};
+    // Quaternion which maps the local frame to the global frame
+    quaternionf rotation {1, 0, 0, 0};
     // Angular acceleration vector in the local rotating (non-inertial) reference frame
     vector3f angular_velocity {0, 0, 0};
-    // Quaternion which maps the local frame to the global frame
-    quaternionf rotationq {1, 0, 0, 0};
     // Current estimation of gyroscope drift
     // TODO: Move into a separate struct and use this only for kinematics
     vector3f gyroscope_drift {0, 0, 0};

@@ -16,7 +16,7 @@ static vector3f get_linear_acceleration(const ekf::state_vec_t& state) noexcept
 }
 
 // Extract the rotation quaternion from the kalman state vector
-static quaternionf get_rotation_q(const ekf::state_vec_t& state) noexcept
+static quaternionf get_rotation(const ekf::state_vec_t& state) noexcept
 {
     return {state(6), state(7), state(8), state(9)};
 }
@@ -46,7 +46,7 @@ ekf::state_transition(const state_vec_t& state, float dt) const noexcept
 {
     const auto v = get_linear_velocity(state);
     const auto a = get_linear_acceleration(state);
-    const auto q = get_rotation_q(state);
+    const auto q = get_rotation(state);
     const auto w = get_angular_velocity(state);
 
     // Acceleration is computed by the vehicle based on current actuator settings and the
@@ -95,7 +95,7 @@ ekf::state_transition_jacob(const state_vec_t& state, float dt) const noexcept
 
     const auto v = get_linear_velocity(state);
     const auto a = get_linear_acceleration(state);
-    const auto q = get_rotation_q(state);
+    const auto q = get_rotation(state);
     const auto w = get_angular_velocity(state);
     const auto qv = q.as_vector();
 
@@ -156,7 +156,7 @@ ekf::state_transition_jacob(const state_vec_t& state, float dt) const noexcept
 static vectorf<3> map_state_to_accelerometer(const ekf::state_vec_t& state)
 {
     const auto a = get_linear_acceleration(state);
-    const auto q = get_rotation_q(state);
+    const auto q = get_rotation(state);
 
     // Accelerometer readings are acceleration - gravity vector
     // in the local reference frame (+ noise)
@@ -166,7 +166,7 @@ static vectorf<3> map_state_to_accelerometer(const ekf::state_vec_t& state)
 static matrixf<3, ekf::KALMAN_DIM> map_state_to_accelerometer_jacobian(const ekf::state_vec_t& state)
 {
     const auto a = get_linear_acceleration(state);
-    const auto qv = get_rotation_q(state).as_vector();
+    const auto qv = get_rotation(state).as_vector();
 
     const float ax = a(0), ay = a(1), az = a(2);
     const float qw = qv(0), qx = qv(1), qy = qv(2), qz = qv(3);
@@ -252,8 +252,8 @@ ekf::update(float dt, const sensors_s& sensors) noexcept
         .position = m_position,
         .velocity = v,
         .acceleration = a,
+        .rotation = get_rotation(m_kalman.get_state()),
         .angular_velocity = get_angular_velocity(m_kalman.get_state()),
-        .rotationq = get_rotation_q(m_kalman.get_state()),
         .gyroscope_drift = get_gyro_drift(m_kalman.get_state())
     };
 }

@@ -17,7 +17,7 @@ telemetry_state::produce(payload_u& payload) const noexcept
     PB_SET(payload.state, velocity, state.velocity);
     PB_SET(payload.state, acceleration, state.acceleration);
     PB_SET(payload.state, angular_velocity, state.angular_velocity);
-    PB_SET(payload.state, rotation, state.rotationq.as_vector());
+    PB_SET(payload.state, rotation, state.rotation.as_vector());
     return true;
 }
 

@@ -38,7 +38,7 @@ copter_controller_pid::update_linear(const linear_controls_s& input, const state
     // Target thrust vector in the global frame - derived from the linear acceleration equation of the copter
     const vector3f target_thrust_g = m_copter_params.mass * (target_a - GV) + m_copter_params.lin_drag_c * v;
     // Target thrust vector in the body (local) frame
-    const vector3f target_thrust_l = state.rotationq.conjugate().rotate_vec(target_thrust_g);
+    const vector3f target_thrust_l = state.rotation.conjugate().rotate_vec(target_thrust_g);
     // Direction of the angular velocity vector required to rotate local UP to local target thrust
     const vector3f target_w_dir = UP.cross(target_thrust_l.normalized());
 
