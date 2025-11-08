@@ -10,7 +10,7 @@ copter_controller_pid::copter_controller_pid(
     m_copter_params(copter_params),
     m_angular_velocity_pid(params.ang_p, params.ang_i, params.ang_d),
     m_linear_acceleration_pid(params.lin_p, params.lin_i, params.lin_d),
-    m_tilt_coeff(params.tilt_coeff)
+    m_turn_pid(params.turn_p, params.turn_i, params.turn_d)
 {}
 
 copter_actuation_s
@@ -44,10 +44,11 @@ copter_controller_pid::update_linear(const linear_controls_s& input, const state
 
     // TODO: Add yaw rotation based on m_target_dir
 
+    m_turn_pid.update(target_w_dir, dt);
     return angular_controls_s {
         // Since the cross product is between to normalized vectors, its max magnitude is
         // 1 when the angle is PI/2, so this constant is the maximum magnitude of target w
-        .angular_velocity = target_w_dir * m_tilt_coeff,
+        .angular_velocity = m_turn_pid.get_output(),
         // Should not overshoot the target vertical velocity during rotation
         .thrust = etl::max(target_thrust_l.dot(UP), 0.f)
     };
