@@ -1,23 +1,26 @@
 import numpy as np
 
-def rot_v(q, v):
-    """
-    Rotate 3D vector(s) v by unit quaternion(s) q.
-    
-    Parameters
-    ----------
-    q : array-like, shape (..., 4)
-        Quaternion(s) in [w, x, y, z] format.
-    v : array-like, shape (..., 3)
-        Vector(s) to rotate. Must be broadcastable with q.
-    
-    Returns
-    -------
-    v_rot : ndarray, shape (..., 3)
-        Rotated vector(s).
-    """
-    w = q[0]
-    qv = q[1:]
+# Must match with constants.hpp
+NORTH       = np.array([1, 0, 0], dtype=np.float32)
+EAST        = np.array([0, 1, 0], dtype=np.float32)
+DOWN        = np.array([0, 0, 1], dtype=np.float32)
+SOUTH       = -NORTH
+WEST        = -EAST
+UP          = -DOWN
+FORWARD     = NORTH
+BACKWARD    = SOUTH
+RIGHT       = EAST
+LEFT        = WEST
 
-    t = 2.0 * np.cross(qv, v)
-    return v + (w * t) + np.cross(qv, t)
+G = 9.80665
+GV = G * DOWN
+
+class tf1:
+    def __init__(self, a: float, y: float = 0):
+        self.a = a
+        self.y = y
+
+    def update(self, dt: float, x: np.ndarray) -> np.ndarray:
+        k = self.a / (self.a + dt)
+        self.y = k * self.y + (1.0 - k) * x
+        return self.y
