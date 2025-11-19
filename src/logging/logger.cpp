@@ -17,10 +17,22 @@ logger::logger() noexcept :
     m_format.precision(3);
 }
 
+static void
+flush(const log_s& log, const etl::ilist<log_sink*>& sinks)
+{
+    log_level_e log_level = static_cast<log_level_e>(log.level);
+    
+    for (log_sink* sink : sinks) {
+        if (sink->get_level() <= log_level) {
+            sink->write(log);
+        }
+    }
+}
+
 void logger::flush_log(log_s& log, log_level_e level) noexcept
 {
-    log.level = level;
-    log.time_since_start = get_time_since_start();
+    log.level = static_cast<mp_pb_logging_LogLevel>(level);
+    log.timestamp_ms = get_time_since_start().value();
     
     if (emblib::rtos::is_scheduler_running()) {
         m_queue.send(log, milliseconds_t(-1));
@@ -29,11 +41,7 @@ void logger::flush_log(log_s& log, log_level_e level) noexcept
         // mode since there are no other threads for a race condition,
         // else it is incremented in the task to avoid using a mutex here
         log.message_id = m_message_count++;
-        
-        for (log_sink* sink : m_sinks) {
-            if (sink->get_level() <= log.level)
-                sink->write(log);
-        }
+        flush(log, m_sinks);
     }
 }
 
@@ -44,11 +52,7 @@ void logger::run() noexcept
         // Wait indefinitely for a log
         m_queue.receive(log, milliseconds_t(-1));
         log.message_id = m_message_count++;
-
-        for (log_sink* sink : m_sinks) {
-            if (sink->get_level() <= log.level)
-                sink->write(log);
-        }
+        flush(log, m_sinks);
     }
 }
 

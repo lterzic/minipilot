@@ -29,8 +29,8 @@ public:
 
         log_s log;
         // ETL string size doesn't include null termination character
-        etl::string_ext log_data(log.data, sizeof(log.data) - 1);
-        etl::string_stream log_stream(log_data, m_format);
+        etl::string_ext log_text(log.text, sizeof(log.text) - 1);
+        etl::string_stream log_stream(log_text, m_format);
 
         // Fill the log string with each item
         ((log_stream << items), ...);

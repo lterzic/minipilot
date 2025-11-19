@@ -35,14 +35,14 @@ encode_channel_sources(pb_ostream_t* stream, const pb_field_t* field, void* cons
     const auto* map = static_cast<telemetry::channel_map*>(*arg);
 
     for (const auto& [channel_tag, producers] : *map) {
-        mp_pb_telemetry_Downlink_Broadcast_ChannelSources channel_sources {
+        mp_pb_telemetry_Broadcast_ChannelSources channel_sources {
             .channel = channel_tag,
             .sources = static_cast<uint32_t>(producers.size())
         };
         
         if (!pb_encode_tag_for_field(stream, field))
             return false;
-        if (!pb_encode_submessage(stream, mp_pb_telemetry_Downlink_Broadcast_ChannelSources_fields, &channel_sources))
+        if (!pb_encode_submessage(stream, mp_pb_telemetry_Broadcast_ChannelSources_fields, &channel_sources))
             return false;
     }
     return true;
@@ -54,10 +54,10 @@ telemetry::broadcast() const noexcept
     mp_pb_link_Downlink msg = {0};
     msg.which_payload = mp_pb_link_Downlink_telemetry_tag;
 
-    mp_pb_telemetry_Downlink& telemetry_downlink = msg.payload.telemetry;
-    telemetry_downlink.which_payload = mp_pb_telemetry_Downlink_broadcast_tag;
+    mp_pb_link_TelemetryDownlink& telemetry_downlink = msg.payload.telemetry;
+    telemetry_downlink.which_payload = mp_pb_link_TelemetryDownlink_broadcast_tag;
 
-    mp_pb_telemetry_Downlink_Broadcast& broadcast_msg = telemetry_downlink.payload.broadcast;
+    mp_pb_telemetry_Broadcast& broadcast_msg = telemetry_downlink.payload.broadcast;
     // Here the constness of the method is ignored, but we know that the
     // encode function does not modify the map
     broadcast_msg.channels.arg = (void*)&m_channels;
@@ -96,10 +96,10 @@ telemetry::run() noexcept
         mp_pb_link_Downlink msg = {0};
         msg.which_payload = mp_pb_link_Downlink_telemetry_tag;
 
-        mp_pb_telemetry_Downlink& telemetry_downlink = msg.payload.telemetry;
-        telemetry_downlink.which_payload = mp_pb_telemetry_Downlink_telemetry_tag;
+        mp_pb_link_TelemetryDownlink& telemetry_downlink = msg.payload.telemetry;
+        telemetry_downlink.which_payload = mp_pb_link_TelemetryDownlink_telemetry_tag;
 
-        mp_pb_telemetry_Downlink_Telemetry& telemetry_msg = telemetry_downlink.payload.telemetry;
+        mp_pb_telemetry_Telemetry& telemetry_msg = telemetry_downlink.payload.telemetry;
         telemetry_msg.timestamp_ms = get_time_since_start().value();
         telemetry_msg.channels.arg = this;
         telemetry_msg.channels.funcs.encode = &telemetry::encode_channels;

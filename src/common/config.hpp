@@ -26,7 +26,6 @@ inline constexpr task_priority_e    TELEMETRY_TASK_PRIORITY     = TASK_PRIORITY_
 inline constexpr size_t             TELEMETRY_MAX_SUBSCRIPTIONS = 8;
 inline constexpr milliseconds_t     TELEMETRY_PERIOD            = milliseconds_t(200); // TODO: Move to dynamic configuration
 
-inline constexpr size_t             LOG_MAX_MESSAGE_LENGTH  = 100;
 inline constexpr task_priority_e    LOGGER_TASK_PRIORITY    = TASK_PRIORITY_LOW;
 inline constexpr size_t             LOGGER_QUEUE_SIZE       = 4;
 inline constexpr size_t             LOGGER_MAX_SINKS        = 4;

@@ -1,28 +1,22 @@
 #pragma once
 
-#include "common/chrono.hpp"
-#include "common/config.hpp"
+#include "pb/logging/log.nanopb.h"
 
 namespace mp {
 
+/**
+ * Log level enum class wrapper
+ */
 enum class log_level_e {
-    DEBUG,
-    INFO,
-    WARNING,
-    ERROR
+    DEBUG   = mp_pb_logging_LogLevel_LOG_LEVEL_DEBUG,
+    INFO    = mp_pb_logging_LogLevel_LOG_LEVEL_INFO,
+    WARNING = mp_pb_logging_LogLevel_LOG_LEVEL_WARNING,
+    ERROR   = mp_pb_logging_LogLevel_LOG_LEVEL_ERROR
 };
 
-struct log_s {
-    // Unique ID within this session
-    size_t message_id;
-    // Log level
-    log_level_e level;
-    // Log time
-    milliseconds_t time_since_start;
-    // Log data
-    char data[LOG_MAX_MESSAGE_LENGTH];
-
-    // TODO: Add task which called log
-};
+/**
+ * Log entry based on the protobuf definition
+ */
+using log_s = mp_pb_logging_Log;
 
 }
