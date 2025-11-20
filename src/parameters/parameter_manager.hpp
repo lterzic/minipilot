@@ -1,15 +1,18 @@
 #pragma once
 
+#include "pb/config/config.nanopb.h"
 #include <emblib/io/istream.hpp>
 #include <emblib/io/ostream.hpp>
 
 namespace mp {
 
+/**
+ * Parameter structure passed to the rest of the system
+ */
+using parameters_s = mp_pb_config_Config;
+
 class parameter_manager {
 public:
-    // TODO: Replace with protobuf generated type
-    struct parameters_s {};
-
     parameter_manager(
         emblib::io::istream& istorage,
         emblib::io::ostream& ostorage

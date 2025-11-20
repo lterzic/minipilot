@@ -24,8 +24,7 @@ void
 rx::run() noexcept
 {
     while (true) {
-        char recv_buf[sizeof(mp_pb_link_Uplink)];
-        mp_pb_link_Uplink recv_msg = mp_pb_link_Uplink_init_zero;
+        char recv_buf[mp_pb_link_Uplink_size];
 
         // Read status is negative in case the read operation failed, else
         // it is the size of the received message in bytes
@@ -71,6 +70,8 @@ rx::run() noexcept
             log_error("rx read error");
             continue;
         }
+
+        mp_pb_link_Uplink recv_msg = mp_pb_link_Uplink_init_zero;
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, read_status);
         if (pb_decode(&buf_istream, mp_pb_link_Uplink_fields, &recv_msg)) {
