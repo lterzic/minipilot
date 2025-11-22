@@ -6,7 +6,7 @@ namespace mp {
 telemetry_state::telemetry_state(telemetry& telemetry, const state_estimator_task& estimator) :
     m_estimator(estimator)
 {
-    assert(telemetry.add_producer(mp_pb_telemetry_Channel_state_tag, *this));
+    assert(telemetry.add_producer(pb::telemetry::channel_s::payload_e::STATE, *this));
 }
 
 bool

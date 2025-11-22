@@ -16,7 +16,7 @@ struct telemetry_producer {
     /**
      * Payload union
      */
-    using payload_u = mp_pb_telemetry_Channel::_mp_pb_telemetry_Channel_payload;
+    using payload_u = pb::telemetry::channel_s::mp_pb_telemetry_channel_payload;
 
     /**
      * Callback which fills the channel with the data
@@ -29,10 +29,15 @@ struct telemetry_producer {
 class telemetry : private emblib::rtos::static_task<1024> {
 public:
     /**
+     * Telemetry channel types
+     */
+    using channel_e = pb::telemetry::channel_s::payload_e;
+
+    /**
      * Map size should be equal to (or at least greater than) the number of channel types
      * Currently only allowing one source per channel type
      */
-    using channel_map = etl::unordered_map<pb_size_t, etl::vector<telemetry_producer*, 1>, 4>;
+    using channel_map = etl::unordered_map<channel_e, etl::vector<telemetry_producer*, 1>, 4>;
 
 public:
     explicit telemetry(link& link);
@@ -41,12 +46,12 @@ public:
      * Add a subscriber for a specific channel
      * @todo Add frequency as a parameter
      */
-    bool add_subscriber(pb_size_t channel_tag, size_t producer_id) noexcept;
+    bool add_subscriber(channel_e channel, size_t producer_id) noexcept;
 
     /**
      * Add a channel source (producer)
      */
-    bool add_producer(pb_size_t channel_tag, telemetry_producer& producer) noexcept;
+    bool add_producer(channel_e channel, telemetry_producer& producer) noexcept;
 
 private:
     /**
@@ -71,7 +76,7 @@ private:
     // Map channel types to a vector of channel sources
     channel_map m_channels;
     // List of (channel tag, channel source id) subscriptions
-    etl::set<etl::pair<pb_size_t, size_t>, TELEMETRY_MAX_SUBSCRIPTIONS> m_subscriptions;
+    etl::set<etl::pair<channel_e, size_t>, TELEMETRY_MAX_SUBSCRIPTIONS> m_subscriptions;
 };
 
 }

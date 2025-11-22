@@ -12,11 +12,11 @@ rx::rx(emblib::io::istream& rx_dev, timeout_s timeout) :
 {}
 
 bool
-rx::set_handler(pb_size_t payload_type, rx_handler& handler) noexcept
+rx::set_handler(payload_e payload, rx_handler& handler) noexcept
 {
-    if (m_handlers.find(payload_type) != m_handlers.end())
+    if (m_handlers.find(payload) != m_handlers.end())
         return false;
-    m_handlers[payload_type] = &handler;
+    m_handlers[payload] = &handler;
     return true;
 }
 
@@ -24,7 +24,7 @@ void
 rx::run() noexcept
 {
     while (true) {
-        char recv_buf[mp_pb_link_Uplink_size];
+        char recv_buf[MP_PB_LINK_UPLINK_SIZE];
 
         // Read status is negative in case the read operation failed, else
         // it is the size of the received message in bytes
@@ -71,10 +71,10 @@ rx::run() noexcept
             continue;
         }
 
-        mp_pb_link_Uplink recv_msg = mp_pb_link_Uplink_init_zero;
+        pb::link::uplink_s recv_msg = {0};
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, read_status);
-        if (pb_decode(&buf_istream, mp_pb_link_Uplink_fields, &recv_msg)) {
+        if (pb_decode(&buf_istream, MP_PB_LINK_UPLINK_FIELDS, &recv_msg)) {
             // TODO (Optional): Add buffering (queue) for parsed messages
             // to decouple handling time from parsing time and call handler elsewhere
 

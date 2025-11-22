@@ -23,7 +23,7 @@ parameter_manager::parameter_manager(
 bool
 parameter_manager::load_from_storage()
 {
-    char buffer[mp_pb_config_Config_size];
+    char buffer[MP_PB_CONFIG_CONFIG_SIZE];
     ssize_t status = m_istorage.read(buffer, sizeof(buffer), milliseconds_t(10));
     
     if (status <= 0) {
@@ -32,13 +32,13 @@ parameter_manager::load_from_storage()
     }
 
     pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)buffer, status);
-    return pb_decode(&buf_istream, mp_pb_config_Config_fields, &m_parameters);
+    return pb_decode(&buf_istream, MP_PB_CONFIG_CONFIG_FIELDS, &m_parameters);
 }
 
 void
 parameter_manager::load_default()
 {
-    m_parameters = mp_pb_config_Config_init_default;
+    m_parameters = {0};
 }
 
 }

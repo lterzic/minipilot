@@ -8,7 +8,7 @@ tx::tx(emblib::io::ostream& tx_dev) :
     m_tx_dev(tx_dev)
 {}
 
-bool tx::send_downlink(mp_pb_link_Downlink& msg)
+bool tx::send_downlink(pb::link::downlink_s& msg)
 {
     emblib::rtos::scoped_lock lock(m_mutex);
 
@@ -24,7 +24,7 @@ bool tx::send_downlink(mp_pb_link_Downlink& msg)
     char out_buffer[256];
     pb_ostream_t pb_ostream = pb_ostream_from_buffer((pb_byte_t*)out_buffer, sizeof(out_buffer));
     
-    if (pb_encode(&pb_ostream, mp_pb_link_Downlink_fields, &msg)) {
+    if (pb_encode(&pb_ostream, MP_PB_LINK_DOWNLINK_FIELDS, &msg)) {
         auto write_cb = [this](ssize_t status) {
             m_write_smphr.signal_from_isr();
         };

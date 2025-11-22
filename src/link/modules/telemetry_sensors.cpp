@@ -11,7 +11,7 @@ telemetry_sensors::telemetry_sensors(
     m_sensor_manager(sensor_manager),
     m_estimator(estimator)
 {
-    assert(telemetry.add_producer(mp_pb_telemetry_Channel_sensors_tag, *this));
+    assert(telemetry.add_producer(pb::telemetry::channel_s::payload_e::SENSORS, *this));
 }
 
 bool

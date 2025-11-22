@@ -17,7 +17,7 @@ struct rx_handler {
     /**
      * Payload union
      */
-    using payload_u = mp_pb_link_Uplink::_mp_pb_link_Uplink_payload;
+    using payload_u = pb::link::uplink_s::mp_pb_link_uplink_payload;
 
     /**
      * Process the received messages
@@ -44,20 +44,25 @@ public:
         etl::delegate<void ()> cb;
     };
 
+    /**
+     * Receiver payload types
+     */
+    using payload_e = pb::link::uplink_s::payload_e;
+
 public:
     explicit rx(emblib::io::istream& rx_dev, timeout_s timeout) noexcept;
 
     /**
      * Set the handler for a certain type of received message
      */
-    bool set_handler(pb_size_t payload_type, rx_handler& handler) noexcept;
+    bool set_handler(payload_e payload, rx_handler& handler) noexcept;
 
 private:
     void run() noexcept override;
 
 private:
     // Size of this map should be equal to number of payload types
-    etl::unordered_map<pb_size_t, rx_handler*, 4> m_handlers;
+    etl::unordered_map<payload_e, rx_handler*, 4> m_handlers;
     // Serial data receive device
     emblib::io::istream& m_rx_dev;
     // Timeout information

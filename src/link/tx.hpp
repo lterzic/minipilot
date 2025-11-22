@@ -37,7 +37,7 @@ public:
      * the caller context, can convert this to a task and copy
      * to a queue, then process in this task's context
      */
-    bool send_downlink(mp_pb_link_Downlink& msg) noexcept;
+    bool send_downlink(pb::link::downlink_s& msg) noexcept;
 
     /**
      * Prevent TX from sending messages until `tx::resume` is called

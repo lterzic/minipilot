@@ -31,7 +31,7 @@ flush(const log_s& log, const etl::ilist<log_sink*>& sinks)
 
 void logger::flush_log(log_s& log, log_level_e level) noexcept
 {
-    log.level = static_cast<mp_pb_logging_LogLevel>(level);
+    log.level = decltype(log_s::level)(level);
     log.timestamp_ms = get_time_since_start().value();
     
     if (emblib::rtos::is_scheduler_running()) {

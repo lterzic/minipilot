@@ -9,7 +9,7 @@ namespace mp {
 /**
  * Parameter structure passed to the rest of the system
  */
-using parameters_s = mp_pb_config_Config;
+using parameters_s = pb::config::config_s;
 
 class parameter_manager {
 public:

@@ -22,6 +22,9 @@ execute_process(COMMAND
     -D ${PROTO_GEN_DIR}
     -e ".nanopb"
     -q
+    -C
+    --cpp-typedefs
+    --cpp-oneof-enums
     ${SRC_FILES}
 )
 
