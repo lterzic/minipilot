@@ -1,11 +1,11 @@
 # Used to compile protobuf files on every build
 
 # Path to nanopb generator
-set(NANOPB_GEN "${PROJECT_SOURCE_DIR}/lib/nanopb/generator/nanopb_generator.py")
+set(NANOPB_GEN "${PROJECT_SOURCE_DIR}/external/nanopb/generator/nanopb_generator.py")
 
 # Generated files are placed in the pb directory so that their
 # includes would have a prefix to differentiate from source files
-set(PROTO_SRC_DIR "${PROJECT_SOURCE_DIR}/lib/minipilot-proto/src")
+set(PROTO_SRC_DIR "${PROJECT_SOURCE_DIR}/external/minipilot-proto/src")
 set(PROTO_GEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/gen/pb")
 
 # Find all proto files recursively

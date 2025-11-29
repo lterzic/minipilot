@@ -60,28 +60,24 @@ PRIVATE
     -Wl,--print-memory-usage
 )
 
-# Add path to emblib configuration
-add_library(emblib_config INTERFACE)
-target_include_directories(emblib_config INTERFACE "${PROJECT_SOURCE_DIR}/src/libconfig")
-
 # FreeRTOS configuration
 add_library(freertos_config INTERFACE)
-target_include_directories(freertos_config SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src/libconfig)
+target_include_directories(freertos_config SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src)
 target_compile_definitions(freertos_config INTERFACE projCOVERAGE_TEST=0)
 
 # Set the protoc path for nanopb
-set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/lib/minipilot-proto/lib)
+set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/external/minipilot-proto/lib)
 set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
 
 # Python environment setup
 add_subdirectory("python")
 
 # Dependencies
-add_subdirectory("lib/emblib")
-add_subdirectory("lib/emblib/drivers/rtos/freertos")
-add_subdirectory("lib/emblib/drivers/math/eigen")
-add_subdirectory("lib/nanopb")
-add_subdirectory("lib/minipilot-proto")
+add_subdirectory("external/emblib")
+add_subdirectory("external/emblib/drivers/rtos/freertos")
+add_subdirectory("external/emblib/drivers/math/eigen")
+add_subdirectory("external/nanopb")
+add_subdirectory("external/minipilot-proto")
 
 # Generate protobuf cpp files from sources
 add_subdirectory("protobuf")
