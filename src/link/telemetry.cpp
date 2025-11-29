@@ -5,7 +5,7 @@
 namespace mp {
 
 telemetry::telemetry(link& link) :
-    static_task("Telemetry", TELEMETRY_TASK_PRIORITY),
+    static_task("telemetry", TELEMETRY_TASK_PRIORITY),
     m_tx(link.m_tx)
 {}
 

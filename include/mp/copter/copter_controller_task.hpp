@@ -24,7 +24,7 @@ public:
         emblib::rtos::task_stack<STACK_SIZE>& stack,
         task_priority_e priority = TASK_PRIORITY_HIGH
     ) noexcept :
-        task("copter controller task", priority, stack),
+        task("copter controller", priority, stack),
         m_controller(controller),
         m_copter(copter),
         m_state_estimator_task(state_estimator_task),

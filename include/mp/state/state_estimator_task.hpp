@@ -22,7 +22,7 @@ public:
         emblib::rtos::task_stack<STACK_SIZE>& stack,
         task_priority_e priority = TASK_PRIORITY_VERY_HIGH
     ) noexcept :
-        task("state estimator task", priority, stack),
+        task("state estimator", priority, stack),
         m_estimator(estimator),
         m_sensor_manager(sensor_manager),
         m_period(period)

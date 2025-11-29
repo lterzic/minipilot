@@ -4,6 +4,7 @@
 #include <emblib/devices/sensors/sensor.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/mutex.hpp>
+#include <etl/string.h>
 
 namespace mp {
 
@@ -98,8 +99,9 @@ private:
      */
     static etl::string<configMAX_TASK_NAME_LEN> create_task_name(sensor_t& sensor) noexcept
     {
-        etl::string<configMAX_TASK_NAME_LEN> task_name = "Sensor reader: ";
+        etl::string<configMAX_TASK_NAME_LEN> task_name = "reader (";
         task_name += sensor.get_name();
+        task_name += ")";
         return task_name;
     }
 
