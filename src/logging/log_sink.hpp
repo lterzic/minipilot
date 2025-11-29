@@ -1,7 +1,6 @@
 #pragma once
 
 #include "logging/log.hpp"
-#include <emblib/io/ostream.hpp>
 
 namespace mp {
 
@@ -17,7 +16,7 @@ public:
 
     /**
      * Set the log level for this sink
-     * @note This is used after the log leve is checked by the
+     * @note This is used after the log level is checked by the
      * logger meaning the level of the log has to be greater or
      * equal to both the logger's and sink's levels to be written
      */

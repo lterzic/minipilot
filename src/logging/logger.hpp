@@ -1,16 +1,20 @@
 #pragma once
 
 #include "common/config.hpp"
+#include "logging/log.hpp"
 #include "logging/log_sink.hpp"
+#include <emblib/rtos/lfalloc.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
 #include <etl/list.h>
-#include <etl/string_stream.h>
 
 namespace mp {
 
+/**
+ * Logger provides methods to create a log and send it
+ * to all registered sinks
+ */
 class logger : private emblib::rtos::static_task<1024> {
-
 public:
     /**
      * Get the singleton logger instance
@@ -18,59 +22,71 @@ public:
     static logger& get_instance() noexcept;
 
     /**
-     * Log a message consisting of multiple items
+     * Create a log entry of a specified level using std::format style
+     * arguments and flush it to all registered sinks whose level
+     * accepts the given log level.
+     * @note If the logger is called before the scheduler is started
+     * logs are written immediatelly (in blocking mode), else the log
+     * entry is placed into a queue which is consumed once the log task
+     * gets running time.
+     * @todo Add `size_t FMT_SIZE` as template parameter and take in
+     * `const char (&fmt)[FMT_SIZE]` to avoid using strlen when writing
      */
-    template <typename... item_types>
-    void log(log_level_e level, item_types&&... items) noexcept
-    {
-        if (m_sinks.empty()) {
-            return;
-        }
-
-        log_s log;
-        // ETL string size doesn't include null termination character
-        etl::string_ext log_text(log.text, sizeof(log.text) - 1);
-        etl::string_stream log_stream(log_text, m_format);
-
-        // Fill the log string with each item
-        ((log_stream << items), ...);
-        
-        flush_log(log, level);
-    }
+    template <typename... arg_types>
+    void log(log_level_e level, const char* fmt, arg_types&&... args) noexcept;
 
     /**
      * Subscribe a new sink to the log event
      */
-    void add_sink(log_sink& sink) noexcept
-    {
-        m_sinks.push_back(&sink);
-    }
+    void add_sink(log_sink& sink) noexcept;
 
 private:
-    logger() noexcept;
-
     /**
-     * Format and write log to output devices
+     * Default constructor
      */
-    void flush_log(log_s& log, log_level_e level) noexcept;
+    logger() noexcept;
 
     /**
      * Task method
      */
     void run() noexcept override;
 
+    /**
+     * Add additional metadata to the log and output it to
+     * the appropriate sinks
+     */
+    void flush(log_level_e level, log_s* log) noexcept;
+
 private:
     // Log message count
     size_t m_message_count;
-
-    // Format for writing numeric types
-    etl::format_spec m_format;
     
     // List of all subscribed handlers
     etl::list<log_sink*, LOGGER_MAX_SINKS> m_sinks;
 
-    // Log queue
-    emblib::rtos::queue<log_s, LOGGER_QUEUE_SIZE> m_queue;
+    // Zero-copy queue using lock-free alloc and pointer queues
+    emblib::rtos::queue<log_s*, LOGGER_QUEUE_SIZE> m_queue;
+    emblib::rtos::lfalloc<log_s, LOGGER_QUEUE_SIZE> m_alloc;
 };
+
+/**
+ * Try to allocate data for the log and fill only the arguments
+ * to reduce this templated function. Other metadata is then filled
+ * in `flush`.
+ */
+template <typename... arg_types>
+inline void logger::log(log_level_e level, const char* fmt, arg_types &&...args) noexcept
+{
+    if (m_sinks.empty()) {
+        return;
+    }
+
+    if (log_s* log = m_alloc.alloc()) {
+        log->format.arg = const_cast<char*>(fmt);
+        log->args_count = 0;
+        (log_write_arg(*log, args), ...);
+        flush(level, log);
+    }    
+}
 
 }

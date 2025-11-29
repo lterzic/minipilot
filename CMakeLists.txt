@@ -20,8 +20,8 @@ add_library(minipilot STATIC
     src/link/modules/link_logging.cpp
     src/link/modules/telemetry_sensors.cpp
     src/link/modules/telemetry_state.cpp
+    src/logging/log.cpp
     src/logging/logger.cpp
-    src/logging/log_sink_text.cpp
     src/parameters/parameter_manager.cpp
     src/sensors/accelerometer.cpp
     src/sensors/gyroscope.cpp
@@ -90,5 +90,7 @@ add_subdirectory("protobuf")
 target_link_libraries(minipilot
 PUBLIC
     emblib
+    emblib_math_eigen
+    emblib_rtos_freertos
     minipilot-proto-nanopb
 )
