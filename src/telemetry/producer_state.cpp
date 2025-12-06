@@ -1,16 +1,16 @@
-#include "link/modules/telemetry_state.hpp"
+#include "telemetry/producer_state.hpp"
 #include "common/pb.hpp"
 
 namespace mp {
 
-telemetry_state::telemetry_state(telemetry& telemetry, const state_estimator_task& estimator) :
+producer_state::producer_state(telemetry& telemetry, const state_estimator_task& estimator) :
     m_estimator(estimator)
 {
     assert(telemetry.add_producer(pb::telemetry::channel_s::payload_e::STATE, *this));
 }
 
 bool
-telemetry_state::produce(payload_u& payload) const noexcept
+producer_state::produce(payload_u& payload) const noexcept
 {
     state_s state = m_estimator.get_state();
     PB_SET(payload.state, position, state.position);

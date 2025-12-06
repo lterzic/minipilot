@@ -1,9 +1,9 @@
-#include "link/modules/telemetry_sensors.hpp"
+#include "telemetry/producer_sensors.hpp"
 #include "common/pb.hpp"
 
 namespace mp {
 
-telemetry_sensors::telemetry_sensors(
+producer_sensors::producer_sensors(
     telemetry& telemetry,
     const sensor_manager& sensor_manager,
     const state_estimator_task& estimator
@@ -15,7 +15,7 @@ telemetry_sensors::telemetry_sensors(
 }
 
 bool
-telemetry_sensors::produce(payload_u& payload) const noexcept
+producer_sensors::produce(payload_u& payload) const noexcept
 {
     auto accelerometer = m_sensor_manager.get_sensor_reader<sensor_type_e::ACCELEROMETER>();
     if (accelerometer) {

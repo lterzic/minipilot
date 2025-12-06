@@ -1,5 +1,5 @@
 #include "common/config.hpp"
-#include "link/telemetry.hpp"
+#include "telemetry/telemetry.hpp"
 #include <pb_encode.h>
 
 namespace mp {
