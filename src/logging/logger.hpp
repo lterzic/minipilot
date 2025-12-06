@@ -3,7 +3,7 @@
 #include "common/config.hpp"
 #include "logging/log.hpp"
 #include "logging/log_sink.hpp"
-#include <emblib/rtos/lfalloc.hpp>
+#include <emblib/lockfree/allocator.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
 #include <etl/list.h>
@@ -66,7 +66,7 @@ private:
 
     // Zero-copy queue using lock-free alloc and pointer queues
     emblib::rtos::queue<log_s*, LOGGER_QUEUE_SIZE> m_queue;
-    emblib::rtos::lfalloc<log_s, LOGGER_QUEUE_SIZE> m_alloc;
+    emblib::lockfree::allocator<log_s, LOGGER_QUEUE_SIZE> m_alloc;
 };
 
 /**
