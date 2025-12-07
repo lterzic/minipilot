@@ -1,10 +1,11 @@
 #pragma once
 
+#include "common/config.hpp"
 #include "pb/link/link.nanopb.h"
 #include <emblib/io/ostream.hpp>
-#include <emblib/rtos/mutex.hpp>
-#include <emblib/rtos/semaphore.hpp>
-#include <etl/delegate.h>
+#include <emblib/lockfree/allocator.hpp>
+#include <emblib/rtos/queue.hpp>
+#include <emblib/rtos/task.hpp>
 
 namespace mp {
 
@@ -15,12 +16,14 @@ namespace mp {
  * manages multiple writers accessing the underlying transmit serial device.
  * All of the processing of the output messages is done in the calling
  * task's context.
- * 
- * @todo Make this a task and instead of holding a mutex while writing,
- * copy the downlink message into a queue and then encode and send from
- * this task's context using async write and waiting for notification
  */
-class tx {
+class tx : public emblib::rtos::static_task<1024> {
+public:
+    /**
+     * Message type sent by the transmitter
+     */
+    using tx_message_s = pb::link::downlink_s;
+
 public:
     /**
      * @todo Add system information like vehicle id, session id,
@@ -29,46 +32,45 @@ public:
     explicit tx(emblib::io::ostream& tx_dev) noexcept;
 
     /**
-     * Send a downlink message
-     * @note Blocking - this method processes the message and starts
-     * an async write, then blocks the calling task's context until
-     * the write operation completes
-     * @todo Instead of encoding and sending the message in
-     * the caller context, can convert this to a task and copy
-     * to a queue, then process in this task's context
+     * Init and enqueue a message for sending.
+     * @param assign_lambda Lambda of type `void (tx_message_s&)` which
+     * should be used to fill the appropriate payload for the message.
+     * @returns `true` if message successfully enqueued for sending.
      */
-    bool send_downlink(pb::link::downlink_s& msg) noexcept;
+    template <typename assign_lambda_type>
+    bool send(assign_lambda_type&& assign_lambda) noexcept;
 
+private:
     /**
-     * Prevent TX from sending messages until `tx::resume` is called
+     * Block until there is a message to be sent in the queue.
+     * Once available, encode and send over the tx device.
      */
-    void suspend() noexcept
-    {
-        emblib::rtos::scoped_lock lock(m_mutex);
-        m_suspend = true;
-    }
-
-    /**
-     * Allow sending messages
-     */
-    void resume() noexcept
-    {
-        emblib::rtos::scoped_lock lock(m_mutex);
-        m_suspend = false;
-    }
+    void run() noexcept override;
 
 private:
     // Message counter
     size_t m_message_id;
-    // If this is true, messages can't be sent
-    bool m_suspend;
-
     // Serial data transmit device
     emblib::io::ostream& m_tx_dev;
-    // Mutex for ensuring a single user
-    emblib::rtos::mutex m_mutex;
-    // Semaphore to signal the end of the async write
-    emblib::rtos::semaphore m_write_smphr;
+    // Zero-copy queue using lock-free allocation and pointer queue
+    emblib::lockfree::allocator<tx_message_s, TX_QUEUE_SIZE> m_alloc;
+    emblib::rtos::queue<tx_message_s*, TX_QUEUE_SIZE> m_queue;
 };
+
+/**
+ * Try to allocate data for the message and fill the payload. Rest
+ * of the message data is filled once the message is next in queue
+ * to be sent.
+ */
+template <typename assign_lambda_type>
+inline bool tx::send(assign_lambda_type &&assign_lambda) noexcept
+{
+    if (tx_message_s* msg = m_alloc.alloc()) {
+        *msg = {0};
+        assign_lambda(*msg);
+        return m_queue.send(msg, milliseconds_t(0));
+    }
+    return false;
+}
 
 }

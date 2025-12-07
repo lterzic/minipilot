@@ -13,14 +13,11 @@ link_logging::link_logging(link& link, logger& logger) :
 void
 link_logging::write(const log_s& log) noexcept
 {
-    pb::link::downlink_s msg = {0};
-    msg.which_payload = pb::link::downlink_s::payload_e::LOGGING;
-    
-    pb::link::logging_downlink_s& log_downlink = msg.payload.logging;
-    log_downlink.which_payload = pb::link::logging_downlink_s::payload_e::LOG;
-    log_downlink.payload.log = log;
-    
-    m_tx.send_downlink(msg);
+    m_tx.send([&log](tx::tx_message_s& msg) {
+        msg.which_payload = pb::link::downlink_s::payload_e::LOGGING;
+        msg.payload.logging.which_payload = pb::link::logging_downlink_s::payload_e::LOG;
+        msg.payload.logging.payload.log = log;
+    });
 }
 
 void

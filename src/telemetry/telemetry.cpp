@@ -51,19 +51,20 @@ encode_channel_sources(pb_ostream_t* stream, const pb_field_t* field, void* cons
 void
 telemetry::broadcast() const noexcept
 {
-    pb::link::downlink_s msg = {0};
-    msg.which_payload = pb::link::downlink_s::payload_e::TELEMETRY;
+    m_tx.send([this](tx::tx_message_s& msg) {
+        msg.which_payload = pb::link::downlink_s::payload_e::TELEMETRY;
+        pb::link::telemetry_downlink_s& telemetry_downlink = msg.payload.telemetry;
 
-    pb::link::telemetry_downlink_s& telemetry_downlink = msg.payload.telemetry;
-    telemetry_downlink.which_payload = pb::link::telemetry_downlink_s::payload_e::BROADCAST;
+        telemetry_downlink.which_payload = pb::link::telemetry_downlink_s::payload_e::BROADCAST;
+        pb::telemetry::broadcast_s& broadcast_msg = telemetry_downlink.payload.broadcast;
 
-    pb::telemetry::broadcast_s& broadcast_msg = telemetry_downlink.payload.broadcast;
-    // Here the constness of the method is ignored, but we know that the
-    // encode function does not modify the map
-    broadcast_msg.channels.arg = (void*)&m_channels;
-    broadcast_msg.channels.funcs.encode = &encode_channel_sources;
-    
-    m_tx.send_downlink(msg);
+        // Here the constness of the method is ignored, but we know that the
+        // encode function does not modify the map.
+        // TODO: Make the channels pre-allocated so that they would be collected
+        // at the time of this function being called instead of time of encoding.
+        broadcast_msg.channels.arg = (void*)&m_channels;
+        broadcast_msg.channels.funcs.encode = &encode_channel_sources;
+    });
 }
 
 bool
@@ -93,18 +94,20 @@ telemetry::run() noexcept
     sleep(milliseconds_t(10));
 
     while (true) {
-        pb::link::downlink_s msg = {0};
-        msg.which_payload = pb::link::downlink_s::payload_e::TELEMETRY;
+        m_tx.send([this](tx::tx_message_s& msg) {
+            msg.which_payload = pb::link::downlink_s::payload_e::TELEMETRY;
+            pb::link::telemetry_downlink_s& telemetry_downlink = msg.payload.telemetry;
 
-        pb::link::telemetry_downlink_s& telemetry_downlink = msg.payload.telemetry;
-        telemetry_downlink.which_payload = pb::link::telemetry_downlink_s::payload_e::TELEMETRY;
+            telemetry_downlink.which_payload = pb::link::telemetry_downlink_s::payload_e::TELEMETRY;
+            pb::telemetry::telemetry_s& telemetry_msg = telemetry_downlink.payload.telemetry;
 
-        pb::telemetry::telemetry_s& telemetry_msg = telemetry_downlink.payload.telemetry;
-        telemetry_msg.timestamp_ms = get_time_since_start().value();
-        telemetry_msg.channels.arg = this;
-        telemetry_msg.channels.funcs.encode = &telemetry::encode_channels;
-
-        m_tx.send_downlink(msg);
+            // TODO: Make the channels pre-allocated so that they would be collected
+            // at the time of this function being called instead of time of encoding,
+            // and to avoid data races since telemetry and tx are different threads.
+            telemetry_msg.timestamp_ms = get_time_since_start().value();
+            telemetry_msg.channels.arg = this;
+            telemetry_msg.channels.funcs.encode = &telemetry::encode_channels;
+        });
 
         sleep_periodic(TELEMETRY_PERIOD);
     }
