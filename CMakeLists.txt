@@ -8,6 +8,7 @@ project(minipilot VERSION 1.0)
 
 # Source files for minipilot
 add_library(minipilot STATIC
+    src/config/configurator.cpp
     src/copter/copter_controller_task.cpp
     src/copter/copter_controller_pid.cpp
     src/copter/quadcopter.cpp
@@ -20,7 +21,6 @@ add_library(minipilot STATIC
     src/link/modules/link_telemetry.cpp
     src/logging/log.cpp
     src/logging/logger.cpp
-    src/parameters/parameter_manager.cpp
     src/sensors/accelerometer.cpp
     src/sensors/gyroscope.cpp
     src/state/ekf.cpp
