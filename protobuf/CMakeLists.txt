@@ -1,7 +1,7 @@
 # Used to compile protobuf files on every build
 
 # Path to nanopb generator
-set(NANOPB_GEN "${PROJECT_SOURCE_DIR}/external/nanopb/generator/nanopb_generator.py")
+set(NANOPB_GEN "${PROJECT_SOURCE_DIR}/external/nanopb-cpp/generator/nanopb_generator.py")
 
 # Generated files are placed in the pb directory so that their
 # includes would have a prefix to differentiate from source files
@@ -23,7 +23,7 @@ execute_process(COMMAND
     -e ".nanopb"
     -q
     -C
-    --cpp-typedefs
+    --cpp-structs
     --cpp-oneof-enums
     ${SRC_FILES}
 )

@@ -77,7 +77,7 @@ add_subdirectory("python")
 add_subdirectory("external/emblib")
 add_subdirectory("external/emblib/drivers/rtos/freertos")
 add_subdirectory("external/emblib/drivers/math/eigen")
-add_subdirectory("external/nanopb")
+add_subdirectory("external/nanopb-cpp")
 add_subdirectory("external/minipilot-proto")
 
 # Generate protobuf cpp files from sources
