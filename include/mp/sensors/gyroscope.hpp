@@ -1,50 +1,47 @@
 #pragma once
 
 #include "common/math.hpp"
-#include "sensors/sensor_reader.hpp"
-#include <emblib/devices/sensors/gyroscope.hpp>
+#include "sensor.hpp"
+#include "sensor_processor.hpp"
+#include "telemetry/producer.hpp"
+#include <emblib/units/rotation.hpp>
 
 namespace mp {
 
 /**
- * Gyroscope config
+ * 3D vector in units of rad/s
  */
-struct gyroscope_config_s {
-    // Device reference
-    emblib::devices::gyroscope& device;
-    // This mutex (if provided) is locked during reads
-    // Used when there are multiple sensors on one device
-    emblib::rtos::mutex* mutex;
-    // Mapping from the device space into the NED coordinate system
-    matrix3f transform;
-};
+using gyroscope_data_type = vector<emblib::units::radians_per_second<float>, 3>;
 
 /**
- * Output units of a gyroscope
+ * Gyroscope is a sensor which produces readings of the body angular
+ * velocity in the local FRD frame.
  */
-using gyroscope_units = emblib::devices::gyroscope_units;
+using gyroscope = sensor<gyroscope_data_type>;
 
 /**
- * Sensor task which provides gyroscope readings
+ * Gyroscope data processor
  */
-class gyroscope_reader : public sensor_reader<
-    emblib::devices::gyroscope::data_t,
-    vector<gyroscope_units, 3>
-> {
+class gyroscope_processor :
+    public sensor_processor<gyroscope>,
+    public telemetry_producer<telemetry_channel_e::GYROSCOPE> {
 public:
-    explicit gyroscope_reader(const gyroscope_config_s& config);
+    /**
+     * Construct a processor of an gyroscope
+     */
+    explicit gyroscope_processor(gyroscope& gyroscope);
+
+    /**
+     * Fill the gyroscope data
+     */
+    bool produce(payload_u& payload) const noexcept override;
 
 private:
-    bool init(sensor_t& sensor) noexcept override;
-
-    vector<gyroscope_units, 3> process(const sensor_t::data_t& raw_data) noexcept override;
-
-private:
-    // Transform maps a potentially different coordinate space
-    // of the readings into the NED coordinate system
-    matrix<float, 3> m_transform;
-
-    // TODO: Add band-pass filter
+    /**
+     * Gyroscope data isn't currently processed
+     * @todo Notch filter
+     */
+    gyroscope_data_type process(const gyroscope_data_type& raw_data) noexcept override;
 };
 
 }

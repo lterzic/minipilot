@@ -1,84 +1,65 @@
 #pragma once
 
-#include "accelerometer.hpp"
-#include "gyroscope.hpp"
+#include "sensors/accelerometer.hpp"
+#include "sensors/gyroscope.hpp"
+#include "telemetry/telemetry.hpp"
+#include <etl/optional.h>
 
 namespace mp {
 
+/**
+ * Sensor type enumeration used to allow compile time sensor
+ * type selection
+ */
 enum class sensor_type_e {
     ACCELEROMETER,
     GYROSCOPE
 };
 
 /**
- * Interface for the system towards sensors available on the platform
+ * Sensor manager provides only access to sensors available
+ * on the system
  */
 class sensor_manager {
-    struct readers_s {
-        accelerometer_reader*   accelerometer;
-        gyroscope_reader*       gyroscope;
+    /**
+     * Sensor type aggregation for convenience
+     * @note `nullptr` means that the sensor type is not available
+     */
+    struct sensors_s {
+        accelerometer* m_accelerometer;
+        gyroscope* m_gyroscope;
     };
+
 public:
     /**
-     * Constructor for creating private reader instances for
-     * each provided sensor configuration
+     * Initialize the sensor manager with all available sensors on the system
      */
-    template <
-        accelerometer_config_s* accelerometer = nullptr,
-        gyroscope_config_s* gyroscope = nullptr
-    >
-    explicit sensor_manager();
+    explicit sensor_manager(const sensors_s& sensors, telemetry& telemetry);
 
     /**
-     * Constructor for externally created reader instances
-     */
-    explicit sensor_manager(readers_s readers) :
-        m_readers(readers)
-    {}
-
-    /**
-     * Get reader for a specific sensor type
+     * Get the sensor of a specific type
      * @note If sensor is currently unavailable, `nullptr` is returned
-     * @todo Once supporting multiple readers of the same
+     * @todo Once supporting multiple sensors of the same
      * type, add index as the parameter and set 0 as default
      */
     template <sensor_type_e SENSOR_TYPE>
-    inline const auto* get_sensor_reader() const noexcept;
+    inline const auto& get_sensor() const noexcept;
 
 private:
-    readers_s m_readers;
+    etl::optional<accelerometer_processor> m_accelerometer;
+    etl::optional<gyroscope_processor> m_gyroscope;
 };
 
-template <
-    accelerometer_config_s* accelerometer,
-    gyroscope_config_s* gyroscope
->
-sensor_manager::sensor_manager()
+template <>
+inline const auto& sensor_manager::get_sensor<sensor_type_e::ACCELEROMETER>() const noexcept
 {
-    // TODO: Accelerometer and gyroscope are mandatory so
-    // change to references, can't accept nullptr
-
-    if constexpr(accelerometer) {
-        static accelerometer_reader reader(*accelerometer);
-        m_readers.accelerometer = &reader;
-    }
-
-    if constexpr(gyroscope) {
-        static gyroscope_reader reader(*gyroscope);
-        m_readers.gyroscope = &reader;
-    }
+    return m_accelerometer;
 }
 
 template <>
-inline const auto* sensor_manager::get_sensor_reader<sensor_type_e::ACCELEROMETER>() const noexcept
+inline const auto& sensor_manager::get_sensor<sensor_type_e::GYROSCOPE>() const noexcept
 {
-    return m_readers.accelerometer;
-}
-
-template <>
-inline const auto* sensor_manager::get_sensor_reader<sensor_type_e::GYROSCOPE>() const noexcept
-{
-    return m_readers.gyroscope;
+    return m_gyroscope;
 }
 
 }

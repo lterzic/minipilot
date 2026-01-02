@@ -1,54 +1,50 @@
 #pragma once
 
 #include "common/math.hpp"
-#include "sensors/sensor_reader.hpp"
-#include <emblib/devices/sensors/accelerometer.hpp>
+#include "sensor.hpp"
+#include "sensor_processor.hpp"
+#include "telemetry/producer.hpp"
+#include <emblib/units/speed.hpp>
 
 namespace mp {
 
 /**
- * Accelerometer config
+ * 3D vector in units of m/s^2
  */
-struct accelerometer_config_s {
-    // Device reference
-    emblib::devices::accelerometer& device;
-    // This mutex (if provided) is locked during reads
-    // Used when there are multiple sensors on one device
-    emblib::rtos::mutex* mutex;
-    // Mapping from the device space into the NED coordinate system
-    matrix3f transform;
-};
+using accelerometer_data_type = vector<emblib::units::meters_per_second_squared<float>, 3>;
 
 /**
- * Output units of an accelerometer
+ * Accelerometer is a sensor which produces readings of the body
+ * acceleration in the local FRD frame, with addition of opposite
+ * of the gravity acceleration vector.
  */
-using accelerometer_units = emblib::devices::accelerometer_units;
+using accelerometer = sensor<accelerometer_data_type>;
 
 /**
- * Sensor task which provides accelerometer readings
+ * Accelerometer data processor
  */
-class accelerometer_reader : public sensor_reader<
-    emblib::devices::accelerometer::data_t,
-    vector<accelerometer_units, 3>
-> {
+class accelerometer_processor :
+    public sensor_processor<accelerometer>,
+    public telemetry_producer<telemetry_channel_e::ACCELEROMETER> {
 public:
-    explicit accelerometer_reader(const accelerometer_config_s& config);
+    /**
+     * Construct a processor of an accelerometer
+     */
+    explicit accelerometer_processor(accelerometer& accelerometer);
+
+    /**
+     * Fill the accelerometer data
+     */
+    bool produce(payload_u& payload) const noexcept override;
 
 private:
-    bool init(sensor_t& sensor) noexcept override;
-
-    vector<accelerometer_units, 3> process(const sensor_t::data_t& raw_data) noexcept override;
+    /**
+     * Accelerometer processing only does bias removal currently
+     */
+    accelerometer_data_type process(const accelerometer_data_type& raw_data) noexcept override;
 
 private:
-    // Transform maps a potentially different coordinate space
-    // of the readings into the NED coordinate system
-    matrix<float, 3> m_transform;
-    // This can be calculated or read from the configuration
-    // depending on if the vehicle is on stable ground before
-    // starting
-    vector<accelerometer_units, 3> m_bias;
-
-    // TODO: Add low-pass filter
+    accelerometer_data_type m_bias;
 };
 
 }
