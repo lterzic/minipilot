@@ -25,8 +25,6 @@ add_library(minipilot STATIC
     src/sensors/gyroscope.cpp
     src/state/ekf.cpp
     src/state/state_estimator_task.cpp
-    src/telemetry/producer_sensors.cpp
-    src/telemetry/producer_state.cpp
     src/telemetry/telemetry.cpp
 )
 
