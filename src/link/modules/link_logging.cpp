@@ -7,7 +7,7 @@ link_logging::link_logging(link& link, logger& logger) :
     m_tx(link.m_tx)
 {
     logger.add_sink(*this);
-    assert(link.m_rx.set_handler(pb::link::uplink_s::payload_e::LOGGING, *this));
+    assert(link.m_rx.set_handler(*this));
 }
 
 void

@@ -5,7 +5,7 @@
 
 namespace mp {
 
-class link_logging : private rx_handler, private log_sink {
+class link_logging : private rx_handler<rx_payload_e::LOGGING>, private log_sink {
 public:
     explicit link_logging(link& link, logger& logger);
 

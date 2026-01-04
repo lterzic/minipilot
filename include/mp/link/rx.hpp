@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/chrono.hpp"
-#include "pb/link/link.nanopb.h"
+#include "rx_handler.hpp"
 #include <emblib/io/istream.hpp>
 #include <emblib/rtos/task.hpp>
 #include <etl/delegate.h>
@@ -10,29 +10,17 @@
 namespace mp {
 
 /**
- * Handler for one type of uplink message payload
- * @note Handlers are executed in the receiver thread context
- */
-struct rx_handler {
-    /**
-     * Payload union
-     */
-    using payload_u = pb::link::uplink_s::mp_pb_link_uplink_payload;
-
-    /**
-     * Process the received messages
-     * @note It is guaranteed that the payload matches the
-     * register payload tag when calling `rx::set_handler`
-     */
-    virtual void handle(payload_u& payload) noexcept = 0;
-};
-
-/**
  * Receiver thread
  * 
  * Parses received messages and calls the appropriate handler
  */
 class rx : public emblib::rtos::static_task<1024> {
+    /**
+     * RX handler template parameter is not used when calling methods,
+     * so we can store all handlers with the same parameter value
+     */
+    using rx_handler_default = rx_handler<rx_payload_e::TELEMETRY>;
+
 public:
     /**
      * Timeout information to handle failed connections
@@ -44,25 +32,33 @@ public:
         etl::delegate<void ()> cb;
     };
 
-    /**
-     * Receiver payload types
-     */
-    using payload_e = pb::link::uplink_s::payload_e;
-
 public:
     explicit rx(emblib::io::istream& rx_dev, timeout_s timeout) noexcept;
 
     /**
-     * Set the handler for a certain type of received message
+     * Set a handler for a payload type
      */
-    bool set_handler(payload_e payload, rx_handler& handler) noexcept;
+    template <rx_payload_e PAYLOAD>
+    bool set_handler(rx_handler<PAYLOAD>& handler) noexcept
+    {
+        return set_handler(PAYLOAD, reinterpret_cast<rx_handler_default&>(handler));
+    }
 
 private:
+    /**
+     * RX handler template parameter is not used at runtime, so
+     * all handlers can be cast to default for storage
+     */
+    bool set_handler(rx_payload_e payload, rx_handler_default& handler) noexcept;
+
+    /**
+     * Call handlers on messages as they are received and parsed
+     */
     void run() noexcept override;
 
 private:
     // Size of this map should be equal to number of payload types
-    etl::unordered_map<payload_e, rx_handler*, 4> m_handlers;
+    etl::unordered_map<rx_payload_e, rx_handler_default*, pb::link::uplink_s::PAYLOAD_COUNT> m_handlers;
     // Serial data receive device
     emblib::io::istream& m_rx_dev;
     // Timeout information

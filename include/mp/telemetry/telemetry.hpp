@@ -11,9 +11,11 @@
 namespace mp {
 
 class telemetry : private emblib::rtos::static_task<1024> {
-    // Telemetry producer template parameter is not used when
-    // calling methods, so we can store all producers with the
-    // same parameter value
+    /**
+     * Telemetry producer template parameter is not used when
+     * calling methods, so we can store all producers with the
+     * same parameter value
+     */
     using telemetry_producer_default = telemetry_producer<telemetry_channel_e::ACCELEROMETER>;
 
 public:
@@ -31,7 +33,7 @@ public:
     template <telemetry_channel_e CHANNEL>
     bool add_producer(telemetry_producer<CHANNEL>& producer) noexcept
     {
-        return add_producer(CHANNEL, static_cast<telemetry_producer_default&>(producer));
+        return add_producer(CHANNEL, reinterpret_cast<telemetry_producer_default&>(producer));
     }
 
 private:
@@ -67,7 +69,7 @@ private:
     // Reference to the link transmitter
     tx& m_tx;
     // Map channel types to a vector of channel sources
-    etl::unordered_map<telemetry_channel_e, etl::vector<telemetry_producer_default*, 1>, 16> m_producers;
+    etl::unordered_map<telemetry_channel_e, etl::vector<telemetry_producer_default*, 1>, pb::telemetry::channel_s::PAYLOAD_COUNT> m_producers;
     // List of (channel tag, channel source id) subscriptions
     etl::set<etl::pair<telemetry_channel_e, size_t>, TELEMETRY_MAX_SUBSCRIPTIONS> m_subscriptions;
 };

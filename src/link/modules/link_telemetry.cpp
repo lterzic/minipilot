@@ -5,7 +5,7 @@ namespace mp {
 link_telemetry::link_telemetry(link& link, telemetry& telemetry) :
     m_telemtry(telemetry)
 {
-    assert(link.m_rx.set_handler(pb::link::uplink_s::payload_e::TELEMETRY, *this));
+    assert(link.m_rx.set_handler(*this));
 }
 
 void

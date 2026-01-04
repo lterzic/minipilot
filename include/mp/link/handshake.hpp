@@ -16,7 +16,7 @@ namespace mp {
  * a callback with link parameters to signal to minipilot that a link is valid.
  * This callback is provided by the `link` class.
  */
-class handshake : public emblib::rtos::static_task<1024> {
+class handshake : public emblib::rtos::static_task<512> {
 public:
     /**
      * Handshake callback
