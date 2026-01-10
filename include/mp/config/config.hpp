@@ -5,7 +5,7 @@
 namespace mp {
 
 /**
- * Entire configuration
+ * Configuration struct
  */
 using config_s = pb::config::config_s;
 
