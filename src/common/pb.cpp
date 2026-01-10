@@ -1,4 +1,4 @@
-#include "pb.hpp"
+#include "common/pb.hpp"
 #include <pb_encode.h>
 
 namespace mp {
