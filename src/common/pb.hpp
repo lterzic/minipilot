@@ -39,4 +39,6 @@ inline vector3f pb_vector3f(const pb::vector3f_s& pb_vec)
     return {pb_vec.x, pb_vec.y, pb_vec.z};
 }
 
+bool pb_encode_string(pb_ostream_t *stream, const pb_field_iter_t *field, void * const *arg);
+
 }
