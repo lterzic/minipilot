@@ -59,7 +59,7 @@
 
 /* Run time and task stats gathering related definitions. */
 #define configGENERATE_RUN_TIME_STATS                       1
-#define configUSE_TRACE_FACILITY                            0
+#define configUSE_TRACE_FACILITY                            1
 #define configUSE_STATS_FORMATTING_FUNCTIONS                0
 
 /* Co-routine related definitions. */
@@ -109,5 +109,16 @@
 #define INCLUDE_xTaskResumeFromISR              1
 
 /* A header file that defines trace macro can be included here. */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void mp_on_task_switch();
+#define traceTASK_SWITCHED_IN() mp_on_task_switch()
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FREERTOS_CONFIG_H */

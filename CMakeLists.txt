@@ -24,6 +24,7 @@ add_library(minipilot STATIC
     src/state/ekf.cpp
     src/state/estimator_runner.cpp
     src/telemetry/telemetry.cpp
+    src/telemetry/sysmon.cpp
 )
 
 # Library users should only use header files
