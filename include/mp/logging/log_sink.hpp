@@ -1,6 +1,6 @@
 #pragma once
 
-#include "logging/log.hpp"
+#include "log_entry.hpp"
 
 namespace mp {
 
@@ -36,7 +36,7 @@ public:
     /**
      * Write the log to this sink
      */
-    virtual void write(const log_s& log) noexcept = 0;
+    virtual void write(const log_entry_s& log) noexcept = 0;
 
 private:
     // Minimum level for outputting the log

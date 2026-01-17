@@ -5,7 +5,7 @@
 
 namespace mp {
 
-class link_telemetry : private rx_handler {
+class link_telemetry : private rx_handler<rx_payload_e::TELEMETRY> {
 public:
     explicit link_telemetry(link& link, telemetry& telemetry);
 

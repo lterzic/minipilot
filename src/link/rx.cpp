@@ -1,4 +1,4 @@
-#include "rx.hpp"
+#include "link/rx.hpp"
 #include "common/config.hpp"
 #include "logging/logging.hpp"
 #include <pb_decode.h>
@@ -12,12 +12,9 @@ rx::rx(emblib::io::istream& rx_dev, timeout_s timeout) :
 {}
 
 bool
-rx::set_handler(payload_e payload, rx_handler& handler) noexcept
+rx::set_handler(rx_payload_e payload, rx_handler_default& handler) noexcept
 {
-    if (m_handlers.find(payload) != m_handlers.end())
-        return false;
-    m_handlers[payload] = &handler;
-    return true;
+    return m_handlers.insert({payload, &handler}).second;
 }
 
 void

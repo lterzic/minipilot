@@ -10,41 +10,21 @@ telemetry::telemetry(link& link) :
 {}
 
 bool
-telemetry::add_subscriber(channel_e channel, size_t producer_id) noexcept
+telemetry::add_subscriber(telemetry_channel_e channel, size_t producer_id) noexcept
 {
-    if (m_subscriptions.full())
-        return false;
-    
-    m_subscriptions.insert({channel, producer_id});
-    return true;
+    return m_subscriptions.insert({channel, producer_id}).second;
 }
 
 bool
-telemetry::add_producer(channel_e channel, telemetry_producer& producer) noexcept
+telemetry::add_producer(telemetry_channel_e channel, telemetry_producer_default& producer) noexcept
 {
-    if (m_channels[channel].full())
+    if (m_producers.find(channel) == m_producers.end())
         return false;
     
-    m_channels[channel].push_back(&producer);
-    return true;
-}
-
-static bool
-encode_channel_sources(pb_ostream_t* stream, const pb_field_t* field, void* const* arg) noexcept
-{
-    const auto* map = static_cast<telemetry::channel_map*>(*arg);
-
-    for (const auto& [channel, producers] : *map) {
-        pb::telemetry::channel_sources_s channel_sources {
-            .channel = static_cast<uint32_t>(channel),
-            .sources = static_cast<uint32_t>(producers.size())
-        };
-        
-        if (!pb_encode_tag_for_field(stream, field))
-            return false;
-        if (!pb_encode_submessage(stream, MP_PB_TELEMETRY_BROADCAST_CHANNEL_SOURCES_FIELDS, &channel_sources))
-            return false;
-    }
+    if (m_producers[channel].full())
+        return false;
+    
+    m_producers[channel].push_back(&producer);
     return true;
 }
 
@@ -62,28 +42,9 @@ telemetry::broadcast() const noexcept
         // encode function does not modify the map.
         // TODO: Make the channels pre-allocated so that they would be collected
         // at the time of this function being called instead of time of encoding.
-        broadcast_msg.channels.arg = (void*)&m_channels;
-        broadcast_msg.channels.funcs.encode = &encode_channel_sources;
+        broadcast_msg.channels.arg = (void*)this;
+        broadcast_msg.channels.funcs.encode = &telemetry::encode_broadcast;
     });
-}
-
-bool
-telemetry::encode_channels(pb_ostream_t* stream, const pb_field_t* field, void* const* arg) noexcept
-{
-    auto* instance = static_cast<telemetry*>(*arg);
-
-    for (auto [channel_tag, producer_id] : instance->m_subscriptions) {
-        pb::telemetry::channel_s channel = {0};
-        channel.source = producer_id;
-        channel.which_payload = channel_tag;
-        instance->m_channels[channel_tag][producer_id]->produce(channel.payload);
-
-        if (!pb_encode_tag_for_field(stream, field))
-            return false;
-        if (!pb_encode_submessage(stream, MP_PB_TELEMETRY_CHANNEL_FIELDS, &channel))
-            return false;
-    }
-    return true;
 }
 
 void
@@ -106,11 +67,52 @@ telemetry::run() noexcept
             // and to avoid data races since telemetry and tx are different threads.
             telemetry_msg.timestamp_ms = get_time_since_start().value();
             telemetry_msg.channels.arg = this;
-            telemetry_msg.channels.funcs.encode = &telemetry::encode_channels;
+            telemetry_msg.channels.funcs.encode = &telemetry::encode_telemetry;
         });
 
         sleep_periodic(TELEMETRY_PERIOD);
     }
+}
+
+bool
+telemetry::encode_telemetry(pb_ostream_t* stream, const pb_field_t* field, void* const* arg) noexcept
+{
+    const auto* telemetry_obj = static_cast<telemetry*>(*arg);
+
+    for (auto [channel_tag, producer_id] : telemetry_obj->m_subscriptions) {
+        pb::telemetry::channel_s channel = {0};
+        channel.source_id = producer_id;
+        channel.which_payload = channel_tag;
+        telemetry_obj->m_producers.at(channel_tag)[producer_id]->produce(channel.payload);
+
+        if (!pb_encode_tag_for_field(stream, field))
+            return false;
+        if (!pb_encode_submessage(stream, MP_PB_TELEMETRY_CHANNEL_FIELDS, &channel))
+            return false;
+    }
+    return true;
+}
+
+bool
+telemetry::encode_broadcast(pb_ostream_t* stream, const pb_field_t* field, void* const* arg) noexcept
+{
+    const auto* telemetry_obj = static_cast<telemetry*>(*arg);
+
+    for (const auto& [channel_tag, producers] : telemetry_obj->m_producers) {
+        for (size_t producer_id = 0; producer_id < producers.size(); producer_id++) {
+            pb::telemetry::channel_s channel = {0};
+            channel.source_id = producer_id;
+            channel.which_payload = channel_tag;
+            producers[producer_id]->broadcast(channel.payload);
+            // TODO: encode name from the producer
+
+            if (!pb_encode_tag_for_field(stream, field))
+                return false;
+            if (!pb_encode_submessage(stream, MP_PB_TELEMETRY_CHANNEL_FIELDS, &channel))
+                return false;
+        }
+    }
+    return true;
 }
 
 }

@@ -1,40 +1,26 @@
 #include "sensors/accelerometer.hpp"
-#include "common/config.hpp"
+#include "common/pb.hpp"
 
 namespace mp {
 
-accelerometer_reader::accelerometer_reader(const accelerometer_config_s& config) :
-    sensor_reader(
-        config.device,
-        config.mutex,
-        ACCELEROMETER_READER_PRIORITY,
-        ACCELEROMETER_READER_PERIOD
-    ),
-    m_transform(config.transform)
-{}
+accelerometer_processor::accelerometer_processor(accelerometer& accelerometer) :
+    sensor_processor(accelerometer, ACCELEROMETER_PROCESSOR_PRIORITY)
+{
+    m_bias.fill(emblib::units::meters_per_second_squared<float>(0));
+}
 
 bool
-accelerometer_reader::init(sensor_t& sensor) noexcept
+accelerometer_processor::produce(payload_u& payload) const noexcept
 {
-    // TODO: Get bias from the saved settings or if not available
-    // warn the user and and ask to read multiple samples to calculate bias
-    m_bias.fill(accelerometer_units(0));
+    PB_SET(payload.accelerometer, acceleration, read().first.cast<float>());
+    PB_SET(payload.accelerometer, raw_acceleration, read_raw().first.cast<float>());
     return true;
 }
 
-vector<accelerometer_units, 3>
-accelerometer_reader::process(const sensor_t::data_t& raw_data) noexcept
+accelerometer_data_type
+accelerometer_processor::process(const accelerometer_data_type& raw_data) noexcept
 {
-    // TODO: Update emblib so that casts don'd do lazy eval
-    vector<accelerometer_units, 3> raw_vec {
-        accelerometer_units(raw_data[0]),
-        accelerometer_units(raw_data[1]),
-        accelerometer_units(raw_data[2])
-    };
-    vector<accelerometer_units, 3> aligned_vec = m_transform.matmul(raw_vec);
-    
-    // TODO: Add (optional) low-pass filtering
-    return aligned_vec - m_bias;
+    return raw_data - m_bias;
 }
 
 }

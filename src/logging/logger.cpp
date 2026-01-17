@@ -1,5 +1,6 @@
-#include "logger.hpp"
+#include "logging/logger.hpp"
 #include "common/chrono.hpp"
+#include "common/pb.hpp"
 #include <emblib/rtos/scheduler.hpp>
 
 namespace mp {
@@ -20,7 +21,7 @@ void logger::add_sink(log_sink& sink) noexcept
     m_sinks.push_back(&sink);
 }
 
-static void write_to_sinks(const log_s& log, const etl::ilist<log_sink*>& sinks)
+static void write_to_sinks(const log_entry_s& log, const etl::ilist<log_sink*>& sinks)
 {
     log_level_e log_level = static_cast<log_level_e>(log.level);
 
@@ -31,11 +32,11 @@ static void write_to_sinks(const log_s& log, const etl::ilist<log_sink*>& sinks)
     }
 }
 
-void logger::flush(log_level_e level, log_s* log) noexcept
+void logger::flush(log_level_e level, log_entry_s* log) noexcept
 {
-    log->level = decltype(log_s::level)(level);
+    log->level = decltype(log_entry_s::level)(level);
     log->timestamp_ms = get_time_since_start().value();
-    log->format.funcs.encode = &encode_string;
+    log->format.funcs.encode = &pb_encode_string;
     
     if (emblib::rtos::is_scheduler_running()) {
         m_queue.send(log, milliseconds_t(-1));
@@ -52,7 +53,7 @@ void logger::flush(log_level_e level, log_s* log) noexcept
 void logger::run() noexcept
 {
     while (true) {
-        log_s* log;
+        log_entry_s* log;
         m_queue.receive(log, milliseconds_t(-1));
 
         log->message_id = m_message_count++;

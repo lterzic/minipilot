@@ -1,35 +1,24 @@
 #include "sensors/gyroscope.hpp"
-#include "common/config.hpp"
+#include "common/pb.hpp"
 
 namespace mp {
 
-gyroscope_reader::gyroscope_reader(const gyroscope_config_s& config) :
-    sensor_reader(
-        config.device,
-        config.mutex,
-        GYROSCOPE_READER_PRIORITY,
-        GYROSCOPE_READER_PERIOD
-    ),
-    m_transform(config.transform)
+gyroscope_processor::gyroscope_processor(gyroscope& gyroscope) :
+    sensor_processor(gyroscope, GYROSCOPE_PROCESSOR_PRIORITY)
 {}
 
 bool
-gyroscope_reader::init(sensor_t& sensor) noexcept
+gyroscope_processor::produce(payload_u& payload) const noexcept
 {
+    PB_SET(payload.gyroscope, angular_velocity, read().first.cast<float>());
+    PB_SET(payload.gyroscope, raw_angular_velocity, read_raw().first.cast<float>());
     return true;
 }
 
-vector<gyroscope_units, 3>
-gyroscope_reader::process(const sensor_t::data_t& raw_data) noexcept
+gyroscope_data_type
+gyroscope_processor::process(const gyroscope_data_type& raw_data) noexcept
 {
-    vector<gyroscope_units, 3> raw_vec {
-        gyroscope_units(raw_data[0]),
-        gyroscope_units(raw_data[1]),
-        gyroscope_units(raw_data[2])
-    };
-    vector<gyroscope_units, 3> aligned_vec = m_transform.matmul(raw_vec);
-    
-    return aligned_vec;
+    return raw_data;
 }
 
 }

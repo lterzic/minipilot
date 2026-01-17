@@ -1,7 +1,7 @@
 #pragma once
 
-#include "state/model.hpp"
-#include "state/state_estimator.hpp"
+#include "ekf_model.hpp"
+#include "estimator.hpp"
 #include <emblib/dsp/kalman.hpp>
 
 namespace mp {
@@ -9,7 +9,7 @@ namespace mp {
 /**
  * Extended kalman filter based state estimator
  */
-class ekf final : public state_estimator {
+class ekf : public estimator {
 public:
     /**
      * Dimension of the state vector used by the kalman filter
@@ -29,12 +29,12 @@ public:
     using state_vec_t = vectorf<KALMAN_DIM>;
 
 public:
-    explicit ekf(const model& model) noexcept;
+    explicit ekf(const ekf_model& model) noexcept;
 
     /**
      * Run an iteration of the algorithm
      */
-    state_s update(float dt, const sensors_s& sensors) noexcept override;
+    state_s update(float dt, const sensor_data_s& sensor_data) noexcept override;
 
 private:
     /**
@@ -52,7 +52,7 @@ private:
 
 private:
     // Model used for prediction
-    const model& m_model;
+    const ekf_model& m_model;
     // Kalman filter
     emblib::dsp::kalman<KALMAN_DIM> m_kalman;
     // Kept separately as it's not computed as part

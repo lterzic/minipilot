@@ -34,7 +34,7 @@ static vector3f get_gyro_drift(const ekf::state_vec_t& state) noexcept
 }
 
 // Initialize the state and underlying task implementation
-ekf::ekf(const model& model) noexcept :
+ekf::ekf(const ekf_model& model) noexcept :
     m_model(model),
     m_kalman({0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0}),
     m_position({0, 0, 0})
@@ -212,16 +212,16 @@ static matrixf<3, ekf::KALMAN_DIM> map_state_to_gyroscope_jacobian(const ekf::st
 }
 
 state_s
-ekf::update(float dt, const sensors_s& sensors) noexcept
+ekf::update(float dt, const sensor_data_s& sensor_data) noexcept
 {
     // Run the prediction step based on the current state
     auto transition = [this, dt](const auto& state) { return state_transition(state, dt); };
     auto jacobian = [this, dt](const auto& state) { return state_transition_jacob(state, dt); };
     m_kalman.predict(transition, jacobian, m_model.get_process_noise());
 
-    if (sensors.accelerometer) {
-        float acc_nd = sensors.accelerometer->second;
-        const vector3f& acc = sensors.accelerometer->first;
+    if (sensor_data.accelerometer) {
+        float acc_nd = sensor_data.accelerometer->second;
+        const vector3f& acc = sensor_data.accelerometer->first;
         const matrix3f cov = matrix3f::diagonal(acc_nd * acc_nd / dt);
         m_kalman.update<3>(
             etl::make_delegate<map_state_to_accelerometer>(),
@@ -231,9 +231,9 @@ ekf::update(float dt, const sensors_s& sensors) noexcept
         );
     }
 
-    if (sensors.gyroscope) {
-        float gyro_nd = sensors.gyroscope->second;
-        const vector3f& ang = sensors.gyroscope->first;
+    if (sensor_data.gyroscope) {
+        float gyro_nd = sensor_data.gyroscope->second;
+        const vector3f& ang = sensor_data.gyroscope->first;
         const matrix3f cov = matrix3f::diagonal(gyro_nd * gyro_nd / dt);
         m_kalman.update<3>(
             etl::make_delegate<map_state_to_gyroscope>(),
@@ -248,14 +248,18 @@ ekf::update(float dt, const sensors_s& sensors) noexcept
     const auto a = get_linear_acceleration(m_kalman.get_state());
     m_position += v * dt + a * (dt * dt / 2.f);
 
-    return {
-        .position = m_position,
-        .velocity = v,
-        .acceleration = a,
-        .rotation = get_rotation(m_kalman.get_state()),
-        .angular_velocity = get_angular_velocity(m_kalman.get_state()),
-        .gyroscope_drift = get_gyro_drift(m_kalman.get_state())
+    state_s result {
+        .kinematics {
+            .position = m_position,
+            .velocity = v,
+            .acceleration = a,
+            .rotation = get_rotation(m_kalman.get_state()),
+            .angular_velocity = get_angular_velocity(m_kalman.get_state())
+        },
+        .gyroscope_drift = get_gyro_drift(m_kalman.get_state()),
+        .grounded = false
     };
+    return std::move(result);
 }
 
 }

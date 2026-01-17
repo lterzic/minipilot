@@ -1,8 +1,8 @@
 #pragma once
 
 #include "common/config.hpp"
-#include "logging/log.hpp"
-#include "logging/log_sink.hpp"
+#include "log_entry.hpp"
+#include "log_sink.hpp"
 #include <emblib/lockfree/allocator.hpp>
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/queue.hpp>
@@ -55,7 +55,7 @@ private:
      * Add additional metadata to the log and output it to
      * the appropriate sinks
      */
-    void flush(log_level_e level, log_s* log) noexcept;
+    void flush(log_level_e level, log_entry_s* log) noexcept;
 
 private:
     // Log message count
@@ -65,8 +65,8 @@ private:
     etl::list<log_sink*, LOGGER_MAX_SINKS> m_sinks;
 
     // Zero-copy queue using lock-free alloc and pointer queues
-    emblib::rtos::queue<log_s*, LOGGER_QUEUE_SIZE> m_queue;
-    emblib::lockfree::allocator<log_s, LOGGER_QUEUE_SIZE> m_alloc;
+    emblib::rtos::queue<log_entry_s*, LOGGER_QUEUE_SIZE> m_queue;
+    emblib::lockfree::allocator<log_entry_s, LOGGER_QUEUE_SIZE> m_alloc;
 };
 
 /**
@@ -81,7 +81,7 @@ inline void logger::log(log_level_e level, const char* fmt, arg_types &&...args)
         return;
     }
 
-    if (log_s* log = m_alloc.alloc()) {
+    if (log_entry_s* log = m_alloc.alloc()) {
         log->format.arg = const_cast<char*>(fmt);
         log->args_count = 0;
         (log_write_arg(*log, args), ...);

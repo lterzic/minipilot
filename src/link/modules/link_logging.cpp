@@ -7,11 +7,11 @@ link_logging::link_logging(link& link, logger& logger) :
     m_tx(link.m_tx)
 {
     logger.add_sink(*this);
-    assert(link.m_rx.set_handler(pb::link::uplink_s::payload_e::LOGGING, *this));
+    assert(link.m_rx.set_handler(*this));
 }
 
 void
-link_logging::write(const log_s& log) noexcept
+link_logging::write(const log_entry_s& log) noexcept
 {
     m_tx.send([&log](tx::tx_message_s& msg) {
         msg.which_payload = pb::link::downlink_s::payload_e::LOGGING;

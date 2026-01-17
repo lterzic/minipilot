@@ -6,8 +6,9 @@ namespace mp {
 
 /**
  * Description of the kinematics of a particular model (vehicle)
+ * used by EKF for predict and update steps
  */
-class model {
+class ekf_model {
 
 public:
     /**

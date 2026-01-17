@@ -1,4 +1,4 @@
-#include "configurator.hpp"
+#include "config/configurator.hpp"
 #include "common/chrono.hpp"
 #include "logging/logging.hpp"
 #include "pb/config/host.nanopb.h"

@@ -32,10 +32,8 @@ inline constexpr task_priority_e    LOGGER_TASK_PRIORITY    = TASK_PRIORITY_LOW;
 inline constexpr size_t             LOGGER_QUEUE_SIZE       = 4;
 inline constexpr size_t             LOGGER_MAX_SINKS        = 4;
 
-inline constexpr task_priority_e    ACCELEROMETER_READER_PRIORITY   = TASK_PRIORITY_VERY_HIGH;
-inline constexpr milliseconds_t     ACCELEROMETER_READER_PERIOD     = milliseconds_t(10);
-inline constexpr task_priority_e    GYROSCOPE_READER_PRIORITY       = TASK_PRIORITY_VERY_HIGH;
-inline constexpr milliseconds_t     GYROSCOPE_READER_PERIOD         = milliseconds_t(10);
+inline constexpr task_priority_e    ACCELEROMETER_PROCESSOR_PRIORITY   = TASK_PRIORITY_VERY_HIGH;
+inline constexpr task_priority_e    GYROSCOPE_PROCESSOR_PRIORITY       = TASK_PRIORITY_VERY_HIGH;
 
 // TODO: Add state estimator priorities here
 

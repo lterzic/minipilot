@@ -19,5 +19,5 @@ endif()
 # Setup bindings if this is not a submodule
 if (PROJECT_IS_TOP_LEVEL)
     add_subdirectory("${PROJECT_SOURCE_DIR}/external/pybind11" "${PROJECT_BINARY_DIR}/external/pybind11")
-    add_subdirectory("mp/binds")
+    # add_subdirectory("mp/binds")
 endif()

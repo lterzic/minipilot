@@ -45,7 +45,6 @@ private:
 
     // Link modules are friends so that rx and tx can be accessed
     // without exposing them with getters or as public
-    friend class link_copter;
     friend class link_logging;
     friend class link_telemetry;
     friend class telemetry;
