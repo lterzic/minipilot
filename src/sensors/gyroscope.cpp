@@ -8,7 +8,7 @@ gyroscope_processor::gyroscope_processor(gyroscope& gyroscope) :
 {}
 
 bool
-gyroscope_processor::produce(payload_u& payload) const noexcept
+gyroscope_processor::produce(payload_u& payload) noexcept
 {
     PB_SET(payload.gyroscope, angular_velocity, read().first.cast<float>());
     PB_SET(payload.gyroscope, raw_angular_velocity, read_raw().first.cast<float>());

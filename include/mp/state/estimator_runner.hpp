@@ -43,7 +43,7 @@ public:
     /**
      * Fill the state data
      */
-    bool produce(payload_u& payload) const noexcept override;
+    bool produce(payload_u& payload) noexcept override;
 
 private:
     /**

@@ -37,7 +37,7 @@ public:
      * according to the payload type
      * @returns `true` if payload valid and should be sent
      */
-    virtual bool produce(payload_u& payload) const noexcept = 0;
+    virtual bool produce(payload_u& payload) noexcept = 0;
 };
 
 }

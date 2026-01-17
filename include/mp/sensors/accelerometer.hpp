@@ -35,7 +35,7 @@ public:
     /**
      * Fill the accelerometer data
      */
-    bool produce(payload_u& payload) const noexcept override;
+    bool produce(payload_u& payload) noexcept override;
 
 private:
     /**

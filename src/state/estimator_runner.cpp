@@ -5,7 +5,7 @@
 namespace mp {
 
 bool
-estimator_runner::produce(payload_u& payload) const noexcept
+estimator_runner::produce(payload_u& payload) noexcept
 {
     emblib::rtos::scoped_lock lock(m_lock);
 

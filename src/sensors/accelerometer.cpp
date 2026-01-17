@@ -10,7 +10,7 @@ accelerometer_processor::accelerometer_processor(accelerometer& accelerometer) :
 }
 
 bool
-accelerometer_processor::produce(payload_u& payload) const noexcept
+accelerometer_processor::produce(payload_u& payload) noexcept
 {
     PB_SET(payload.accelerometer, acceleration, read().first.cast<float>());
     PB_SET(payload.accelerometer, raw_acceleration, read_raw().first.cast<float>());
