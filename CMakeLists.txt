@@ -32,7 +32,6 @@ add_library(minipilot STATIC
 # accessible through mp/ prefix
 target_include_directories(minipilot
 PUBLIC
-    "${PROJECT_SOURCE_DIR}/src"
     "${PROJECT_SOURCE_DIR}/include/mp"
 INTERFACE
     "${PROJECT_SOURCE_DIR}/include"
@@ -59,11 +58,6 @@ PRIVATE
     -Wl,--print-memory-usage
 )
 
-# FreeRTOS configuration
-add_library(freertos_config INTERFACE)
-target_include_directories(freertos_config SYSTEM INTERFACE ${PROJECT_SOURCE_DIR}/src)
-target_compile_definitions(freertos_config INTERFACE projCOVERAGE_TEST=0)
-
 # Set the protoc path for nanopb
 set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/external/minipilot-proto/lib)
 set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
@@ -73,8 +67,6 @@ add_subdirectory("python")
 
 # Dependencies
 add_subdirectory("external/emblib")
-add_subdirectory("external/emblib/drivers/rtos/freertos")
-add_subdirectory("external/emblib/drivers/math/eigen")
 add_subdirectory("external/nanopb-cpp")
 add_subdirectory("external/minipilot-proto")
 
@@ -88,4 +80,10 @@ PUBLIC
     emblib_math_eigen
     emblib_rtos_freertos
     minipilot-proto-nanopb
+)
+
+# FreeRTOS configuration
+target_include_directories(freertos_config
+SYSTEM INTERFACE
+    ${PROJECT_SOURCE_DIR}/src
 )
