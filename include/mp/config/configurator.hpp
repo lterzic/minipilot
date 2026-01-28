@@ -19,6 +19,13 @@ public:
         emblib::io::ostream_base<pb_byte_t>& ohost
     );
 
+    configurator(
+        emblib::io::istream& istorage,
+        emblib::io::ostream& ostorage,
+        emblib::io::istream& ihost,
+        emblib::io::ostream& ohost
+    );
+
     /**
      * Get configuration
      */

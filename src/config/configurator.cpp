@@ -28,6 +28,20 @@ configurator::configurator(
     update_from_host();
 }
 
+configurator::configurator(
+    emblib::io::istream& istorage,
+    emblib::io::ostream& ostorage,
+    emblib::io::istream& ihost,
+    emblib::io::ostream& ohost
+) :
+    configurator(
+        reinterpret_cast<emblib::io::istream_base<pb_byte_t>&>(istorage),
+        reinterpret_cast<emblib::io::ostream_base<pb_byte_t>&>(ostorage),
+        reinterpret_cast<emblib::io::istream_base<pb_byte_t>&>(ihost),
+        reinterpret_cast<emblib::io::ostream_base<pb_byte_t>&>(ohost)
+    )
+{}
+
 bool configurator::load_from_storage() noexcept
 {
     pb_byte_t buffer[MP_PB_CONFIG_CONFIG_SIZE];
