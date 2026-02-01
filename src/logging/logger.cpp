@@ -35,7 +35,8 @@ static void write_to_sinks(const log_entry_s& log, const etl::ilist<log_sink*>& 
 void logger::flush(log_level_e level, log_entry_s* log) noexcept
 {
     log->level = decltype(log_entry_s::level)(level);
-    log->timestamp_ms = get_time_since_start().value();
+    log->has_timestamp = true;
+    log->timestamp = pb_from(get_time_since_start());
     log->format.funcs.encode = &pb_encode_string;
     
     if (emblib::rtos::is_scheduler_running()) {

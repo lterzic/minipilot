@@ -1,5 +1,6 @@
 #include "telemetry/sysmon.hpp"
 #include "common/chrono.hpp"
+#include "common/pb.hpp"
 #include <FreeRTOS.h>
 #include <task.h>
 #include <pb_encode.h>
@@ -20,7 +21,8 @@ sysmon::on_task_switch() noexcept
 
     pb::telemetry::task_switch_in_s task_switch {
         .task_id = static_cast<uint32_t>(uxTaskGetTaskNumber(current_task)),
-        .cycles = get_time_since_start().value()
+        .has_timestamp = true,
+        .timestamp = pb_from(get_time_since_start())
     };
 
     get_instance().m_switch_count++;

@@ -10,8 +10,10 @@ gyroscope_processor::gyroscope_processor(gyroscope& gyroscope) :
 bool
 gyroscope_processor::produce(payload_u& payload) noexcept
 {
-    PB_SET(payload.gyroscope, angular_velocity, read().first.cast<float>());
-    PB_SET(payload.gyroscope, raw_angular_velocity, read_raw().first.cast<float>());
+    payload.gyroscope.has_angular_velocity = true;
+    payload.gyroscope.angular_velocity = pb_from(read().first.cast<float>());
+    payload.gyroscope.has_raw_angular_velocity = true;
+    payload.gyroscope.raw_angular_velocity = pb_from(read_raw().first.cast<float>());
     return true;
 }
 

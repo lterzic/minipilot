@@ -9,15 +9,16 @@ estimator_runner::produce(payload_u& payload) noexcept
 {
     emblib::rtos::scoped_lock lock(m_lock);
 
-    PB_SET(payload.state.kinematics, position, m_state.kinematics.position);
-    PB_SET(payload.state.kinematics, velocity, m_state.kinematics.velocity);
-    PB_SET(payload.state.kinematics, acceleration, m_state.kinematics.acceleration);
-    PB_SET(payload.state.kinematics, rotation, m_state.kinematics.rotation.as_vector());
-    PB_SET(payload.state.kinematics, angular_velocity, m_state.kinematics.angular_velocity);
+    PB_SET_FIELD(payload.state.kinematics, position, m_state.kinematics.position);
+    PB_SET_FIELD(payload.state.kinematics, velocity, m_state.kinematics.velocity);
+    PB_SET_FIELD(payload.state.kinematics, acceleration, m_state.kinematics.acceleration);
+    PB_SET_FIELD(payload.state.kinematics, rotation, m_state.kinematics.rotation);
+    PB_SET_FIELD(payload.state.kinematics, angular_velocity, m_state.kinematics.angular_velocity);
     payload.state.has_kinematics = true;
 
-    PB_SET(payload.state, gyroscope_drift, m_state.gyroscope_drift);
-    payload.state.grounded = m_state.grounded;
+    PB_SET_FIELD(payload.state, gyroscope_drift, m_state.gyroscope_drift);
+    // TODO: Currently no support for grounded
+    payload.state.has_grounded = false;
 
     return true;
 }

@@ -1,44 +1,62 @@
 #pragma once
 
 #include "common/math.hpp"
-#include "pb/common/types.nanopb.h"
-#include <etl/array.h>
-
-#define PB_SET(struct, field, value) pb_set(struct.field, struct.has_ ## field, value)
+#include "common/chrono.hpp"
+#include "pb/common/math.nanopb.h"
+#include "pb/common/chrono.nanopb.h"
 
 namespace mp {
 
-inline void pb_set(pb::vector3f_s& pb_vec, bool& pb_has_field, const vector3f& mp_vec)
+#define PB_SET_FIELD(message, field, value)\
+    message.has_ ## field = true;\
+    message.field = pb_from(value)
+
+inline pb::vector3f_s pb_from(const vector3f& v) noexcept
 {
-    pb_vec.x = mp_vec(0);
-    pb_vec.y = mp_vec(1);
-    pb_vec.z = mp_vec(2);
-    pb_has_field = true;
+    return { v(0), v(1), v(2) };
 }
 
-template <typename unit_type, size_t SIZE>
-inline void pb_set(pb::vector3f_s& pb_vec, bool& pb_has_field, const etl::array<unit_type, SIZE>& array)
+inline vector3f pb_to(const pb::vector3f_s& v) noexcept
 {
-    pb_vec.x = array[0].value();
-    pb_vec.y = array[1].value();
-    pb_vec.z = array[2].value();
-    pb_has_field = true;
+    return { v.x, v.y, v.z };
 }
 
-inline void pb_set(pb::vector4f_s& pb_vec, bool& pb_has_field, const vector4f& mp_vec)
+inline pb::quaternionf_s pb_from(const quaternionf& q) noexcept
 {
-    pb_vec.w = mp_vec(0);
-    pb_vec.x = mp_vec(1);
-    pb_vec.y = mp_vec(2);
-    pb_vec.z = mp_vec(3);
-    pb_has_field = true;
+    auto qv = q.as_vector();
+    return { qv(0), qv(1), qv(2), qv(3) };
 }
 
-inline vector3f pb_vector3f(const pb::vector3f_s& pb_vec)
+inline quaternionf pb_to(const pb::quaternionf_s& q) noexcept
 {
-    return {pb_vec.x, pb_vec.y, pb_vec.z};
+    return { q.w, q.x, q.y, q.z };
+}
+
+inline pb::time_s pb_from(const milliseconds_t& t) noexcept
+{
+    return pb::time_s {
+        .which_units = pb::time_s::units_e::MS,
+        .units = t.value()
+    };
 }
 
 bool pb_encode_string(pb_ostream_t *stream, const pb_field_iter_t *field, void * const *arg);
+
+inline pb_callback_s pb_from(const char* str) noexcept
+{
+    pb_callback_s cb;
+    cb.funcs.encode = &pb_encode_string;
+    cb.arg = const_cast<char*>(str);
+    return cb;
+}
+
+template <size_t N>
+inline pb_callback_s pb_from(const char* (&str)[N]) noexcept
+{
+    pb_callback_s cb;
+    cb.funcs.encode = &pb_encode_string;
+    cb.arg = const_cast<char*>(str);
+    return cb;
+}
 
 }

@@ -1,4 +1,5 @@
 #include "common/config.hpp"
+#include "common/pb.hpp"
 #include "telemetry/telemetry.hpp"
 #include <pb_encode.h>
 
@@ -62,10 +63,12 @@ telemetry::run() noexcept
             telemetry_downlink.which_payload = pb::link::telemetry_downlink_s::payload_e::TELEMETRY;
             pb::telemetry::telemetry_s& telemetry_msg = telemetry_downlink.payload.telemetry;
 
+            telemetry_msg.has_timestamp = true;
+            telemetry_msg.timestamp = pb_from(get_time_since_start());
+
             // TODO: Make the channels pre-allocated so that they would be collected
             // at the time of this function being called instead of time of encoding,
             // and to avoid data races since telemetry and tx are different threads.
-            telemetry_msg.timestamp_ms = get_time_since_start().value();
             telemetry_msg.channels.arg = this;
             telemetry_msg.channels.funcs.encode = &telemetry::encode_telemetry;
         });

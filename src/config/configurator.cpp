@@ -1,5 +1,6 @@
 #include "config/configurator.hpp"
 #include "common/chrono.hpp"
+#include "common/pb.hpp"
 #include "logging/logging.hpp"
 #include "pb/config/host.nanopb.h"
 #include <pb_encode.h>
@@ -71,7 +72,8 @@ void configurator::update_from_host() noexcept
 
     pb_ostream_t request_ostream = pb_ostream_from_buffer(buffer.request, sizeof(buffer.request));
     pb::config::config_host_request_s request {
-        .request_timeout_ms = host_timeout.value(),
+        .has_request_timeout = true,
+        .request_timeout = pb_from(host_timeout),
         .has_current_config = true,
         .current_config = m_config
     };

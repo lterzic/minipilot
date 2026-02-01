@@ -12,8 +12,10 @@ accelerometer_processor::accelerometer_processor(accelerometer& accelerometer) :
 bool
 accelerometer_processor::produce(payload_u& payload) noexcept
 {
-    PB_SET(payload.accelerometer, acceleration, read().first.cast<float>());
-    PB_SET(payload.accelerometer, raw_acceleration, read_raw().first.cast<float>());
+    payload.accelerometer.has_acceleration = true;
+    payload.accelerometer.acceleration = pb_from(read().first.cast<float>());
+    payload.accelerometer.has_raw_acceleration = true;
+    payload.accelerometer.raw_acceleration = pb_from(read_raw().first.cast<float>());
     return true;
 }
 
