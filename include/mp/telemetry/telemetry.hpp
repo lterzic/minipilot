@@ -1,7 +1,8 @@
 #pragma once
 
 #include "common/config.hpp"
-#include "link/link.hpp"
+#include "link/handler.hpp"
+#include "link/tx.hpp"
 #include "producer.hpp"
 #include <emblib/rtos/task.hpp>
 #include <etl/set.h>
@@ -10,7 +11,9 @@
 
 namespace mp {
 
-class telemetry : private emblib::rtos::static_task<1024> {
+class telemetry :
+    public rx_handler<rx_payload_e::TELEMETRY>,
+    private emblib::rtos::static_task<1024> {
     /**
      * Telemetry producer template parameter is not used when
      * calling methods, so we can store all producers with the
@@ -19,7 +22,7 @@ class telemetry : private emblib::rtos::static_task<1024> {
     using telemetry_producer_default = telemetry_producer<telemetry_channel_e::ACCELEROMETER>;
 
 public:
-    explicit telemetry(link& link);
+    explicit telemetry(tx& link);
 
     /**
      * Add a subscriber for a specific channel
@@ -64,6 +67,11 @@ private:
      * @param arg is set to `this`
      */
     static bool encode_broadcast(pb_ostream_t* stream, const pb_field_t*, void* const* arg) noexcept;
+
+    /**
+     * Handle rx messages
+     */
+    void handle(payload_u& payload) noexcept override;
 
 private:
     // Reference to the link transmitter

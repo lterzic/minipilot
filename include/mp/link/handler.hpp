@@ -21,9 +21,9 @@ struct rx_handler {
     using payload_u = pb::link::uplink_s::mp_pb_link_uplink_payload;
 
     /**
-     * Process the received messages
-     * @note It is guaranteed that the payload matches the
-     * register payload tag when calling `rx::set_handler`
+     * Process the received message
+     * @note It is guaranteed that the payload matches the template
+     * `PAYLOAD` type
      */
     virtual void handle(payload_u& payload) noexcept = 0;
 };

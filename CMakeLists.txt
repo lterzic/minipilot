@@ -15,8 +15,6 @@ add_library(minipilot STATIC
     src/link/link.cpp
     src/link/rx.cpp
     src/link/tx.cpp
-    src/link/modules/link_logging.cpp
-    src/link/modules/link_telemetry.cpp
     src/logging/log_entry.cpp
     src/logging/logger.cpp
     src/sensors/accelerometer.cpp

@@ -16,6 +16,16 @@ public:
         emblib::io::ostream& tx_dev
     ) noexcept;
 
+    /**
+     * Get the link receiver
+     */
+    rx& get_rx() noexcept { return m_rx; }
+
+    /**
+     * Get the link sender
+     */
+    tx& get_tx() noexcept { return m_tx; }
+
 private:
     /**
      * When a handshake is established, create the receiver
@@ -42,12 +52,6 @@ private:
     // Receiver and transmitter
     rx m_rx;
     tx m_tx;
-
-    // Link modules are friends so that rx and tx can be accessed
-    // without exposing them with getters or as public
-    friend class link_logging;
-    friend class link_telemetry;
-    friend class telemetry;
 };
 
 }

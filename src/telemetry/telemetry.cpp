@@ -5,9 +5,9 @@
 
 namespace mp {
 
-telemetry::telemetry(link& link) :
+telemetry::telemetry(tx& tx) :
     static_task("telemetry", TELEMETRY_TASK_PRIORITY),
-    m_tx(link.m_tx)
+    m_tx(m_tx)
 {}
 
 bool
@@ -116,6 +116,22 @@ telemetry::encode_broadcast(pb_ostream_t* stream, const pb_field_t* field, void*
         }
     }
     return true;
+}
+
+void
+telemetry::handle(payload_u& payload) noexcept
+{
+    pb::link::telemetry_uplink_s& msg = payload.telemetry;
+    switch (msg.which_payload) {
+    case pb::link::telemetry_uplink_s::payload_e::SUBSCRIBE:
+        add_subscriber(
+            telemetry_channel_e(msg.payload.subscribe.channel),
+            msg.payload.subscribe.source_id
+        );
+        break;
+    default:
+        break;
+    }
 }
 
 }
