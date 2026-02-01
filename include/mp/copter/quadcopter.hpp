@@ -53,8 +53,16 @@ public:
      */
     throttle_s calculate_throttle(const copter_actuation_s& input) const;
 
+    /**
+     * Get quadcopter parameters
+     */
+    const quadcopter_params_s& get_params() const noexcept
+    {
+        return m_params;
+    }
+
 private:
-    quadcopter_params_s m_params;
+    const quadcopter_params_s& m_params;
     quadcopter_actuators_s m_actuators;
 };
 

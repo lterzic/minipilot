@@ -1,7 +1,7 @@
 #pragma once
 
-#include "state/state.hpp"
 #include "pb/control/control.nanopb.h"
+#include "state/state.hpp"
 #include <etl/delegate.h>
 
 namespace mp {
@@ -9,14 +9,15 @@ namespace mp {
 class controller {
 public:
     /**
-     * Combined control type
+     * All available control types used for controlling the vehicle.
      */
     using controls_s = pb::control::controls_s;
 
     /**
-     * Control mode
+     * For each vehicle type there might be one or more control
+     * modes which are used to define target actuation of the vehicle.
      */
-    using control_mode_e = controls_s::controls_e;
+    using control_mode_e = controls_s::mode_e;
 
     /**
      * When a change of control mode happens, this is called to notify
@@ -34,7 +35,6 @@ public:
      * conditions for the new mode are not met.
      * @note This only starts the transition. The transition itself
      * might take some time, for example if changing wing configuration.
-     * It is up to the runner to check the current control mode.
      */
     virtual bool request_transition(const controls_s& controls, const state_s& state) noexcept = 0;
 
@@ -42,12 +42,7 @@ public:
      * Run an iteration of the control algorithm. Type of the controls
      * in the argument should match the current controller mode.
      */
-    virtual void update(float dt, const controls_s& controls, const state_s& state) noexcept = 0;
-
-    /**
-     * Set the transition callback.
-     */
-    void set_transition_callback(transition_callback callback) noexcept;
+    virtual void update(const controls_s& controls, const state_s& state, float dt) noexcept = 0;
 
 protected:
     /**

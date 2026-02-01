@@ -5,25 +5,31 @@
 
 namespace mp {
 
-/**
- * Interface for controlling a `copter`
- */
 class copter_controller : public controller {
 public:
-    explicit copter_controller(copter& copter);
+    copter_controller(copter& copter);
 
     /**
-     * Copter controller can switch between any copter control
-     * mode at any time, but can't use other modes.
+     * Run an iteration of the control algorithm and apply the
+     * received actuation on to the copter.
      */
-    bool request_transition(const controls_s& controls, const state_s& state) noexcept override;
+    void update(
+        const controls_s& controls,
+        const state_s& state,
+        float dt) noexcept override;
 
+private:
     /**
-     * Run an iteration of the control algorithm and send the
-     * output to the copter actuators.
+     * Run an iteration of the control algorithm and return
+     * the actuation to achieve the target control.
      */
-    void update(float dt, const controls_s& controls, const state_s& state) noexcept override;
+    virtual copter_actuation_s update_copter(
+        const controls_s& controls,
+        const state_s& state,
+        float dt) noexcept = 0;
 
+private:
+    copter& m_copter;
 };
 
 }

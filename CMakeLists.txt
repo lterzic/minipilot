@@ -10,6 +10,7 @@ project(minipilot VERSION 1.0)
 add_library(minipilot STATIC
     src/config/configurator.cpp
     src/common/pb.cpp
+    src/controls/copter_controller.cpp
     src/copter/quadcopter.cpp
     src/link/handshake.cpp
     src/link/link.cpp
