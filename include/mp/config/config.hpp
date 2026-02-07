@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pb/config/config.nanopb.h"
+#include <pblink/config/config.nanopb.h>
 
 namespace mp {
 

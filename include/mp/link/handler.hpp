@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pb/link/link.nanopb.h"
+#include <pblink/link/link.nanopb.h>
 
 namespace mp {
 

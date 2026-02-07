@@ -2,7 +2,7 @@
 #include "common/chrono.hpp"
 #include "common/pb.hpp"
 #include "logging/logging.hpp"
-#include "pb/config/host.nanopb.h"
+#include <pblink/config/host.nanopb.h>
 #include <pb_encode.h>
 #include <pb_decode.h>
 

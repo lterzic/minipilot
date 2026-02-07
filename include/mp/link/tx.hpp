@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/config.hpp"
-#include "pb/link/link.nanopb.h"
+#include <pblink/link/link.nanopb.h>
 #include <emblib/io/ostream.hpp>
 #include <emblib/lockfree/allocator.hpp>
 #include <emblib/rtos/queue.hpp>

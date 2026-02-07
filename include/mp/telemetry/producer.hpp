@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pb/telemetry/channel.nanopb.h"
+#include <pblink/telemetry/channel.nanopb.h>
 
 namespace mp {
 

@@ -2,8 +2,8 @@
 
 #include "common/math.hpp"
 #include "common/chrono.hpp"
-#include "pb/common/math.nanopb.h"
-#include "pb/common/chrono.nanopb.h"
+#include <pblink/common/math.nanopb.h>
+#include <pblink/common/chrono.nanopb.h>
 
 namespace mp {
 
