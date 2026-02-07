@@ -21,7 +21,7 @@ void
 rx::run() noexcept
 {
     while (true) {
-        char recv_buf[MP_PB_LINK_UPLINK_SIZE];
+        char recv_buf[PBLINK_LINK_UPLINK_SIZE];
 
         // Read status is negative in case the read operation failed, else
         // it is the size of the received message in bytes
@@ -68,10 +68,10 @@ rx::run() noexcept
             continue;
         }
 
-        pb::link::uplink_s recv_msg = {0};
+        pblink::link::uplink_s recv_msg = {0};
 
         pb_istream_t buf_istream = pb_istream_from_buffer((const pb_byte_t*)recv_buf, read_status);
-        if (pb_decode(&buf_istream, MP_PB_LINK_UPLINK_FIELDS, &recv_msg)) {
+        if (pb_decode(&buf_istream, PBLINK_LINK_UPLINK_FIELDS, &recv_msg)) {
             // TODO (Optional): Add buffering (queue) for parsed messages
             // to decouple handling time from parsing time and call handler elsewhere
 

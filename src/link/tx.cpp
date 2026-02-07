@@ -26,7 +26,7 @@ void tx::run() noexcept
         pb_byte_t send_buf[256];
         pb_ostream_t pb_ostream = pb_ostream_from_buffer(send_buf, sizeof(send_buf));
 
-        if (!pb_encode(&pb_ostream, MP_PB_LINK_DOWNLINK_FIELDS, msg)) {
+        if (!pb_encode(&pb_ostream, PBLINK_LINK_DOWNLINK_FIELDS, msg)) {
             log_error("Failed to encode tx message");
             m_alloc.dealloc(msg);
             continue;

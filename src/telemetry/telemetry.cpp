@@ -33,11 +33,11 @@ void
 telemetry::broadcast() const noexcept
 {
     m_tx.send([this](tx::tx_message_s& msg) {
-        msg.which_payload = pb::link::downlink_s::payload_e::TELEMETRY;
-        pb::link::telemetry_downlink_s& telemetry_downlink = msg.payload.telemetry;
+        msg.which_payload = pblink::link::downlink_s::payload_e::TELEMETRY;
+        pblink::link::telemetry_downlink_s& telemetry_downlink = msg.payload.telemetry;
 
-        telemetry_downlink.which_payload = pb::link::telemetry_downlink_s::payload_e::BROADCAST;
-        pb::telemetry::broadcast_s& broadcast_msg = telemetry_downlink.payload.broadcast;
+        telemetry_downlink.which_payload = pblink::link::telemetry_downlink_s::payload_e::BROADCAST;
+        pblink::telemetry::broadcast_s& broadcast_msg = telemetry_downlink.payload.broadcast;
 
         // Here the constness of the method is ignored, but we know that the
         // encode function does not modify the map.
@@ -57,11 +57,11 @@ telemetry::run() noexcept
 
     while (true) {
         m_tx.send([this](tx::tx_message_s& msg) {
-            msg.which_payload = pb::link::downlink_s::payload_e::TELEMETRY;
-            pb::link::telemetry_downlink_s& telemetry_downlink = msg.payload.telemetry;
+            msg.which_payload = pblink::link::downlink_s::payload_e::TELEMETRY;
+            pblink::link::telemetry_downlink_s& telemetry_downlink = msg.payload.telemetry;
 
-            telemetry_downlink.which_payload = pb::link::telemetry_downlink_s::payload_e::TELEMETRY;
-            pb::telemetry::telemetry_s& telemetry_msg = telemetry_downlink.payload.telemetry;
+            telemetry_downlink.which_payload = pblink::link::telemetry_downlink_s::payload_e::TELEMETRY;
+            pblink::telemetry::telemetry_s& telemetry_msg = telemetry_downlink.payload.telemetry;
 
             telemetry_msg.has_timestamp = true;
             telemetry_msg.timestamp = pb_from(get_time_since_start());
@@ -83,14 +83,14 @@ telemetry::encode_telemetry(pb_ostream_t* stream, const pb_field_t* field, void*
     const auto* telemetry_obj = static_cast<telemetry*>(*arg);
 
     for (auto [channel_tag, producer_id] : telemetry_obj->m_subscriptions) {
-        pb::telemetry::channel_s channel = {0};
+        pblink::telemetry::channel_s channel = {0};
         channel.source_id = producer_id;
         channel.which_payload = channel_tag;
         telemetry_obj->m_producers.at(channel_tag)[producer_id]->produce(channel.payload);
 
         if (!pb_encode_tag_for_field(stream, field))
             return false;
-        if (!pb_encode_submessage(stream, MP_PB_TELEMETRY_CHANNEL_FIELDS, &channel))
+        if (!pb_encode_submessage(stream, PBLINK_TELEMETRY_CHANNEL_FIELDS, &channel))
             return false;
     }
     return true;
@@ -103,7 +103,7 @@ telemetry::encode_broadcast(pb_ostream_t* stream, const pb_field_t* field, void*
 
     for (const auto& [channel_tag, producers] : telemetry_obj->m_producers) {
         for (size_t producer_id = 0; producer_id < producers.size(); producer_id++) {
-            pb::telemetry::channel_s channel = {0};
+            pblink::telemetry::channel_s channel = {0};
             channel.source_id = producer_id;
             channel.which_payload = channel_tag;
             producers[producer_id]->broadcast(channel.payload);
@@ -111,7 +111,7 @@ telemetry::encode_broadcast(pb_ostream_t* stream, const pb_field_t* field, void*
 
             if (!pb_encode_tag_for_field(stream, field))
                 return false;
-            if (!pb_encode_submessage(stream, MP_PB_TELEMETRY_CHANNEL_FIELDS, &channel))
+            if (!pb_encode_submessage(stream, PBLINK_TELEMETRY_CHANNEL_FIELDS, &channel))
                 return false;
         }
     }
@@ -121,9 +121,9 @@ telemetry::encode_broadcast(pb_ostream_t* stream, const pb_field_t* field, void*
 void
 telemetry::handle(payload_u& payload) noexcept
 {
-    pb::link::telemetry_uplink_s& msg = payload.telemetry;
+    pblink::link::telemetry_uplink_s& msg = payload.telemetry;
     switch (msg.which_payload) {
-    case pb::link::telemetry_uplink_s::payload_e::SUBSCRIBE:
+    case pblink::link::telemetry_uplink_s::payload_e::SUBSCRIBE:
         add_subscriber(
             telemetry_channel_e(msg.payload.subscribe.channel),
             msg.payload.subscribe.source_id

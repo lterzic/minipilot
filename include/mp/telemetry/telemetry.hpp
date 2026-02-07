@@ -77,7 +77,7 @@ private:
     // Reference to the link transmitter
     tx& m_tx;
     // Map channel types to a vector of channel sources
-    etl::unordered_map<telemetry_channel_e, etl::vector<telemetry_producer_default*, 1>, pb::telemetry::channel_s::PAYLOAD_COUNT> m_producers;
+    etl::unordered_map<telemetry_channel_e, etl::vector<telemetry_producer_default*, 1>, pblink::telemetry::channel_s::PAYLOAD_COUNT> m_producers;
     // List of (channel tag, channel source id) subscriptions
     etl::set<etl::pair<telemetry_channel_e, size_t>, TELEMETRY_MAX_SUBSCRIPTIONS> m_subscriptions;
 };

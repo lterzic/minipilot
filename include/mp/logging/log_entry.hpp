@@ -8,16 +8,16 @@ namespace mp {
  * Log level enum class wrapper
  */
 enum class log_level_e {
-    DEBUG   = MP_PB_LOGGING_LOG_LEVEL_LOG_LEVEL_DEBUG,
-    INFO    = MP_PB_LOGGING_LOG_LEVEL_LOG_LEVEL_INFO,
-    WARNING = MP_PB_LOGGING_LOG_LEVEL_LOG_LEVEL_WARNING,
-    ERROR   = MP_PB_LOGGING_LOG_LEVEL_LOG_LEVEL_ERROR
+    DEBUG   = PBLINK_LOGGING_LOG_LEVEL_LOG_LEVEL_DEBUG,
+    INFO    = PBLINK_LOGGING_LOG_LEVEL_LOG_LEVEL_INFO,
+    WARNING = PBLINK_LOGGING_LOG_LEVEL_LOG_LEVEL_WARNING,
+    ERROR   = PBLINK_LOGGING_LOG_LEVEL_LOG_LEVEL_ERROR
 };
 
 /**
  * Log entry based on the protobuf definition
  */
-using log_entry_s = pb::logging::log_s;
+using log_entry_s = pblink::logging::log_s;
 
 /**
  * Encode each type of log argument

@@ -58,7 +58,7 @@ private:
 
 private:
     // Size of this map should be equal to number of payload types
-    etl::unordered_map<rx_payload_e, rx_handler_default*, pb::link::uplink_s::PAYLOAD_COUNT> m_handlers;
+    etl::unordered_map<rx_payload_e, rx_handler_default*, pblink::link::uplink_s::PAYLOAD_COUNT> m_handlers;
     // Serial data receive device
     emblib::io::istream& m_rx_dev;
     // Timeout information

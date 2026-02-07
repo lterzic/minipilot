@@ -22,7 +22,7 @@ public:
     /**
      * Message type sent by the transmitter
      */
-    using tx_message_s = pb::link::downlink_s;
+    using tx_message_s = pblink::link::downlink_s;
 
 public:
     /**
