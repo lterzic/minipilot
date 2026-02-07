@@ -1,13 +1,13 @@
 #pragma once
 
-#include "pb/link/link.nanopb.h"
+#include <pblink/link/link.nanopb.h>
 
 namespace mp {
 
 /**
  * Uplink message payload type
  */
-using rx_payload_e = pb::link::uplink_s::payload_e;
+using rx_payload_e = pblink::link::uplink_s::payload_e;
 
 /**
  * Handler for one type of uplink message payload
@@ -18,7 +18,7 @@ struct rx_handler {
     /**
      * Payload union
      */
-    using payload_u = pb::link::uplink_s::mp_pb_link_uplink_payload;
+    using payload_u = pblink::link::uplink_s::pblink_link_uplink_payload;
 
     /**
      * Process the received message

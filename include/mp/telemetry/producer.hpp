@@ -1,13 +1,13 @@
 #pragma once
 
-#include "pb/telemetry/channel.nanopb.h"
+#include <pblink/telemetry/channel.nanopb.h>
 
 namespace mp {
 
 /**
  * Telemetry channel enumeration
  */
-using telemetry_channel_e = pb::telemetry::channel_s::payload_e;
+using telemetry_channel_e = pblink::telemetry::channel_s::payload_e;
 
 /**
  * Producer for one telemetry channel
@@ -18,7 +18,7 @@ public:
     /**
      * Payload union
      */
-    using payload_u = pb::telemetry::channel_s::mp_pb_telemetry_channel_payload;
+    using payload_u = pblink::telemetry::channel_s::pblink_telemetry_channel_payload;
 
     /**
      * Callback to fill broadcast information about this

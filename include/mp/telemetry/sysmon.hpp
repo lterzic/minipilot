@@ -32,7 +32,7 @@ private:
 
 private:
     std::atomic_size_t m_switch_count = 0;
-    emblib::lockfree::spsc_queue<pb::telemetry::task_switch_in_s, 64> m_switches;
+    emblib::lockfree::spsc_queue<pblink::telemetry::task_switch_in_s, 64> m_switches;
 };
 
 }

@@ -2,7 +2,7 @@
 #include "common/chrono.hpp"
 #include "common/pb.hpp"
 #include "logging/logging.hpp"
-#include "pb/config/host.nanopb.h"
+#include <pblink/config/host.nanopb.h>
 #include <pb_encode.h>
 #include <pb_decode.h>
 
@@ -45,7 +45,7 @@ configurator::configurator(
 
 bool configurator::load_from_storage() noexcept
 {
-    pb_byte_t buffer[MP_PB_CONFIG_CONFIG_SIZE];
+    pb_byte_t buffer[PBLINK_CONFIG_CONFIG_SIZE];
     ssize_t status = m_istorage.read(buffer, sizeof(buffer), milliseconds_t(10));
     
     if (status <= 0) {
@@ -54,31 +54,31 @@ bool configurator::load_from_storage() noexcept
     }
 
     pb_istream_t buf_istream = pb_istream_from_buffer(buffer, status);
-    return pb_decode(&buf_istream, MP_PB_CONFIG_CONFIG_FIELDS, &m_config);
+    return pb_decode(&buf_istream, PBLINK_CONFIG_CONFIG_FIELDS, &m_config);
 }
 
 void configurator::update_from_host() noexcept
 {
     // Only one buffer is used at a time
     union buffer_u {
-        pb_byte_t request[MP_PB_CONFIG_CONFIG_HOST_REQUEST_SIZE];
-        pb_byte_t ack[MP_PB_CONFIG_CONFIG_HOST_ACK_SIZE];
-        pb_byte_t update[MP_PB_CONFIG_CONFIG_HOST_UPDATE_SIZE];
-        pb_byte_t save[MP_PB_CONFIG_CONFIG_SIZE];
+        pb_byte_t request[PBLINK_CONFIG_CONFIG_HOST_REQUEST_SIZE];
+        pb_byte_t ack[PBLINK_CONFIG_CONFIG_HOST_ACK_SIZE];
+        pb_byte_t update[PBLINK_CONFIG_CONFIG_HOST_UPDATE_SIZE];
+        pb_byte_t save[PBLINK_CONFIG_CONFIG_SIZE];
     } buffer;
 
     // Request update from host
     constexpr auto host_timeout = milliseconds_t(3000);
 
     pb_ostream_t request_ostream = pb_ostream_from_buffer(buffer.request, sizeof(buffer.request));
-    pb::config::config_host_request_s request {
+    pblink::config::config_host_request_s request {
         .has_request_timeout = true,
         .request_timeout = pb_from(host_timeout),
         .has_current_config = true,
         .current_config = m_config
     };
 
-    if (!pb_encode(&request_ostream, MP_PB_CONFIG_CONFIG_HOST_REQUEST_FIELDS, &request)) {
+    if (!pb_encode(&request_ostream, PBLINK_CONFIG_CONFIG_HOST_REQUEST_FIELDS, &request)) {
         log_error("Failed to encode request");
         return;
     }
@@ -90,7 +90,7 @@ void configurator::update_from_host() noexcept
     }
 
     // Host has responeded
-    pb::config::config_host_update_s update;
+    pblink::config::config_host_update_s update;
     while (true) {
         if (!m_ihost.read(buffer.update, sizeof(buffer.update), milliseconds_t(-1))) {
             log_error("Host read update failed");
@@ -98,7 +98,7 @@ void configurator::update_from_host() noexcept
         }
         
         pb_istream_t update_istream = pb_istream_from_buffer(buffer.update, sizeof(buffer.update));
-        if (!pb_decode(&update_istream, MP_PB_CONFIG_CONFIG_HOST_UPDATE_FIELDS, &update)) {
+        if (!pb_decode(&update_istream, PBLINK_CONFIG_CONFIG_HOST_UPDATE_FIELDS, &update)) {
             log_error("Failed to decode update");
             return;
         }
@@ -113,7 +113,7 @@ void configurator::update_from_host() noexcept
     }
 
     pb_ostream_t save_stream = pb_ostream_from_buffer(buffer.save, sizeof(buffer.save));
-    if (!pb_encode(&save_stream, MP_PB_CONFIG_CONFIG_FIELDS, &update.config)) {
+    if (!pb_encode(&save_stream, PBLINK_CONFIG_CONFIG_FIELDS, &update.config)) {
         log_error("Failed to encode new config");
         return;
     }

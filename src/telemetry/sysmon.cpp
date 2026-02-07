@@ -19,7 +19,7 @@ sysmon::on_task_switch() noexcept
 {
     auto* current_task = xTaskGetCurrentTaskHandle();
 
-    pb::telemetry::task_switch_in_s task_switch {
+    pblink::telemetry::task_switch_in_s task_switch {
         .task_id = static_cast<uint32_t>(uxTaskGetTaskNumber(current_task)),
         .has_timestamp = true,
         .timestamp = pb_from(get_time_since_start())
@@ -43,11 +43,11 @@ sysmon::encode_switches(pb_ostream_t *stream, const pb_field_t *field, void * co
 {
     sysmon& sysmon_instance = *reinterpret_cast<sysmon*>(*arg);
     
-    pb::telemetry::task_switch_in_s task_switch;
+    pblink::telemetry::task_switch_in_s task_switch;
     while (sysmon_instance.m_switches.pop(&task_switch)) {
         if (!pb_encode_tag_for_field(stream, field))
             return false;
-        if (!pb_encode_submessage(stream, MP_PB_TELEMETRY_KERNEL_TASK_SWITCH_IN_FIELDS, &task_switch))
+        if (!pb_encode_submessage(stream, PBLINK_TELEMETRY_KERNEL_TASK_SWITCH_IN_FIELDS, &task_switch))
             return false;
     }
 

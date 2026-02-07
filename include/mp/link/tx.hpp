@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common/config.hpp"
-#include "pb/link/link.nanopb.h"
+#include <pblink/link/link.nanopb.h>
 #include <emblib/io/ostream.hpp>
 #include <emblib/lockfree/allocator.hpp>
 #include <emblib/rtos/queue.hpp>
@@ -22,7 +22,7 @@ public:
     /**
      * Message type sent by the transmitter
      */
-    using tx_message_s = pb::link::downlink_s;
+    using tx_message_s = pblink::link::downlink_s;
 
 public:
     /**
