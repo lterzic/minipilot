@@ -2,10 +2,6 @@
 	path = external/emblib
 	url = https://github.com/lterzic/emblib
 	shallow = true
-[submodule "external/minipilot-proto"]
-	path = external/minipilot-proto
-	url = https://github.com/lterzic/minipilot-proto
-	shallow = true
 [submodule "external/pybind11"]
 	path = external/pybind11
 	url = https://github.com/pybind/pybind11.git
@@ -13,4 +9,8 @@
 [submodule "external/nanopb-cpp"]
 	path = external/nanopb-cpp
 	url = https://github.com/lterzic/nanopb-cpp
+	shallow = true
+[submodule "external/pblink"]
+	path = external/pblink
+	url = https://github.com/lterzic/pblink
 	shallow = true

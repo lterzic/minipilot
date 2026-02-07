@@ -57,7 +57,7 @@ PRIVATE
 )
 
 # Set the protoc path for nanopb
-set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/external/minipilot-proto/lib)
+set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/external/pblink/lib)
 set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
 
 # Python environment setup
@@ -66,7 +66,7 @@ add_subdirectory("python")
 # Dependencies
 add_subdirectory("external/emblib")
 add_subdirectory("external/nanopb-cpp")
-add_subdirectory("external/minipilot-proto")
+add_subdirectory("external/pblink")
 
 # Generate protobuf cpp files from sources
 add_subdirectory("protobuf")
@@ -77,7 +77,7 @@ PUBLIC
     emblib
     emblib_math_eigen
     emblib_rtos_freertos
-    minipilot-proto-nanopb
+    pblink_nanopb
 )
 
 # FreeRTOS configuration
