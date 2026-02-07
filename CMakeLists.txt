@@ -58,7 +58,8 @@ PRIVATE
 
 # Set the protoc path for nanopb
 set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/external/pblink/lib)
-set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
+set(PROTOC ${PROTOC_DIR}/protoc)
+set(nanopb_PROTOC_PATH ${PROTOC})
 
 # Python environment setup
 add_subdirectory("python")
@@ -68,7 +69,7 @@ add_subdirectory("external/emblib")
 add_subdirectory("external/nanopb-cpp")
 add_subdirectory("external/pblink")
 
-# Generate protobuf cpp files from sources
+# Generate protobuf files
 add_subdirectory("protobuf")
 
 # Link dependency libraries to minipilot

@@ -10,14 +10,15 @@ file(REMOVE_RECURSE ${PROTO_GEN_DIR})
 # Find all proto files recursively
 file(GLOB_RECURSE SRC_FILES "${PROTO_SRC_DIR}/*.proto")
 
-# Generate files
-file(MAKE_DIRECTORY ${PROTO_GEN_DIR})
+# Generate nanopb
+set(PROTO_GEN_NANOPB_DIR "${PROTO_GEN_DIR}/nanopb")
+file(MAKE_DIRECTORY ${PROTO_GEN_NANOPB_DIR})
 execute_process(COMMAND
     ${CMAKE_COMMAND} -E env 
     "PATH=${PROTOC_DIR}:$PATH"
     ${Python_EXECUTABLE} ${NANOPB_GEN}
     -I ${PROTO_SRC_DIR}
-    -D ${PROTO_GEN_DIR}
+    -D ${PROTO_GEN_NANOPB_DIR}
     -e ".nanopb"
     -q
     -C
@@ -27,7 +28,18 @@ execute_process(COMMAND
 )
 
 # Create a library with all generated files
-file(GLOB_RECURSE NANOPB_FILES "${PROTO_GEN_DIR}/*.nanopb.c")
+file(GLOB_RECURSE NANOPB_FILES "${PROTO_GEN_NANOPB_DIR}/*.nanopb.c")
 add_library(pblink_nanopb ${NANOPB_FILES})
 target_link_libraries(pblink_nanopb PUBLIC protobuf-nanopb-static)
-target_include_directories(pblink_nanopb PUBLIC ${PROTO_GEN_DIR})
+target_include_directories(pblink_nanopb PUBLIC ${PROTO_GEN_NANOPB_DIR})
+
+# Generate python
+set(PROTO_GEN_PY_DIR "${PROTO_GEN_DIR}/py")
+file(MAKE_DIRECTORY ${PROTO_GEN_PY_DIR})
+execute_process(COMMAND
+    ${PROTOC}
+    -I ${PROTO_SRC_DIR}
+    --python_out=${PROTO_GEN_PY_DIR}
+    --pyi_out=${PROTO_GEN_PY_DIR}
+    ${SRC_FILES}
+)
