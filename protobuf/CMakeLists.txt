@@ -43,3 +43,4 @@ execute_process(COMMAND
     --pyi_out=${PROTO_GEN_PY_DIR}
     ${SRC_FILES}
 )
+add_python_package(pblink ${PROTO_GEN_PY_DIR})

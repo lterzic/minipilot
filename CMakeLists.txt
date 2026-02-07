@@ -68,6 +68,7 @@ add_subdirectory("python")
 add_subdirectory("external/emblib")
 add_subdirectory("external/nanopb-cpp")
 add_subdirectory("external/pblink")
+add_subdirectory("external/pybind11")
 
 # Generate protobuf files
 add_subdirectory("protobuf")
