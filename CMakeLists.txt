@@ -87,3 +87,8 @@ target_include_directories(freertos_config
 SYSTEM INTERFACE
     ${PROJECT_SOURCE_DIR}/src
 )
+
+# Tests
+if(PROJECT_IS_TOP_LEVEL)
+    add_subdirectory("test")
+endif()
