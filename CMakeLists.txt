@@ -58,7 +58,8 @@ PRIVATE
 
 # Set the protoc path for nanopb
 set(PROTOC_DIR ${PROJECT_SOURCE_DIR}/external/pblink/lib)
-set(nanopb_PROTOC_PATH ${PROTOC_DIR}/protoc)
+set(PROTOC ${PROTOC_DIR}/protoc)
+set(nanopb_PROTOC_PATH ${PROTOC})
 
 # Python environment setup
 add_subdirectory("python")
@@ -67,8 +68,9 @@ add_subdirectory("python")
 add_subdirectory("external/emblib")
 add_subdirectory("external/nanopb-cpp")
 add_subdirectory("external/pblink")
+add_subdirectory("external/pybind11")
 
-# Generate protobuf cpp files from sources
+# Generate protobuf files
 add_subdirectory("protobuf")
 
 # Link dependency libraries to minipilot
@@ -85,3 +87,8 @@ target_include_directories(freertos_config
 SYSTEM INTERFACE
     ${PROJECT_SOURCE_DIR}/src
 )
+
+# Tests
+if(PROJECT_IS_TOP_LEVEL)
+    add_subdirectory("test")
+endif()
