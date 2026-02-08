@@ -20,11 +20,7 @@ class Firmware:
             return
         
         try:
-            self.proc = subprocess.Popen(
-                [self.get_exe_path()],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
+            self.proc = subprocess.Popen([self.get_exe_path()])
             print(f"Process started with PID: {self.proc.pid}")
         except Exception as e:
             print(f"Failed to start process: {e}")
