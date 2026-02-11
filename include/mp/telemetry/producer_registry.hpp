@@ -1,0 +1,74 @@
+#pragma once
+
+#include <etl/vector.h>
+#include <etl/unordered_map.h>
+#include <pblink/telemetry/channel.nanopb.h>
+
+namespace mp {
+
+class telemetry_producer_registry {
+    /**
+     * Telemetry channel enumeration.
+     * @note Type definition must match with the one telemetry_producer uses.
+     */
+    using telemetry_channel_e = pblink::telemetry::channel_s::payload_e;
+
+    /**
+     * Forward declaration of a telemetry producer.
+     */
+    template <telemetry_channel_e CHANNEL>
+    class telemetry_producer;
+
+    /**
+     * Telemetry producer template parameter is not used when
+     * calling methods, so we can store all producers with the
+     * same parameter value
+     */
+    using producer_default = telemetry_producer<telemetry_channel_e::ACCELEROMETER>;
+
+    /**
+     * Each channel type might have 0 or more producers, and the
+     * user subscribes to a (channel, source idx) pair to select
+     * the source of the telemetry data.
+     */
+    using producer_map = etl::unordered_map<
+        telemetry_channel_e,
+        etl::vector<producer_default*, 2>,
+        pblink::telemetry::channel_s::PAYLOAD_COUNT
+    >;
+
+public:
+    /**
+     * Get the singleton registry instance.
+     */
+    static telemetry_producer_registry& get_instance() noexcept;
+
+    /**
+     * Add a channel producer
+     */
+    template <telemetry_channel_e CHANNEL>
+    bool add_producer(telemetry_producer<CHANNEL>& producer) noexcept
+    {
+        return add_producer(CHANNEL, reinterpret_cast<producer_default&>(producer));
+    }
+
+    /**
+     * Get telemetry channel to producer vector map.
+     */
+    const auto& get_producers() const noexcept
+    {
+        return m_producers;
+    }
+
+private:
+    /**
+     * Producer template parameter is not used at runtime currently, so
+     * public add_producer calls are forwarded to this
+     */
+    bool add_producer(telemetry_channel_e channel, producer_default& producer) noexcept;
+
+private:
+    producer_map m_producers;
+};
+
+}
