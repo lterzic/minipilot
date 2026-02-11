@@ -6,19 +6,18 @@
 
 namespace mp {
 
+/**
+ * Telemetry channel enumeration.
+ */
+using telemetry_channel_e = pblink::telemetry::channel_s::payload_e;
+
+/**
+ * Forward declaration of a telemetry producer.
+ */
+template <telemetry_channel_e CHANNEL>
+class telemetry_producer;
+
 class telemetry_producer_registry {
-    /**
-     * Telemetry channel enumeration.
-     * @note Type definition must match with the one telemetry_producer uses.
-     */
-    using telemetry_channel_e = pblink::telemetry::channel_s::payload_e;
-
-    /**
-     * Forward declaration of a telemetry producer.
-     */
-    template <telemetry_channel_e CHANNEL>
-    class telemetry_producer;
-
     /**
      * Telemetry producer template parameter is not used when
      * calling methods, so we can store all producers with the

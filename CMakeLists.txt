@@ -25,6 +25,7 @@ add_library(minipilot STATIC
     # src/telemetry/telemetry.cpp
     src/telemetry/producer_registry.cpp
     src/telemetry/sysmon.cpp
+    src/telemetry/sink.cpp
 )
 
 # Library users should only use header files

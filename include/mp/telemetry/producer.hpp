@@ -1,20 +1,23 @@
 #pragma once
 
-#include <pblink/telemetry/channel.nanopb.h>
+#include "producer_registry.hpp"
 
 namespace mp {
 
 /**
- * Telemetry channel enumeration
- */
-using telemetry_channel_e = pblink::telemetry::channel_s::payload_e;
-
-/**
- * Producer for one telemetry channel
+ * Producer for one telemetry channel.
  */
 template <telemetry_channel_e CHANNEL>
 class telemetry_producer {
 public:
+    /**
+     * Register this producer on creation.
+     */
+    telemetry_producer()
+    {
+        telemetry_producer_registry::get_instance().add_producer(*this);
+    }
+
     /**
      * Payload union
      */
