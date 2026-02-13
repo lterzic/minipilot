@@ -39,7 +39,7 @@ INTERFACE
 
 # Minipilot compiler and linker options
 target_compile_options(minipilot
-PRIVATE
+PUBLIC
     -fno-rtti
     -fno-exceptions
     -fdata-sections
@@ -51,7 +51,7 @@ PRIVATE
     # -Wpedantic
 )
 target_link_options(minipilot
-PRIVATE
+PUBLIC
     -flto
     -Wl,-Map=${CMAKE_PROJECT_NAME}.map
     -Wl,--gc-sections

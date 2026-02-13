@@ -31,6 +31,7 @@ public:
      * Create a sink with a specified message creation period.
      */
     explicit telemetry_sink(milliseconds_t period);
+    virtual ~telemetry_sink() = default;
 
     /**
      * Subscribe to a telemetry producer.
@@ -50,7 +51,7 @@ private:
     void run() noexcept override;
 
 private:
-    static constexpr auto MAX_CHANNELS =
+    static inline constexpr auto MAX_CHANNELS =
         sizeof(pblink::telemetry::telemetry_s::channels) /
         sizeof(pblink::telemetry::channel_s);
 

@@ -10,7 +10,7 @@ telemetry_producer_registry::get_instance() noexcept
 }
 
 bool
-telemetry_producer_registry::add_producer(telemetry_channel_e channel, producer_default& producer) noexcept
+telemetry_producer_registry::add_producer(telemetry_channel_e channel, telemetry_producer_base& producer) noexcept
 {
     if (m_producers[channel].full())
         return false;

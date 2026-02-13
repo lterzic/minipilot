@@ -11,20 +11,15 @@ namespace mp {
  */
 using telemetry_channel_e = pblink::telemetry::channel_s::payload_e;
 
-/**
- * Forward declaration of a telemetry producer.
- */
+class telemetry_producer_base;
+
 template <telemetry_channel_e CHANNEL>
 class telemetry_producer;
 
+/**
+ * Global registry of all producers available in the system.
+ */
 class telemetry_producer_registry {
-    /**
-     * Telemetry producer template parameter is not used when
-     * calling methods, so we can store all producers with the
-     * same parameter value
-     */
-    using producer_default = telemetry_producer<telemetry_channel_e::ACCELEROMETER>;
-
     /**
      * Each channel type might have 0 or more producers, and the
      * user subscribes to a (channel, source idx) pair to select
@@ -32,7 +27,7 @@ class telemetry_producer_registry {
      */
     using producer_map = etl::unordered_map<
         telemetry_channel_e,
-        etl::vector<producer_default*, 2>,
+        etl::vector<telemetry_producer_base*, 2>,
         pblink::telemetry::channel_s::PAYLOAD_COUNT
     >;
 
@@ -48,7 +43,7 @@ public:
     template <telemetry_channel_e CHANNEL>
     bool add_producer(telemetry_producer<CHANNEL>& producer) noexcept
     {
-        return add_producer(CHANNEL, reinterpret_cast<producer_default&>(producer));
+        return add_producer(CHANNEL, producer);
     }
 
     /**
@@ -64,7 +59,7 @@ private:
      * Producer template parameter is not used at runtime currently, so
      * public add_producer calls are forwarded to this
      */
-    bool add_producer(telemetry_channel_e channel, producer_default& producer) noexcept;
+    bool add_producer(telemetry_channel_e channel, telemetry_producer_base& producer) noexcept;
 
 private:
     producer_map m_producers;

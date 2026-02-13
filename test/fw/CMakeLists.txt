@@ -9,6 +9,7 @@ PUBLIC
 )
 
 target_link_libraries(mp_test_fw
+PUBLIC
     minipilot
     emblib_io_net
     emblib_io_std

@@ -5,19 +5,12 @@
 namespace mp {
 
 /**
- * Producer for one telemetry channel.
+ * Telemetry producer interface.
+ * @note Users should not derive from this class, but from
+ * template specialized `telemetry_producer`.
  */
-template <telemetry_channel_e CHANNEL>
-class telemetry_producer {
+class telemetry_producer_base {
 public:
-    /**
-     * Register this producer on creation.
-     */
-    telemetry_producer()
-    {
-        telemetry_producer_registry::get_instance().add_producer(*this);
-    }
-
     /**
      * Payload union
      */
@@ -39,8 +32,24 @@ public:
      * Callback which fills the channel with the data
      * according to the payload type
      * @returns `true` if payload valid and should be sent
+     * @todo Change to const
      */
     virtual bool produce(payload_u& payload) noexcept = 0;
+};
+
+/**
+ * Producer of one telemetry channel.
+ */
+template <telemetry_channel_e CHANNEL>
+class telemetry_producer : public telemetry_producer_base {
+public:
+    /**
+     * Register this producer on creation.
+     */
+    telemetry_producer()
+    {
+        telemetry_producer_registry::get_instance().add_producer(*this);
+    }
 };
 
 }
