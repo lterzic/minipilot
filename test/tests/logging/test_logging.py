@@ -1,10 +1,10 @@
-from pblink.link.modules.logging_pb2 import LoggingDownlink
 from pblink.logging.log_pb2 import Log, LogLevel
 import pytest
 import time
 
 def test_logging(firmware, device):
     assert device.receive() is None
+    
     firmware.start()
     time.sleep(1)
     firmware.stop()

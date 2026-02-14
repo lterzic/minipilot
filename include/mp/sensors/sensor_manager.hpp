@@ -2,7 +2,6 @@
 
 #include "sensors/accelerometer.hpp"
 #include "sensors/gyroscope.hpp"
-#include "telemetry/telemetry.hpp"
 #include <etl/optional.h>
 
 namespace mp {
@@ -34,7 +33,7 @@ public:
     /**
      * Initialize the sensor manager with all available sensors on the system
      */
-    explicit sensor_manager(const sensors_s& sensors, telemetry& telemetry);
+    explicit sensor_manager(const sensors_s& sensors);
 
     /**
      * Get the sensor of a specific type
