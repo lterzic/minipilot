@@ -36,6 +36,7 @@ telemetry_sink::run() noexcept
             if (channel_it->second[producer.source_idx]->produce(
                 msg.channels[msg.channels_count].payload
             )) {
+                msg.channels[msg.channels_count].which_payload = producer.channel;
                 msg.channels[msg.channels_count].source_id = producer.source_idx;
                 msg.channels_count++;
             }
