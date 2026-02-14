@@ -22,7 +22,6 @@ add_library(minipilot STATIC
     src/sensors/sensor_manager.cpp
     src/state/ekf.cpp
     src/state/estimator_runner.cpp
-    # src/telemetry/telemetry.cpp
     src/telemetry/producer_registry.cpp
     src/telemetry/sysmon.cpp
     src/telemetry/sink.cpp
