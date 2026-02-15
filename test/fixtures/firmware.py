@@ -15,7 +15,7 @@ class Firmware:
         return root_path + "/" + TEST_EXE_PATH + TEST_EXE_PREFIX + self.test_name
 
     def start(self):
-        if self.proc is not None and self.proc.poll() is None:
+        if self.proc is not None:
             print("A process is already running. Stop it first.")
             return
         
@@ -23,6 +23,7 @@ class Firmware:
             self.proc = subprocess.Popen([self.get_exe_path()])
             print(f"Process started with PID: {self.proc.pid}")
         except Exception as e:
+            self.proc = None
             print(f"Failed to start process: {e}")
 
     def stop(self):
@@ -31,6 +32,8 @@ class Firmware:
             return
         
         if self.proc.poll() is not None:
+            self.proc.wait()
+            self.proc = None
             print("Process has already terminated.")
             return
         
@@ -46,6 +49,7 @@ class Firmware:
                 print("Process killed.")
         except Exception as e:
             print(f"Failed to stop process: {e}")
+        self.proc = None
 
 @pytest.fixture
 def firmware(info):

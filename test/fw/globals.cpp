@@ -1,5 +1,6 @@
-#include <mp/common/chrono.hpp>
 #include <FreeRTOSConfig.h>
+#include <mp/common/chrono.hpp>
+#include <mp/telemetry/sysmon.hpp>
 
 namespace mp {
 
@@ -17,12 +18,7 @@ milliseconds_t get_time_since_start() noexcept
 
 }
 
-/**
- * In case that sysmon is not being used, task switch hook
- * is weak defined as an empty function.
- * @todo Could be totally removed
- */
-__attribute__((weak)) void mp_on_task_switch()
+void mp_on_task_switch()
 {
-    
+    mp::sysmon::get_instance().on_task_switch();
 }

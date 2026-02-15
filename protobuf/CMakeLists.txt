@@ -32,6 +32,7 @@ file(GLOB_RECURSE NANOPB_FILES "${PROTO_GEN_NANOPB_DIR}/*.nanopb.c")
 add_library(pblink_nanopb ${NANOPB_FILES})
 target_link_libraries(pblink_nanopb PUBLIC protobuf-nanopb-static)
 target_include_directories(pblink_nanopb PUBLIC ${PROTO_GEN_NANOPB_DIR})
+target_compile_definitions(protobuf-nanopb-static PRIVATE PB_BUFFER_ONLY)
 
 # Generate python
 set(PROTO_GEN_PY_DIR "${PROTO_GEN_DIR}/py")

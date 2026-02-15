@@ -1,7 +1,7 @@
 #pragma once
 
 #include "producer.hpp"
-#include <emblib/lockfree/spsc_queue.hpp>
+#include <emblib/lockfree/spmc_queue.hpp>
 
 namespace mp {
 
@@ -15,7 +15,7 @@ public:
     /**
      * Task switch handler
      */
-    static void on_task_switch() noexcept;
+    void on_task_switch() noexcept;
     
     /**
      * Kernel produce
@@ -23,7 +23,7 @@ public:
     bool produce(payload_u& payload) noexcept override;
 
 private:
-    sysmon() = default;
+    sysmon();
 
     /**
      * Consume current switch queue entries into task switch telemetry
@@ -31,8 +31,13 @@ private:
     static bool encode_switches(pb_ostream_t *stream, const pb_field_t *field, void * const *arg);
 
 private:
-    std::atomic_size_t m_switch_count = 0;
-    emblib::lockfree::spsc_queue<pblink::telemetry::task_switch_in_s, 64> m_switches;
+    using switch_queue = emblib::lockfree::spmc_queue<pblink::telemetry::task_switch_in_s, 64>;
+    
+    switch_queue m_switch_queue;
+    switch_queue::reader<false> m_main_reader;
+    switch_queue::reader<false> m_temp_reader;
+
+    uint32_t m_prev_task;
 };
 
 }
