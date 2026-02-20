@@ -92,12 +92,13 @@ void configurator::update_from_host() noexcept
     // Host has responeded
     pblink::config::config_host_update_s update;
     while (true) {
-        if (!m_ihost.read(buffer.update, sizeof(buffer.update), milliseconds_t(-1))) {
+        ssize_t read_status = m_ihost.read(buffer.update, sizeof(buffer.update), milliseconds_t(-1));
+        if (read_status <= 0) {
             log_error("Host read update failed");
             return;
         }
         
-        pb_istream_t update_istream = pb_istream_from_buffer(buffer.update, sizeof(buffer.update));
+        pb_istream_t update_istream = pb_istream_from_buffer(buffer.update, read_status);
         if (!pb_decode(&update_istream, PBLINK_CONFIG_CONFIG_HOST_UPDATE_FIELDS, &update)) {
             log_error("Failed to decode update");
             return;
@@ -120,6 +121,8 @@ void configurator::update_from_host() noexcept
 
     if (m_ostorage.write(buffer.save, save_stream.bytes_written, milliseconds_t(100)) < 0) {
         log_error("Failed to save new config");
+    } else {
+        log_info("Saved new config");
     }
 }
 

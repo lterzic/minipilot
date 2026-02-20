@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/config.hpp"
 #include "logging/logging.hpp"
 #include <emblib/rtos/task.hpp>
 #include <emblib/rtos/spinlock.hpp>

@@ -1,18 +1,11 @@
 import subprocess
-import sys
 import pytest
 
 class Firmware:
-    def __init__(self, test_name: str):
-        self.test_name = test_name
+    def __init__(self, binary_path, tmp_path):
+        self.binary_path = binary_path
+        self.tmp_path = tmp_path
         self.proc = None
-
-    def get_exe_path(self):
-        TEST_EXE_PREFIX = "mp_test_"
-        TEST_EXE_PATH = "build/test/"
-        py_path = sys.executable
-        root_path = "/".join(py_path.split("/")[:-4])
-        return root_path + "/" + TEST_EXE_PATH + TEST_EXE_PREFIX + self.test_name
 
     def start(self):
         if self.proc is not None:
@@ -20,7 +13,7 @@ class Firmware:
             return
         
         try:
-            self.proc = subprocess.Popen([self.get_exe_path()])
+            self.proc = subprocess.Popen([self.binary_path], cwd=self.tmp_path)
             print(f"Process started with PID: {self.proc.pid}")
         except Exception as e:
             self.proc = None
@@ -52,5 +45,5 @@ class Firmware:
         self.proc = None
 
 @pytest.fixture
-def firmware(info):
-    return Firmware(info.test_name)
+def firmware(info, tmp_path):
+    return Firmware(info.fw_path, tmp_path)
