@@ -74,6 +74,9 @@ add_subdirectory("external/pybind11")
 # Generate protobuf files
 add_subdirectory("protobuf")
 
+# Add algorithms
+add_subdirectory("algo")
+
 # Link dependency libraries to minipilot
 target_link_libraries(minipilot
 PUBLIC
