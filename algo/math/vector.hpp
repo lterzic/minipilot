@@ -10,6 +10,7 @@ template <typename scalar_type, size_t SIZE>
 using vector = emblib::math::vector<scalar_type, SIZE>;
 
 using vector3f = vector<float, 3>;
+using vector4f = vector<float, 4>;
 
 }
 

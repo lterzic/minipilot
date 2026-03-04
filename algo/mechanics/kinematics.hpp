@@ -19,6 +19,11 @@ struct kinematics_s {
     quaternionf rotation {1, 0, 0, 0};
     // Angular acceleration vector in the local rotating (non-inertial) reference frame
     vector3f angular_velocity {0, 0, 0};
+
+    /**
+     * Advance the state by one timestep using Euler integration.
+     */
+    void update(float dt, const vector3f& lin_acc, const vector3f& ang_acc) noexcept;
 };
 
 }
